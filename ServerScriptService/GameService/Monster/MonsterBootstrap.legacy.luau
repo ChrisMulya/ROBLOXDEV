@@ -1,0 +1,4 @@
+-- Monster spawning is now player-triggered via GreyCubeSpawnButton's
+-- ProximityPrompt (Workspace.GreyCubeSpawnButton), not automatic on server
+-- start. This file is a placeholder for a future encounter director should
+-- one become necessary (wave spawning, multiple spawn points, etc.).
