@@ -59,6 +59,84 @@ Run `graphify update` once per completed unit of work — after a multi-file cha
 before a query that depends on this session's edits, before an architecture review.
 Skip for comments, strings, formatting, test bodies.
 
+# Work Modes
+
+Claude must determine the requested work mode before taking action.
+
+There are four modes:
+
+## Planning
+
+Triggered by words like:
+
+- plan
+- blueprint
+- architecture
+- design
+- proposal
+- roadmap
+- implementation plan
+- audit
+- review
+- scope
+
+Planning mode is READ ONLY.
+
+In Planning mode:
+
+- Never modify files.
+- Never generate code.
+- Never apply edits.
+- Never use write tools.
+- Never enter Auto implementation.
+- Read only the minimum files required.
+- Graphify should be preferred for architecture questions.
+- End after delivering the requested plan.
+
+Planning is complete once the design has been presented.
+
+Stop.
+
+Wait for further instructions.
+
+---
+
+## Implementation
+
+Triggered only when the user explicitly asks to:
+
+- implement
+- code
+- build
+- create
+- modify
+- edit
+- refactor
+- write
+- update
+
+Implementation follows the approved plan.
+
+---
+
+## Bug Fix
+
+Only fix the reported bug.
+
+Do not redesign.
+
+---
+
+## Audit
+
+Read-only.
+
+Review architecture.
+
+Suggest improvements.
+
+Never modify code.
+
 # Reporting
 
 For code-changing tasks, end with this and nothing else:

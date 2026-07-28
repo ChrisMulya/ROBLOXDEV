@@ -1,14 +1,17 @@
--- Thin remote adapter: validates the shooter, resolves cooldown/settings,
--- delegates the actual raycast to PhotoCapture, and reports the outcome
--- (hit or miss) back to the shooter.
+-- Thin remote adapter: validates the shooter and the shot itself, resolves
+-- cooldown/settings, delegates the raycast to PhotoCapture, and routes any
+-- hit through the Reward System. Reports the outcome (hit/miss + reward)
+-- back to the shooter.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 
 local CameraStats = require(ReplicatedStorage.Modules.Camera.CameraStats)
 local Cooldown = require(ReplicatedStorage.Modules.Shared.Cooldown)
-local Units = require(ReplicatedStorage.Modules.Shared.Units)
 local PhotoCapture = require(script.Parent.PhotoCapture)
+local CaptureGuard = require(ServerScriptService.GameService.Reward.CaptureGuard)
+local RewardService = require(ServerScriptService.GameService.Reward.RewardService)
 
 local WeakCameraShot = ReplicatedStorage.Remotes:WaitForChild("WeakCameraShot")
 local StrongCameraShot = ReplicatedStorage.Remotes:WaitForChild("StrongCameraShot")
@@ -36,6 +39,11 @@ local function handleShot(player, shotType, origin, direction)
 		return
 	end
 
+	if not CaptureGuard.ValidateShot(player, origin, direction) then
+		warn(player.Name, "camera shot failed origin/direction validation")
+		return
+	end
+
 	local cameraTool = getEquippedCameraTool(player)
 	if not cameraTool then
 		warn(player.Name, "tried to camera-shoot without holding a camera")
@@ -43,7 +51,10 @@ local function handleShot(player, shotType, origin, direction)
 	end
 
 	local cameraId = CameraStats.GetIdFromTool(cameraTool)
-	local settings = CameraStats.GetShotSettings(cameraId, shotType)
+	-- Server re-derives quality from actual movement state, so a client can't
+	-- just always claim Strong for the bigger payout (see REWARD_SYSTEM.md).
+	local resolvedQuality = CaptureGuard.ResolveShotQuality(player, shotType, cameraId)
+	local settings = CameraStats.GetShotSettings(cameraId, resolvedQuality)
 
 	if not shotCooldown:Check(player.UserId, settings.Cooldown) then
 		return
@@ -56,22 +67,39 @@ local function handleShot(player, shotType, origin, direction)
 
 	local result = PhotoCapture.Fire(origin, direction.Unit, settings.Range, settings.SpreadRadius, raycastParams)
 
-	if result then
-		local distanceMeters = Units.StudsToMeters(result.distanceStuds)
-		print(string.format("%s took a %s shot from %.1fm away", player.Name, string.lower(shotType), distanceMeters))
-
+	if not result then
 		ShotFeedback:FireClient(player, {
-			shotType = shotType,
-			hit = true,
-			distanceMeters = distanceMeters,
-			position = result.hitPosition,
-		})
-	else
-		ShotFeedback:FireClient(player, {
-			shotType = shotType,
+			shotType = resolvedQuality,
 			hit = false,
 		})
+		return
 	end
+
+	local rewardContext = {
+		player = player,
+		subject = result.subject,
+		shotQuality = resolvedQuality,
+		distanceStuds = result.distanceStuds,
+		cameraId = cameraId,
+	}
+
+	-- Always routes through the full resolve/validate/calculate/grant
+	-- pipeline -- the result always carries a resultCode explaining the
+	-- outcome (Awarded, TooFar, WrongShotQuality, OnRepeatCooldown,
+	-- UnknownTarget), amounts only present when Awarded. See RewardService.
+	local rewardResult = RewardService.AwardFromCapture(player, rewardContext)
+
+	ShotFeedback:FireClient(player, {
+		shotType = resolvedQuality,
+		hit = true,
+		position = result.hitPosition,
+		meters = rewardResult.meters,
+		bandLabel = rewardResult.bandLabel,
+		targetType = rewardResult.targetType,
+		resultCode = rewardResult.resultCode,
+		amounts = rewardResult.amounts,
+		rollMultiplier = rewardResult.rollMultiplier,
+	})
 end
 
 WeakCameraShot.OnServerEvent:Connect(function(player, origin, direction)

@@ -1,5 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
 local HideCurrencyUI = ReplicatedStorage.Remotes:WaitForChild("HideCurrencyUI")
+local RewardLedger = require(ServerScriptService.GameService.Reward.RewardLedger)
 
 local RemoveAllSlot = {}
 
@@ -24,6 +27,8 @@ function RemoveAllSlot.ClearPlayerTools(player)
 	if cash then
 		cash.Value = 0
 	end
+
+	RewardLedger.ResetRunScoped(player) -- Score; XP is persistent and untouched
 
 	HideCurrencyUI:FireClient(player)
 end

@@ -25,7 +25,12 @@ end
 -- previous visit to the shelf). Falls back to CameraInventory.DefaultCameraId
 -- for first-time players, or if the recorded CameraId no longer matches a
 -- real template.
-local function giveStarterCamera(player)
+--
+-- Returns whether a REAL camera was granted. The empty-placeholder branch
+-- returns false so GivePlayerStarterKit doesn't claim KitGiven over a broken
+-- kit -- a retry once the asset is fixed replaces the placeholder cleanly,
+-- since Give destroys whatever occupies the slot.
+local function giveStarterCamera(player): boolean
 	local cameraId = CameraInventory.GetCurrentId(player) or CameraInventory.DefaultCameraId
 
 	local ok = CameraInventory.Give(player, cameraId)
@@ -40,16 +45,27 @@ local function giveStarterCamera(player)
 		if backpack then
 			createEmptySlot("Camera").Parent = backpack
 		end
+		return false
 	end
+
+	return true
 end
 
 function StartGameService.GivePlayerStarterKit(player)
 	local backpack = player:FindFirstChild("Backpack")
-	if not backpack then return end
+	if not backpack then
+		warn("StartGameService: no Backpack for", player.Name, "- starter kit not given")
+		return
+	end
 	if player:GetAttribute("KitGiven") then return end
-	player:SetAttribute("KitGiven", true)
 
-	giveStarterCamera(player)
+	-- KitGiven is claimed at the END, not up front. Claiming it first meant a
+	-- failed camera grant left the player permanently marked as kitted with
+	-- nothing, and re-triggering the prompt no-op'd forever.
+	if not giveStarterCamera(player) then
+		warn("StartGameService: starter camera could not be granted to", player.Name, "- kit not marked given, retry is safe")
+		return
+	end
 
 	for _, slotName in ipairs(SLOT_NAMES) do
 		createEmptySlot(slotName).Parent = backpack
@@ -62,6 +78,8 @@ function StartGameService.GivePlayerStarterKit(player)
 	end
 
 	ShowCurrencyUI:FireClient(player)
+
+	player:SetAttribute("KitGiven", true)
 end
 
 return StartGameService

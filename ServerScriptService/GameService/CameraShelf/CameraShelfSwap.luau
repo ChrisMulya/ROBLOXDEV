@@ -21,7 +21,7 @@ function CameraShelfSwap.TakeCamera(player, cameraId)
 		return false, "InCameraSession"
 	end
 
-	local slot, _inCharacter = CameraInventory.FindSlot(player)
+	local slot = CameraInventory.FindSlot(player)
 
 	-- No Camera slot exists yet (e.g. shelf used before StartGame ever ran).
 	-- Nothing to physically swap -- just record the preference so whenever

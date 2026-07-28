@@ -19,7 +19,7 @@ function FloatingShotText.Show(worldPosition, text, color)
 	part.Parent = workspace
 
 	local billboard = Instance.new("BillboardGui")
-	billboard.Size = UDim2.new(0, 200, 0, 50)
+	billboard.Size = UDim2.new(0, 220, 0, 80)
 	billboard.StudsOffset = Vector3.new(0, 0, 0)
 	billboard.AlwaysOnTop = true
 	billboard.Parent = part
@@ -29,9 +29,10 @@ function FloatingShotText.Show(worldPosition, text, color)
 	label.BackgroundTransparency = 1
 	label.Font = Enum.Font.GothamBold
 	label.TextScaled = true
+	label.TextWrapped = true
 	label.TextColor3 = color
 	label.TextStrokeTransparency = 0.5
-	label.Text = text
+	label.Text = text -- may be multi-line, e.g. "POINT BLANK\n4.2m\n+900 XP  +180 Score"
 	label.Parent = billboard
 
 	local endPosition = worldPosition + Vector3.new(0, RISE_DISTANCE, 0)

@@ -1,5 +1,7 @@
 # Photo Scoring Blueprint
 
+> **⚠ SUPERSEDED by [`REWARD_SYSTEM.md`](REWARD_SYSTEM.md).** The band table (100/60/30/10), the `ShotTypeMultiplier`, the single-`Score` design and `PlayerRewards.Award` are all replaced by the XP + Score reward system with a stepped distance curve. Still valid and carried forward: **step 1** (`Shared/Units` + the `distanceStuds` rename), which is **already implemented**; the convert-at-the-boundary units rule; the hit-point measurement bias; and the client-supplied-`origin` exploit. Build against `REWARD_SYSTEM.md`, not this file.
+
 Design/architecture plan for distance-in-meters and the photo points system. No implementation yet — this is the contract the build is written against.
 
 ## The core idea

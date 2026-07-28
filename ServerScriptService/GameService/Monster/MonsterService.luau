@@ -50,12 +50,12 @@ function MonsterService.Spawn(monsterId: string, cframe: CFrame, stage: number?)
 
 	local model = builder(cframe)
 
-	-- CanCapture ties straight into the existing CameraShotHandler -- the
-	-- monster is photographable with zero camera-code changes.
+	-- IsMonster ties straight into CaptureTargets -- the monster is
+	-- photographable (Reward/CaptureTargets.Types.Monster.Attribute) with
+	-- zero camera-code changes.
 	model:SetAttribute("IsMonster", true)
 	model:SetAttribute("MonsterId", monsterId)
 	model:SetAttribute("Stage", stage or 1)
-	model:SetAttribute("CanCapture", true)
 
 	model.Parent = workspace
 

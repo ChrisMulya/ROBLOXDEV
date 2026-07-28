@@ -41,7 +41,7 @@ end
 -- Two exemptions, both required for the camera to be usable on touch devices:
 --   - ScreenGuis carrying a KeepDuringCamera=true attribute (the viewfinder
 --     itself, and CameraTouchHud) -- same attribute-tag convention as
---     IsCameraTool/CanCapture/IsCameraShelf elsewhere in this project.
+--     IsCameraTool/IsMonster/IsCameraShelf elsewhere in this project.
 --   - "TouchGui" by name: Roblox's own touch controls (joystick, jump). It's
 --     engine-owned and gets recreated on control-scheme changes, so it can't
 --     reliably carry our attribute. Hiding it previously also broke camera

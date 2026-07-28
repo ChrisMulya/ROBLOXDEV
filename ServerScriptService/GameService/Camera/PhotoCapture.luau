@@ -2,6 +2,9 @@
 -- is the seam future photo-scoring / MonsterBehavior.OnPhotographed hooks
 -- attach to -- callers get back a result table, not a print statement.
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CaptureTargets = require(ReplicatedStorage.Modules.Reward.CaptureTargets)
+
 local PhotoCapture = {}
 
 local SPREAD_OFFSETS = {-2, -1, 0, 1, 2}
@@ -21,17 +24,6 @@ do
 	end)
 end
 
-local function findCapturableFromHit(hitInstance: Instance?)
-	local current = hitInstance
-	while current and current ~= workspace do
-		if current:GetAttribute("CanCapture") then
-			return current
-		end
-		current = current.Parent
-	end
-	return nil
-end
-
 local function buildBasis(direction: Vector3)
 	local worldUp = Vector3.new(0, 1, 0)
 	if math.abs(direction:Dot(worldUp)) > 0.999 then
@@ -43,8 +35,10 @@ local function buildBasis(direction: Vector3)
 	return right, up
 end
 
--- Returns a result table { subject, hitPosition, distanceStuds } on a hit,
--- or nil on a miss.
+-- Returns a result table { subject, targetType, hitPosition, distanceStuds }
+-- on a hit, or nil on a miss. targetType comes from CaptureTargets.Resolve --
+-- PhotoCapture doesn't know or care what a Monster or Objective IS, only
+-- that the walk found a registered attribute.
 function PhotoCapture.Fire(origin: Vector3, direction: Vector3, range: number, spreadRadius: number, raycastParams: RaycastParams)
 	local right, up = buildBasis(direction)
 
@@ -54,10 +48,11 @@ function PhotoCapture.Fire(origin: Vector3, direction: Vector3, range: number, s
 
 		local result = workspace:Raycast(origin, spreadDirection * range, raycastParams)
 		if result then
-			local capturable = findCapturableFromHit(result.Instance)
+			local capturable, targetType = CaptureTargets.Resolve(result.Instance)
 			if capturable then
 				return {
 					subject = capturable,
+					targetType = targetType,
 					hitPosition = result.Position,
 					distanceStuds = (result.Position - origin).Magnitude,
 				}
