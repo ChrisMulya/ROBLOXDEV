@@ -28,6 +28,9 @@ Remotes.ALL_NAMES = {
 	"OpenShop",
 	"BuyItem",
 	"PurchaseResult",
+	"SpectateRequest",
+	"SpectateResult",
+	"SpectateStateSync",
 }
 
 function Remotes.Get(name: string): RemoteEvent

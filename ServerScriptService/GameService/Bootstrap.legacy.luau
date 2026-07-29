@@ -16,6 +16,13 @@
 -- the other five Scripts in GameService. require() is synchronous and
 -- memoized, so it makes no difference whether this Script or PlayerCurrency
 -- happens to run first.
+--
+-- The role branch below is the exception: LobbyBoot/GameBoot hold an
+-- ORDERED service list (see plans/planning-mode-do-not-rustling-firefly.md,
+-- Service lifecycle convention) because the match rearchitecture has
+-- services that subscribe to each other's Signals at boot, where require
+-- order silently mattering would be a bug with no error message. That's a
+-- convention for new services only -- the two requires below are untouched.
 
 local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -25,3 +32,11 @@ Remotes.Init()
 
 require(ServerScriptService.GameService.Objective.ObjectiveService)
 require(ServerScriptService.GameService.Objective.ObjectiveReplicator)
+
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+
+if ServerRole.Is("LobbyServer") then
+	require(ServerScriptService.GameService.Boot.LobbyBoot).Start()
+elseif ServerRole.Is("GameServer") then
+	require(ServerScriptService.GameService.Boot.GameBoot).Start()
+end
