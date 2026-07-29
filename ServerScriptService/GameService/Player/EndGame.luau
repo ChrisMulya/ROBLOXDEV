@@ -1,8 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local HideCurrencyUI = ReplicatedStorage.Remotes:WaitForChild("HideCurrencyUI")
+local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
+local HideCurrencyUI = Remotes.Get("HideCurrencyUI")
 local RewardLedger = require(ServerScriptService.GameService.Reward.RewardLedger)
+local ObjectiveService = require(ServerScriptService.GameService.Objective.ObjectiveService)
 
 local RemoveAllSlot = {}
 
@@ -29,6 +31,7 @@ function RemoveAllSlot.ClearPlayerTools(player)
 	end
 
 	RewardLedger.ResetRunScoped(player) -- Score; XP is persistent and untouched
+	ObjectiveService.Reset(player) -- ResetPolicy == "OnRunEnd" objectives only; "Never" ones stay Completed
 
 	HideCurrencyUI:FireClient(player)
 end

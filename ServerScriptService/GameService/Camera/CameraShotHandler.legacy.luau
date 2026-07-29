@@ -12,14 +12,21 @@ local Cooldown = require(ReplicatedStorage.Modules.Shared.Cooldown)
 local PhotoCapture = require(script.Parent.PhotoCapture)
 local CaptureGuard = require(ServerScriptService.GameService.Reward.CaptureGuard)
 local RewardService = require(ServerScriptService.GameService.Reward.RewardService)
+local FlashEvents = require(ServerScriptService.GameService.Flash.FlashEvents)
+local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
 
-local WeakCameraShot = ReplicatedStorage.Remotes:WaitForChild("WeakCameraShot")
-local StrongCameraShot = ReplicatedStorage.Remotes:WaitForChild("StrongCameraShot")
-local ShotFeedback = ReplicatedStorage.Remotes:WaitForChild("ShotFeedback")
+local WeakCameraShot = Remotes.Get("WeakCameraShot")
+local StrongCameraShot = Remotes.Get("StrongCameraShot")
+local ShotFeedback = Remotes.Get("ShotFeedback")
 
 -- Window varies per camera + shot type, so Check() is called with an
 -- explicit override each time rather than a fixed window at construction.
 local shotCooldown = Cooldown.new()
+
+-- Separate from shotCooldown, which can't gate the two warns below (they fire
+-- on paths that never reach a settings-derived cooldown window). Bounds log
+-- volume from a client spamming invalid shots -- previously unthrottled.
+local logCooldown = Cooldown.new(2)
 
 -- Server always resolves cameraId from the server-observed equipped tool's
 -- attribute, never a client-declared identity.
@@ -40,13 +47,17 @@ local function handleShot(player, shotType, origin, direction)
 	end
 
 	if not CaptureGuard.ValidateShot(player, origin, direction) then
-		warn(player.Name, "camera shot failed origin/direction validation")
+		if logCooldown:Check(player.UserId) then
+			warn(player.Name, "camera shot failed origin/direction validation")
+		end
 		return
 	end
 
 	local cameraTool = getEquippedCameraTool(player)
 	if not cameraTool then
-		warn(player.Name, "tried to camera-shoot without holding a camera")
+		if logCooldown:Check(player.UserId) then
+			warn(player.Name, "tried to camera-shoot without holding a camera")
+		end
 		return
 	end
 
@@ -66,6 +77,16 @@ local function handleShot(player, shotType, origin, direction)
 	raycastParams.FilterDescendantsInstances = { character }
 
 	local result = PhotoCapture.Fire(origin, direction.Unit, settings.Range, settings.SpreadRadius, raycastParams)
+
+	FlashEvents:Fire({
+		player = player,
+		origin = origin,
+		direction = direction,
+		cameraId = cameraId,
+		shotQuality = resolvedQuality,
+		hitPosition = result and result.hitPosition or nil,
+		timestamp = os.clock(),
+	})
 
 	if not result then
 		ShotFeedback:FireClient(player, {

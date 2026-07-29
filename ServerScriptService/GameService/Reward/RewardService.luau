@@ -5,7 +5,9 @@
 -- only reachable from other server scripts.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
 
+local Signal = require(ReplicatedStorage.Modules.Shared.Signal)
 local CaptureTargets = require(ReplicatedStorage.Modules.Reward.CaptureTargets)
 local CaptureRules = require(ReplicatedStorage.Modules.Reward.CaptureRules)
 local RewardCalculator = require(ReplicatedStorage.Modules.Reward.RewardCalculator)
@@ -14,8 +16,27 @@ local CaptureGuard = require(script.Parent.CaptureGuard)
 
 local RewardService = {}
 
+-- (player: Player, context: table, result: RewardResult) -- fired after a
+-- successful Grant from AwardFromCapture. Generic: this module never learns
+-- what an objective is. ObjectiveService subscribes to mark completion.
+RewardService.Awarded = Signal.new()
+
+-- fn(player, subject, context) -> table? -- merged into the reward context
+-- before CaptureRules.Check runs. A provider that has nothing to add for this
+-- subject returns nil. Order is registration order; providers must be
+-- side-effect-free and non-yielding (AwardFromCapture stays atomic).
+local contextProviders = {}
+
+function RewardService.RegisterContextProvider(fn: (Player, Instance, any) -> any?)
+	table.insert(contextProviders, fn)
+end
+
 local ANOMALY_XP_PER_MINUTE = 20000
 local recentXP = {} -- [userId] = { amount, windowStart }
+
+Players.PlayerRemoving:Connect(function(player)
+	recentXP[player.UserId] = nil
+end)
 
 local function flagIfAnomalous(player: Player, xpAmount: number)
 	if xpAmount <= 0 then return end
@@ -76,6 +97,15 @@ function RewardService.AwardFromCapture(player: Player, context)
 	fullContext.subject = subject
 	fullContext.targetType = typeName
 
+	for _, provider in ipairs(contextProviders) do
+		local extra = provider(player, subject, fullContext)
+		if extra then
+			for key, value in pairs(extra) do
+				fullContext[key] = value
+			end
+		end
+	end
+
 	local rulesOk, ruleCode = CaptureRules.Check(typeDef, fullContext)
 	if not rulesOk then
 		return { resultCode = ruleCode, targetType = typeName, meters = meters, bandLabel = bandLabel, amounts = nil }
@@ -90,6 +120,9 @@ function RewardService.AwardFromCapture(player: Player, context)
 
 	result.resultCode = "Awarded"
 	result.targetType = typeName
+
+	RewardService.Awarded:Fire(player, fullContext, result)
+
 	return result
 end
 

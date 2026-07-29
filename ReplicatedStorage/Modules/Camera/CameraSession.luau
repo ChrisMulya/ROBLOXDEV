@@ -12,12 +12,13 @@ local Trove = require(ReplicatedStorage.Modules.Shared.Trove)
 local CameraState = require(ReplicatedStorage.Modules.Camera.CameraState)
 local CameraEffects = require(ReplicatedStorage.Modules.Camera.CameraEffects)
 local CameraViewfinder = require(ReplicatedStorage.Modules.Camera.CameraViewfinder)
-local CameraFlashEffect = require(ReplicatedStorage.Modules.Camera.CameraFlashEffect)
 local CameraStats = require(ReplicatedStorage.Modules.Camera.CameraStats)
+local FlashSignal = require(ReplicatedStorage.Modules.Flash.FlashSignal)
+local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
 
-local WeakCameraShot = ReplicatedStorage.Remotes:WaitForChild("WeakCameraShot")
-local StrongCameraShot = ReplicatedStorage.Remotes:WaitForChild("StrongCameraShot")
-local CameraSessionChanged = ReplicatedStorage.Remotes:WaitForChild("CameraSessionChanged")
+local WeakCameraShot = Remotes.Get("WeakCameraShot")
+local StrongCameraShot = Remotes.Get("StrongCameraShot")
+local CameraSessionChanged = Remotes.Get("CameraSessionChanged")
 
 local player = Players.LocalPlayer
 
@@ -25,6 +26,7 @@ local CameraSession = {}
 
 local sessionTrove = nil
 local originalCameraMode = nil
+local activeCameraId = nil
 
 local function setToolLocalTransparency(tool, transparency)
 	for _, descendant in ipairs(tool:GetDescendants()) do
@@ -74,6 +76,7 @@ function CameraSession.Enter(tool: Tool)
 	if CameraState.Get() then return end
 
 	local cameraId = CameraStats.GetIdFromTool(tool)
+	activeCameraId = cameraId
 	local effectsSettings = CameraStats.GetEffectsSettings(cameraId)
 	local blurSettings = CameraStats.GetBlurSettings(cameraId)
 	local movementSettings = CameraStats.GetMovementSettings(cameraId)
@@ -167,6 +170,7 @@ function CameraSession.Capture()
 	local camera = workspace.CurrentCamera
 	local origin = camera.CFrame.Position
 	local direction = camera.CFrame.LookVector
+	local shotQuality = stable and "Strong" or "Weak"
 
 	if stable then
 		StrongCameraShot:FireServer(origin, direction)
@@ -174,7 +178,12 @@ function CameraSession.Capture()
 		WeakCameraShot:FireServer(origin, direction)
 	end
 
-	CameraFlashEffect.Play()
+	FlashSignal:Fire({
+		cameraId = activeCameraId,
+		shotQuality = shotQuality,
+		origin = origin,
+		direction = direction,
+	})
 	CameraSession.Exit()
 end
 

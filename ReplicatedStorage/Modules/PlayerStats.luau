@@ -1,18 +1,22 @@
 -- PlayerStats ModuleScript
 -- Place in: ReplicatedStorage.Modules (so both server and client can require it)
 --
--- Central place for every tunable player stat so other systems (movement,
--- combat, UI, etc.) read/write the same numbers instead of hardcoding values
--- scattered across scripts. Add new stats here and everything else can use
--- PlayerStats.Get/Set/Add without needing to know where the number lives.
+-- Shared, read-mostly tuning constants only -- movement/camera numbers and
+-- stat caps. Per-player mutable runtime values (Stamina) live in
+-- PlayerRuntimeStats instead: PlayerStats is required on both server and
+-- client, so a Set/Add here was one value shared by every player on the
+-- server, and nothing stopped an accidental PlayerStats.Set("WalkSpeed", 0).
+-- Get/Set/Add are kept for the constants that do get tuned at runtime (there
+-- are none currently, but see StartGame.luau's use of StartingCash as a
+-- pure read) -- Set/Add still work for any of the fields below.
 
 local PlayerStats = {}
 
 -- Fires (statName: string, newValue: number, oldValue: number) any time Set/Add
--- actually changes a value. Lets HUDs and other systems react instead of polling.
+-- actually changes a value.
 local changedEvent = Instance.new("BindableEvent")
 PlayerStats.Changed = changedEvent.Event
-	
+
 -- ===== Movement =====
 PlayerStats.WalkSpeed   = 16     -- studs/sec, normal top speed
 PlayerStats.SprintSpeed = 25      -- studs/sec, top speed while sprinting
@@ -27,8 +31,10 @@ PlayerStats.MaxCameraTilt = 2     -- degrees, camera roll at full left/right str
 PlayerStats.CameraTiltRate = 3    -- higher = snappier tilt response to strafing
 
 -- ===== Stamina =====
+-- Stamina itself (the mutable, per-player, per-frame value) lives in
+-- PlayerRuntimeStats now -- MaxStamina/DrainRate/RegenRate/MinToSprint are
+-- tuning constants, not runtime state, so they stay here.
 PlayerStats.MaxStamina        = 100
-PlayerStats.Stamina           = 100
 PlayerStats.StaminaDrainRate  = 15   -- per second while sprinting
 PlayerStats.StaminaRegenRate  = 10   -- per second while not sprinting
 PlayerStats.MinStaminaToSprint = 15   -- can't start sprinting below this
@@ -53,8 +59,8 @@ function PlayerStats.Set(statName: string, value: number)
 	changedEvent:Fire(statName, value, oldValue)
 end
 
--- Adds delta to a stat, auto-clamping to [0, MaxX] if a "MaxX" counterpart exists
--- (works for Stamina/MaxStamina automatically).
+-- Adds delta to a stat, auto-clamping to [0, MaxX] if a "MaxX" counterpart exists.
+-- (Stamina itself is no longer one of these -- see PlayerRuntimeStats.Add.)
 function PlayerStats.Add(statName: string, delta: number): number?
 	local current = PlayerStats[statName]
 	if current == nil then

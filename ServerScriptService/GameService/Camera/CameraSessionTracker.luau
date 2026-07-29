@@ -7,7 +7,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local CameraSessionChanged = ReplicatedStorage.Remotes:WaitForChild("CameraSessionChanged")
+local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
+local CameraSessionChanged = Remotes.Get("CameraSessionChanged")
 
 local CameraSessionTracker = {}
 

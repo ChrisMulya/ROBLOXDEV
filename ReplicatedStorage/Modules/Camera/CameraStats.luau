@@ -61,6 +61,15 @@ CameraStats.Stats = {
 			RecLabel = "● REC",
 			SettingsLabel = "AUTO  1/125  f/2.8",
 		},
+		Flash = {
+			Enabled = true,
+			Color = Color3.fromRGB(255, 255, 245),
+			Duration = 0.4,          -- seconds -- shared by both the screen and world-light renderers
+			ScreenIntensity = 1.0,   -- 0-1, peak opacity of the full-screen fade; 0 disables it without removing the renderer
+			LightBrightness = 6,     -- PointLight.Brightness at flash peak
+			LightRange = 40,         -- studs -- doubles as the future monster-detection radius
+			LightAngle = 90,         -- degrees -- reserved for a future SpotLight/viewing-angle check
+		},
 	},
 
 	Camera2 = {
@@ -99,6 +108,15 @@ CameraStats.Stats = {
 			RecLabel = "● REC",
 			SettingsLabel = "4K  1/500  f/1.8",
 		},
+		Flash = {
+			Enabled = true,
+			Color = Color3.fromRGB(255, 255, 255),
+			Duration = 0.3,
+			ScreenIntensity = 0.85,
+			LightBrightness = 8,
+			LightRange = 50,
+			LightAngle = 90,
+		},
 	},
 }
 
@@ -116,8 +134,12 @@ function CameraStats.GetStats(cameraId)
 		return stats
 	end
 
-	if not warnedMissingIds[cameraId] then
-		warnedMissingIds[cameraId] = true
+	-- cameraId can legitimately be nil (e.g. a flash context with no camera
+	-- tool behind it) -- warnedMissingIds[nil] = true would throw "table
+	-- index is nil" instead of falling back, so nil gets its own key.
+	local warnKey = cameraId or "<nil>"
+	if not warnedMissingIds[warnKey] then
+		warnedMissingIds[warnKey] = true
 		warn(("CameraStats: no entry for CameraId '%s' — falling back to %s"):format(tostring(cameraId), DEFAULT_ID))
 	end
 
@@ -150,6 +172,13 @@ end
 
 function CameraStats.GetViewfinderSettings(cameraId)
 	return CameraStats.GetStats(cameraId).Viewfinder
+end
+
+-- Falls back to Default's Flash block if this cameraId's entry predates the
+-- Flash system (unlike the other accessors, which don't nil-guard missing
+-- sections -- this one deliberately does).
+function CameraStats.GetFlashSettings(cameraId)
+	return CameraStats.GetStats(cameraId).Flash or CameraStats.Default.Flash
 end
 
 -- Single source of truth for resolving a camera Tool's identity. Always use

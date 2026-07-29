@@ -27,6 +27,14 @@ CaptureTargets.Types = {
 		Rules = {
 			{ Rule = "RequireShotQuality", Value = "Strong", Code = "WrongShotQuality" },
 			{ Rule = "MaxMeters", Value = 15, Code = "TooFar" }, -- inclusive: exactly 15m awards
+			-- Checked before objectiveState: an instance tagged IsObjective but
+			-- not yet (or no longer) tracked by ObjectiveRegistry used to fall
+			-- through with objectiveState == nil, which reads as "not
+			-- Available" and reports AlreadyCompleted ("Already Photographed")
+			-- for an objective that was never touched. ObjectiveService's
+			-- context provider sets objectiveRegistered explicitly either way.
+			{ Rule = "RequireContextEquals", Field = "objectiveRegistered", Value = true, Code = "ObjectiveUnavailable" },
+			{ Rule = "RequireContextEquals", Field = "objectiveState", Value = "Available", Code = "AlreadyCompleted" },
 		},
 		RepeatPolicy = "Unlimited",
 		Payout = {

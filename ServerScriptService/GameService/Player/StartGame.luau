@@ -1,7 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerStats = require(ReplicatedStorage.Modules.PlayerStats)
 local CameraInventory = require(script.Parent.Parent.CameraShelf.CameraInventory)
-local ShowCurrencyUI = ReplicatedStorage.Remotes:WaitForChild("ShowCurrencyUI")
+local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
+local ShowCurrencyUI = Remotes.Get("ShowCurrencyUI")
 
 local StartGameService = {}
 

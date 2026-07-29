@@ -31,6 +31,14 @@ CaptureRules.Register("MinMeters", function(context, ruleSpec)
 	return Units.StudsToMeters(context.distanceStuds) >= ruleSpec.Value
 end)
 
+-- Generic equality gate against any field a context provider placed on the
+-- context (e.g. RewardService's Objective provider adds context.objectiveState).
+-- This rule knows nothing about objectives; it just compares a field to a
+-- value, which is what lets Feature 4's whole gate be one config row.
+CaptureRules.Register("RequireContextEquals", function(context, ruleSpec)
+	return context[ruleSpec.Field] == ruleSpec.Value
+end)
+
 -- Runs every rule in typeDef.Rules against context in order, stopping at the
 -- first failure. Returns true, nil on success, or false, code on failure.
 -- An empty/absent Rules list (e.g. Monster) always passes.

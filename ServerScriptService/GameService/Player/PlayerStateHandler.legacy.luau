@@ -11,11 +11,19 @@ local function bindDeathHandler(player, character)
 	end)
 end
 
-Players.PlayerAdded:Connect(function(player)
+local function onPlayerAdded(player)
 	if player.Character then
 		bindDeathHandler(player, player.Character)
 	end
 	player.CharacterAdded:Connect(function(character)
 		bindDeathHandler(player, character)
 	end)
-end)
+end
+
+Players.PlayerAdded:Connect(onPlayerAdded)
+
+-- Catches any player who joined before this Connect call executed --
+-- otherwise that player's character never gets a death handler, silently.
+for _, player in ipairs(Players:GetPlayers()) do
+	task.spawn(onPlayerAdded, player)
+end

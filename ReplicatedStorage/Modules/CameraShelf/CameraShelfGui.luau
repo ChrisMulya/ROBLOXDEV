@@ -2,7 +2,8 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CameraStats = require(ReplicatedStorage.Modules.Camera.CameraStats)
-local TakeCameraRequest = ReplicatedStorage.Remotes:WaitForChild("TakeCameraRequest")
+local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
+local TakeCameraRequest = Remotes.Get("TakeCameraRequest")
 
 local CameraShelfGui = {}
 

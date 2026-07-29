@@ -61,7 +61,7 @@ local function ensureBuilt(onOpenPressed: () -> (), onPhotoPressed: () -> ())
 	screenGui.Name = "CameraTouchHud"
 	screenGui.ResetOnSpawn = false
 	screenGui.Enabled = false
-	screenGui.DisplayOrder = 100 -- above the viewfinder (default 0), below CameraFlashEffect (1000)
+	screenGui.DisplayOrder = 100 -- above the viewfinder (default 0), below ScreenFlashRenderer (1000)
 	screenGui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
 	-- Exempts this HUD from CameraSession.hideOtherGuis -- without this the
 	-- Open/Photo buttons would vanish the instant the session they control

@@ -11,6 +11,8 @@ ShotResultCodes.Messages = {
 	WrongShotQuality = "Needs a Strong Shot",
 	OnRepeatCooldown = "Already Photographed",
 	UnknownTarget = "Not Capturable",
+	AlreadyCompleted = "Already Photographed",
+	ObjectiveUnavailable = "Not Available",
 }
 
 -- "Awarded" has no message here -- the client renders the amounts instead.

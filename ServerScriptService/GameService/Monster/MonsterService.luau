@@ -95,6 +95,11 @@ RunService.Heartbeat:Connect(function()
 	local now = os.clock()
 	for model, agent in pairs(liveAgents) do
 		if not model.Parent then
+			-- Reached when a model is unparented without going through
+			-- :Destroy() (which fires Destroying above and cleans up via
+			-- ClearAgent there) -- Destroying does not fire on a bare
+			-- `model.Parent = nil`, so this path needs its own cleanup call.
+			MonsterDamage.ClearAgent(agent)
 			liveAgents[model] = nil
 			continue
 		end

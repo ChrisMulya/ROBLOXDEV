@@ -2,6 +2,8 @@ local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local RewardLedger = require(ServerScriptService.GameService.Reward.RewardLedger)
+-- ObjectiveService/ObjectiveReplicator boot from GameService/Bootstrap.legacy.luau now --
+-- this file no longer doubles as their hidden keystone.
 
 -- Cash stays hand-built here rather than as a RewardType: it's spent (not
 -- earned via the camera), so RewardCalculator/RewardService have no reason
@@ -33,3 +35,10 @@ end
 
 Players.PlayerAdded:Connect(onPlayerAdded)
 Players.PlayerRemoving:Connect(onPlayerRemoving)
+
+-- Catches any player who joined in the window between server start and the
+-- Connect call above (e.g. a require earlier in this script's chain yielded).
+-- Without this, that player permanently gets no leaderstats/Cash.
+for _, player in ipairs(Players:GetPlayers()) do
+	task.spawn(onPlayerAdded, player)
+end

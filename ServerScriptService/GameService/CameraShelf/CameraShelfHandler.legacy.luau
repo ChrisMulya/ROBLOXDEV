@@ -4,14 +4,20 @@ local Players = game:GetService("Players")
 
 local Cooldown = require(ReplicatedStorage.Modules.Shared.Cooldown)
 local CameraShelfSwap = require(script.Parent.CameraShelfSwap)
+local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
 
-local OpenCameraShelf = ReplicatedStorage.Remotes:WaitForChild("OpenCameraShelf")
-local CloseCameraShelf = ReplicatedStorage.Remotes:WaitForChild("CloseCameraShelf")
-local TakeCameraRequest = ReplicatedStorage.Remotes:WaitForChild("TakeCameraRequest")
-local CameraShelfResult = ReplicatedStorage.Remotes:WaitForChild("CameraShelfResult")
+local OpenCameraShelf = Remotes.Get("OpenCameraShelf")
+local CloseCameraShelf = Remotes.Get("CloseCameraShelf")
+local TakeCameraRequest = Remotes.Get("TakeCameraRequest")
+local CameraShelfResult = Remotes.Get("CameraShelfResult")
 
 local MAX_INTERACT_DISTANCE = 12 -- studs; generous margin over the ProximityPrompt's own activation range
 local requestCooldown = Cooldown.new(0.5)
+
+-- Separate from requestCooldown: the "no open shelf" warn below fires before
+-- requestCooldown is ever checked, so a client spamming TakeCameraRequest
+-- with no shelf open could log unbounded. Bounds that independently.
+local logCooldown = Cooldown.new(2)
 
 -- Tracks which shelf part each player currently has open, so a
 -- TakeCameraRequest can be rejected if it didn't come from a legitimately
@@ -35,7 +41,9 @@ end)
 TakeCameraRequest.OnServerEvent:Connect(function(player, cameraId)
 	local shelfPart = shelfOpenFor[player.UserId]
 	if not shelfPart then
-		warn(player.Name, "sent TakeCameraRequest without an open shelf UI")
+		if logCooldown:Check(player.UserId) then
+			warn(player.Name, "sent TakeCameraRequest without an open shelf UI")
+		end
 		return
 	end
 

@@ -57,6 +57,12 @@ function CaptureGuard.ValidateShot(player: Player, origin: Vector3, direction: V
 	if not isFiniteVector(origin) or not isFiniteVector(direction) then
 		return false
 	end
+	-- direction.Unit is (nan, nan, nan) for a zero vector, which isFiniteVector
+	-- already passed (0 < math.huge) -- that NaN then flows into PhotoCapture's
+	-- raycast basis, producing 25 NaN raycasts per shot for free.
+	if direction.Magnitude == 0 then
+		return false
+	end
 	return validateOrigin(player, origin)
 end
 

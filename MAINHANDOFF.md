@@ -1,145 +1,110 @@
-# Roblox Game — Project Handoff
+# MAINHANDOFF — current state
 
-## Philosophy
-Modular, expandable architecture. Config/tunable values live in dedicated ModuleScripts, not scattered in logic. No `--!strict`.
+Agent-facing. Current phase only, no history. Git has the changelog.
+Module behavior lives in the code and `graphify-out/GRAPH_REPORT.md` — not here.
 
-## Confirmed Working Systems
+## Phase
 
-### Player Stats & Movement
-- Centralized `PlayerStats` ModuleScript at `ReplicatedStorage/Modules/`
-  - Require path: `ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PlayerStats")`
-- `LinearVelocity`-based movement, asymmetric smoothing
-- Sprint/stamina system
-- FOV pull on sprint, camera roll tilt
-- Reduced jump height
-- Reactive HUD driven via `BindableEvent`
-- **`Hudcontroller`** (Stamina bar, top-right) lives in `StarterPlayerScripts`, not `StarterGui` — moved deliberately. A LocalScript directly under `StarterGui` is re-copied and re-run on every respawn; this one builds a `ScreenGui` with `ResetOnSpawn = false`, so leaving it in `StarterGui` stacked a duplicate HUD (and duplicate `PlayerStats.Changed` listeners) on every death. `StarterPlayerScripts` scripts run exactly once per player.
-- **`CoreGuiController`** (`StarterPlayerScripts`) disables the default Roblox Health CoreGui (`StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)`), which otherwise renders top-right and overlaps the Stamina bar on damage. Wrapped in a retry `pcall` (can throw before CoreGui finishes initializing) and reapplied on `CharacterAdded` as a cheap idempotent guard, though CoreGui state is client-global and survives respawn on its own.
+Single-server vertical slice, feature-complete enough to play: move → buy camera →
+photograph monsters/objectives → earn XP+Score. XP persists.
 
-### Inventory & Shop
-- Slot-based inventory; empty slots tagged with `IsEmpty` (Boolean attribute) — `IsA("Tool")` alone can't distinguish empty vs filled
-- `StartGame` / `EndGame` lifecycle modules
-  - `EndGame` must reset `KitGiven` player attribute to `false` to allow re-triggering
-- `ShopFillSlot` + `BuyHandler` — server-authoritative purchases
-- Proximity-triggered shop GUI, with movement lock + mouse unlock handling
-  - On close, must restore `Enum.MouseBehavior.Default` (NOT `LockCenter` — persists incorrectly in third-person)
+**Next:** rearchitecting to Lobby Server + reserved Game Server (matchmaking, match state
+machine, player state machine, death/spectate, end-match teleport). Blueprint approved and
+written to `~/.claude/plans/planning-mode-do-not-rustling-firefly.md`. **No code started.**
+That plan is the spec; if it disagrees with disk, disk wins.
 
-### Currency UI
-- Remote-event-driven display (not spawn-based)
-- Known minor issue: connection leak from repeated Show/Hide cycles — **deferred intentionally**, not yet fixed
+## Architecture invariants
 
-### Camera Framework (comprehensive, multi-module)
-Rebuilt for modularity in a later pass — was previously one god-object (`CameraState`) plus a duplicated per-template equip script. Now split by concern, each with exactly one owner. All modules under `ReplicatedStorage/Modules/Camera/` (including `CameraStats`) unless noted.
+Rules that outlive any single file. Violating one is a bug even if it works.
 
-**Client:**
-- **`CameraState`** — pure state cell only: InCamera/Stable flags + listeners (`OnChanged`/`OnStableChanged`, both return a disconnect fn) + walk speed multiplier. Owns zero Instances. `InCamera`/`Stable` are private upvalues, not public fields — mutate only via `SetInCamera`/`SetStable`.
-- **`CameraSession`** — the orchestrator; owns ONE `Trove` per session. `Enter(tool)` acquires the viewfinder, Lighting effects, `CameraMode`, mouse icon, and tool transparency, registering each one's undo in the Trove immediately. `Exit()` is just `trove:Clean()`. `Toggle(tool)` is the shared "scope button" semantics (enter if inactive, exit if active) — both the desktop right-click binding and the mobile Open/Close touch button call this so the two input paths can't drift apart. This is the module to touch when adding a new per-camera effect — one more `sessionTrove:Add(...)` pair, no signature changes elsewhere. Also reports `IsInCamera` to the server via the `CameraSessionChanged` remote (UX guard only, not security).
-- **`CameraEffects`** — Lighting-level `BlurEffect` + `ColorCorrectionEffect` lifecycle and blur math; own internal Trove.
-- **`CameraViewfinder`** — the letterbox/bracket/reticle/scanline/grain/vignette overlay. Built **once** and reused via `Show`/`Hide` (not rebuilt every camera-enter); only the scanline count is regenerated per `Show`, sized from `workspace.CurrentCamera.ViewportSize.Y`. `SetBlurAlpha(alpha)` drives the reticle ghost-ring.
-- **`ViewfinderTheme`** — layout/chrome constants that are NOT per-camera (bar height, bracket size/margins, label font). Per-camera flavor text (`RecLabel`, `SettingsLabel`) lives in `CameraStats.<id>.Viewfinder` instead.
-- **`CameraStability`** — pure `IsMoving(humanoid, rootPart, thresholds)`; thresholds come from `CameraStats.<id>.Stability`.
-- **`CameraToolController`** — input binding only (MouseButton1/2 while equipped), delegates everything to `CameraSession`. `Init(tool)` is idempotent (weak-table guard) and returns a destructor. Also the single source of truth for "which camera tool is currently equipped": `GetEquipped(): Tool?` and `OnEquippedChanged(callback): disconnectFn` (fires `(tool)` on equip, `(nil)` on unequip) — `CameraTouchHud`'s driver reads this instead of running a second equip watcher.
-- **`CameraFlashEffect`** + **`FloatingShotText`** — visual feedback, unchanged.
-- **`CameraClient`** (LocalScript, `StarterPlayerScripts`) — replaces the old `CameraStateWatcher`. One `RenderStepped` loop drives blur + stability, reading root velocity exactly once (previously updated twice per tick — smoothed at ~2x the configured rate). Checks `IsCameraTool` specifically, not "holding any Tool."
-- **`CameraToolWatcher`** (LocalScript, `StarterPlayerScripts`) — binds `CameraToolController` to any Backpack/Character Tool tagged `IsCameraTool`. Replaces the per-template `CameraEquipScript` copy — **adding a camera no longer requires a script, only a `CameraStats` entry + model.**
-- **`CameraTouchHud`** — touch-only camera controls: an "Open"/"Close" scope button (middle-right, above the jump button) and a "Photo" button (middle-left, above the thumbstick, visible only while InCamera). Pure UI — `Init(onOpenPressed, onPhotoPressed)` takes callbacks, same shape as `CameraShelfGui.Build(onClose)`. Gated to touch devices via `UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled`; on desktop (or a hybrid device with a keyboard) `Init`/`Show` are no-ops and no Instances are created. Built once, toggled via `.Enabled`, same persistent-singleton pattern as `CameraViewfinder`.
-- **`CameraTouchHudClient`** (LocalScript, `StarterPlayerScripts`) — wires `CameraTouchHud` to the real systems: `CameraToolController.OnEquippedChanged` → `Show`/`Hide`, `CameraState.OnChanged` → `SetInCamera`, Open button → `CameraSession.Toggle(GetEquipped())`, Photo button → `CameraSession.Capture()`. Kept as its own script rather than folded into `CameraToolWatcher` — that script's job is binding input to tools, not owning UI lifecycle.
+- **Config in data tables, not logic.** `CameraStats`, `MonsterStats`, `RewardTypes`, `CaptureTargets`, `ObjectiveTypes`. Adding a camera/monster/reward/target = one table row, no new script.
+- **Enum as data.** States are rows with flags (`ObjectiveStates`). Never branch on a state *name*; read its flag. Predicates fail closed on unknown states.
+- **Replication split.** Shared state → Instance attribute (auto-replicates). Per-player state → RemoteEvent + snapshot on join/`CharacterAdded`. Attributes cannot express per-player values.
+- **RemoteEvents only.** Zero RemoteFunctions in the repo. Client fires a request; server replies on a separate `*Result`/`*Feedback` remote with a **code string**; a shared `*ResultCodes` module maps code → message.
+- **All remotes registered** in `Remotes.ALL_NAMES`; `Remotes.Init()` provisions them (server, from `Bootstrap.legacy.luau`). Never `WaitForChild` a remote by hand.
+- **Ownership is symmetric.** Whoever acquires a GUI/effect/connection releases it, by reference, via a `Trove` — never by name lookup.
+- **No reward amount ever crosses a remote.** `RewardService` is the only sink.
+- **Server reads attributes off the server-observed instance**, never client-declared identity.
+- **Defaults are for display, never persistence.** If you can't distinguish "no data" from "couldn't read data", do not write.
+- No `--!strict`. No circular dependencies (graph currently reports **zero** import cycles — protect that).
 
-**Server:**
-- **`CameraShotHandler`** — thin remote adapter: validates the shot via `CaptureGuard`, resolves cooldown/settings, delegates the raycast to `PhotoCapture`, and routes any hit through the Reward System (`RewardService.AwardFromCapture`).
-- **`PhotoCapture`** (`ServerScriptService/GameService/Camera/`) — the 5×5 spread raycast + `CaptureTargets.Resolve` for target resolution, returns `{ subject, targetType, hitPosition, distanceStuds }` or `nil`. Offset table is precomputed once at module load, genuinely center-out by radius. Misses fire `ShotFeedback` (client shows a brief "Missed" label). Doesn't know what a Monster or Objective *is* — that's entirely `CaptureTargets`'s business.
-- **`CameraSessionTracker`** — tracks client-reported InCamera state per player (UX guard for the shelf, not anti-cheat).
+## Systems
 
-**Camera Shelf** (`Modules/CameraShelf/` client, `GameService/CameraShelf/` server):
-- **`CameraShelfGui`** — built from small named-element builders (`buildPanel`, `buildCameraRow`, ...). Iterates `CameraStats.GetOrderedIds()` (stable `ShelfOrder`, not `pairs()` — button order used to be random per session). Shows `DisplayName`/`Description`, highlights the currently-held camera, renders messages via `ShelfResultCodes`.
-- **`ShelfResultCodes`** — shared reason-code → display-string table, used by both the client GUI and (implicitly) the server's returned codes.
-- **`CameraInventory`** (server) — single owner of "give player camera X" (template lookup, clone, rename to `"Camera"`, set `CurrentCamera` attribute). `StartGame` and `CameraShelfSwap` both call this instead of duplicating the logic. `FindSlot(player)` returns `(slot, container)` — the Tool and the Instance holding it (Backpack or Character), or `(nil, nil)`. **It returns the container, not an `inCharacter` boolean, deliberately** — see lesson 14.
-- **`CameraShelfSwap`** (server) — policy only: refuses if `CameraSessionTracker.IsInCamera(player)` (don't destroy an equipped active camera), returns `AlreadyHolding` as **success** (informational, not an error), delegates the actual grant to `CameraInventory`.
-- **`CameraShelfHandler`** (server) — identifies the shelf part via an `IsCameraShelf` attribute (not `part.Name == "CameraShelf"`), re-validates the player's distance to the shelf on every `TakeCameraRequest` (previously only checked at prompt-open time — could be exploited by walking away), uses `Shared/Cooldown` instead of a hand-rolled table.
-- `PlayerStats.CurrentCamera` was **removed** — `CurrentCamera` is a per-player fact, not a shared tunable, and now lives only as a `Player` attribute set server-side by `CameraInventory`. Read it client-side via `player:GetAttribute("CurrentCamera")`, never write it from the client.
+| System | Status | Notes |
+|---|---|---|
+| Movement / stamina / FOV / camera tilt | works | `LinearVelocity`, asymmetric smoothing |
+| HUD (stamina) | works | `StarterPlayerScripts`, **not** `StarterGui` — see G1 |
+| Inventory slots + shop | works | server-authoritative buy; empty slots tagged `IsEmpty` |
+| Currency UI | works | remote-driven; leaks connections on Show/Hide (deferred) |
+| Camera framework | works | client session/viewfinder/touch HUD + shelf; one `Trove` per session |
+| Photo capture → reward | works | 5×5 spread raycast → `CaptureTargets.Resolve` → `RewardService` |
+| XP persistence | works | `RewardStore_v1`, verified round trip. Score is run-scoped, Cash is not a RewardType |
+| Monsters | works | spawn/damage; **player-triggered** via a `Workspace` ProximityPrompt, no director |
+| Objectives | works, uncommitted | registry/service/replicator + client visuals |
+| Flash | works, uncommitted | client `FlashSignal` → screen + world-light renderers |
 
-**Shared utilities** (`ReplicatedStorage/Modules/Shared/`) — reusable outside the camera system too:
-- **`Trove`** — `:Add(connection|Instance|function)`, `:Clean()` (reverse order). The fix for the leaked-connections/GUIs-destroyed-by-name-lookup bug class. **Convention: one Trove per "session" or "owner" object; acquire-then-immediately-register the undo, never batch cleanup separately from setup.** This is exactly the pattern that would also fix the deferred `CurrencyUI` Show/Hide connection leak (see below) whenever that gets picked up.
-- **`Cooldown`** — `Cooldown.new(seconds?)`, `:Check(key, secondsOverride?)`, auto-clears on `PlayerRemoving`. Pass `secondsOverride` when the window varies per call (e.g. shot cooldown differs by camera + shot type).
-- **`Remotes`** — `Remotes.Get(name)`, resolves `ReplicatedStorage.Remotes` once instead of repeating `WaitForChild` boilerplate.
+## Half-built / not wired
 
-**GUI attribute:**
-- `KeepDuringCamera` (Boolean, on a `ScreenGui`) — exempts that GUI from `CameraSession.hideOtherGuis`. Set on `CameraViewfinderGui` and `CameraTouchHud`. Roblox's own `TouchGui` (joystick/jump) is exempted separately by name, since it's engine-owned, gets recreated on control-scheme changes, and can't reliably carry a custom attribute — hiding it previously also broke camera look on touch devices, since `CameraModule/CameraInput` reads `TouchGui.TouchControlFrame` and early-outs when `TouchGui` is disabled.
+- **`StartGame` / `EndGame` have no in-code caller.** Both fire only from Studio ProximityPrompts (`Workspace.TestButton.InventorySlot.StartGame.Script`). They are *inventory* functions despite the names — kit grant and kit teardown, not match lifecycle. The match rearchitecture makes them a real caller's job.
+- **`UITheme` / `UIBuilder` adopted by `CurrencyUI` only.** Six divergent "dark grey" values remain across five files. Blocked on palette sign-off. Use them in all new UI.
+- **`RewardModifiers`** — registry exists, zero entries. The Combo/Streak/Event seam, unproven.
+- **`FlashEvents`** (server) — bare Signal, zero subscribers. Reserved for monster perception.
+- **`SoundIds.luau`** — TODO stub.
+- **No encounter director.** `MonsterBootstrap` was deleted, not replaced.
 
-**Camera tool template attributes:**
-- `IsCameraTool` (Boolean)
-- `CameraId` (String) — must exactly match a key in `CameraStats.Stats`
-  - Do NOT use `Tool.Name` for identification — it gets overwritten at purchase/shelf-swap time by the slot name `"Camera"`
+## Known broken / deferred (accepted)
 
-**Target attributes:**
-- Owned by `Reward/CaptureTargets.luau` (`CaptureTargets.Types[name].Attribute`), not hardcoded at each use site. The old bare `CanCapture` boolean is retired.
-- `IsMonster` (Boolean) — capturable monster Model roots, e.g. every `MonsterService.Spawn` output.
-- `IsObjective` (Boolean) — Strong-shot-only, ≤15m, repeatable-with-a-roll capturables. Can be a `Model` or a lone `Part`.
+| Issue | Impact | Why deferred |
+|---|---|---|
+| `RepeatPolicy = "Unlimited"` on both capture targets | Holding aim on one target ≈ 120k XP/min | Anti-farm logic (`CaptureGuard.CheckRepeatPolicy` → `"Cooldown"`) exists and is one table edit from live |
+| No DataStore session locking | Fast rejoin / server hop = last-write-wins clobber | Prefer a proven library over hand-rolling. Destructive outage-zeroing case is already closed |
+| `origin` is client-supplied | Spoofable shot origin | `CaptureGuard.ValidateShot` 10-stud proximity check is a mitigation; server-derived origin is a larger change |
+| `CurrencyUI` Show/Hide connection leak | Slow growth | Fix is a `Trove`, same pattern as `CameraSession` |
+| Death resets `KitGiven` but skips `EndGame.ClearPlayerTools` | Cash/Score/objectives survive death | Unmade design decision, not a bug |
 
-**Security:** Server always reads attributes from the server-observed tool instance, never trusts client-declared identity. Exception: `CameraSessionTracker`'s InCamera flag is client-reported and is a UX guard only — never treat it as a security boundary.
+## Environment & tooling gotchas
 
-### Reward System (`REWARD_SYSTEM.md` — supersedes `PHOTO_SCORING.md`'s scoring numbers)
-Awards XP + Score off shot quality and distance. Camera reports only `{ player, subject, shotQuality, distanceStuds, cameraId }` — everything else is the reward system's business, so future sources (missions, achievements, events) pay out through the same sink with zero calculator changes.
+Non-derivable from code. These will burn a session if forgotten.
 
-**Shared** (`ReplicatedStorage/Modules/Reward/`):
-- **`CurveFactory`** — `LookupCurve(entries, default)` and `SteppedCurve(spec)`, both returning `{ Evaluate(self, input) -> number }`. The one interface every curve implements.
-- **`Curves/DistanceMultiplierCurve`** — meters → multiplier, `SteppedCurve{ StepMeters=15, StartValue=1.0, StepDelta=-0.1, MinValue=0.5 }`. Tier = `floor(meters/15)`, so **the upper bound of each step is exclusive** — exactly 15.0m is tier 1 (×0.9), not ×1.0.
-- **`Curves/XPRewardCurve`** / **`Curves/ScoreRewardCurve`** — shot quality → base amount, `LookupCurve{ Strong=..., Weak=... }`.
-- **`Curves/DistanceBandLabels`** — meters → display label ("POINT BLANK"/"CLOSE"/...), presentation-only, never multiplied into a number. Its own Max thresholds are inclusive, independent of the multiplier curve's tier boundaries (both use 15/30/45/60 but round differently at the seam — intentional, not a bug).
-- **`RewardTypes`** — registry of what a reward type *is* (leaderstat name, `Persistent`, `ResetOnRunEnd`, which base curve). Adding a currency is a row here + one curve module.
-- **`RewardModifiers`** — empty bonus registry (`Register`/`Collect`). The seam for Combo/Streak/Event/Prestige/etc; ships with zero entries.
-- **`RewardCalculator`** — pure `Calculate(context, targetTypeDef?) -> { meters, bandLabel, amounts, breakdown, rollMultiplier? }`. Contains zero reward values itself. Dispatches on `targetTypeDef.Payout.Strategy`: `"Curve"` (original behavior — per-shot-quality base curve × the distance multiplier; `nil`/omitted `targetTypeDef` also takes this path, so every pre-`CaptureTargets` caller is unaffected) or `"FlatRoll"` (a fixed base × ONE random roll, shared across every currency in the same capture — a 0.35 roll on `Base = {XP=1000, Score=500}` is +350/+175, never two independent rolls). `Describe(distanceStuds) -> meters, bandLabel` is the cheap failure-path variant with no payout math, used when a shot didn't qualify for a reward but distance should still display. Uses `math.round`, never `math.floor` — floating-point drift (`0.7000000000000001`) makes flooring silently pay one less than intended at some tiers.
-- **`CaptureTargets`** — the registry of capturable target *kinds*. `Types[name] = { Attribute, Priority, Rules, RepeatPolicy, Payout }`. `Resolve(instance) -> subject, typeName` walks ancestors (checking the instance itself first) for the highest-`Priority` registered attribute — this is the **only** place a capture attribute name is defined; `PhotoCapture` and `MonsterService` both go through it instead of hardcoding a string. Currently `Monster` (`IsMonster`, always awards, distance-curve payout) and `Objective` (`IsObjective`, Strong-only + ≤15m via `CaptureRules`, flat-base × random-roll payout via `RewardCalculator`'s `FlatRoll` strategy). Adding Boss/RareMonster/SecretObject/etc. is one more table entry — see `REWARD_SYSTEM.md`.
-- **`CaptureRules`** — composable validation predicates (`RequireShotQuality`, `MaxMeters` [inclusive], `MinMeters`) a `CaptureTargets` type opts into via its `Rules` list. `Check(typeDef, context) -> ok, code` stops at the first failing rule.
-- **`ShotResultCodes`** — mirrors `CameraShelf/ShelfResultCodes`: reason codes (`TooFar`, `WrongShotQuality`, `OnRepeatCooldown`, `UnknownTarget`) → display strings, so a non-award always explains itself instead of the client rendering a bare hardcoded `"No Reward"`.
+- **G1 — `StarterGui` LocalScripts re-run on every respawn.** They get re-copied per spawn, stacking duplicate GUIs and duplicate listeners. Put persistent UI in `StarterPlayerScripts` with `ResetOnSpawn = false`. `CoreGuiController` also disables the default Health CoreGui (overlaps the stamina bar).
+- **G2 — Local files are live-synced with the open Studio session, both directions.** Never hand-edit a file *and* push the same content via a Studio tool call in one turn — it appends instead of replacing.
+- **G3 — `execute_luau` runs in an isolated `require()` cache** from real Scripts/LocalScripts (plugin identity), on **both** Client and Server datamodels. A module's internal Lua state (tables, closures) populated by a real script is invisible to it — looks exactly like a hung async call, with no error. Verify via shared Instances (properties/attributes/leaderstats) only. *Tell: a real script's background op "never completes" with zero errors → suspect isolation before a hang.*
+- **G4 — Play datamodel clones from Edit at Play-start, and file sync is async.** Editing locally then immediately hitting Play can silently run the **old** code. Confirm the Edit datamodel has the new source before Play. *Tell: `script_grep` finds nothing for something you definitely just wrote.*
+- **G5 — `execute_luau` is misleadingly permissive.** It has plugin capability; real Scripts don't. `Instance:GetDebugId()` passes every `execute_luau` check and errors the instant a real player hits it. **Always do one end-to-end pass firing the real remote from a Client context** before calling a feature done.
+- **G6 — Studio "Play Solo" reports `TouchEnabled` *and* `KeyboardEnabled` true.** Any `TouchEnabled and not KeyboardEnabled` gate (`CameraTouchHud`) stays hidden there. Use **Test → Device** emulation to see touch-only UI.
+- **G7 — Studio API Services off** ⇒ every join lands in `RewardStore` state `Failed`: XP shows 0 and *nothing is written*. Real data stays intact. Not a bug.
+- **G8 — `ServerScriptService` modules are unreachable from clients.** Shared code must live in `ReplicatedStorage`.
+- **G9 — Roblox does not guarantee Script execution order.** `Bootstrap.legacy.luau` is a decoupling point, *not* an ordered bootstrap. Safe today only because nothing subscribes to anything at boot — that stops being true the moment the match rearchitecture lands.
 
-**Server** (`ServerScriptService/GameService/Reward/`):
-- **`RewardService`** — the single sink. `Grant(player, amounts, meta)` is the raw entry point; `AwardFromCapture(player, context)` runs the full pipeline (re-resolve via `CaptureTargets` → `CaptureRules.Check` → `CaptureGuard.CheckRepeatPolicy` → `RewardCalculator.Calculate` → `Grant`) and **always** returns a `resultCode` (`"Awarded"`, `"TooFar"`, `"WrongShotQuality"`, `"OnRepeatCooldown"`, `"UnknownTarget"`) — `amounts` is only present when `resultCode == "Awarded"`. Re-resolves `context.subject` itself rather than trusting a caller-supplied `targetType`, closing the raycast-to-award race where a subject is destroyed/detagged in between. No remote accepts a reward amount — unreachable from the client.
-- **`RewardLedger`** — owns the actual leaderstat numbers. `SetupPlayer`/`TeardownPlayer` are called explicitly by `PlayerCurrency.legacy.luau`'s `PlayerAdded`/`PlayerRemoving` (not self-connected — one obvious place lifecycle wiring happens). `ResetRunScoped(player)` zeroes only types with `ResetOnRunEnd=true` (Score); XP is untouched. `EndGame` calls this instead of touching a currency by name.
-- **`RewardStore`** — DataStore wrapper (`RewardStore_v1`), XP only (Score isn't persistent). `pcall`+retry (3 attempts, exponential backoff), autosave, `BindToClose` saves everyone concurrently. **Tracks a per-player session state (`Loading`/`Ready`/`Failed`) and refuses to save anything but `Ready`** — a failed read is never confused with a new player, so an outage can't zero out stored XP (see lesson 16). With Studio API Services **off**, every join lands in `Failed`: XP displays 0 and *nothing is written*, leaving real saved data intact. With API Services **on** (confirmed working, real round trip verified: earned XP survived a stop/restart Play cycle), a fresh join reaches `Ready` in well under a second. `RewardStore.Backend` is swappable so failure paths can be tested deterministically. **Do not check `RewardStore.IsReady`/internal session state via `execute_luau`** — see lesson 12's addendum; check outcomes on `leaderstats` values instead.
-  - `RewardLedger.SetupPlayer` creates the leaderstat IntValues at 0 **synchronously** (no yield), then loads on a separate thread and **adds** the saved baseline. So XP earned during the load window survives (earn 1000, resolve against a stored 5000 → 6000) and `RewardLedger.Add` never hits a missing value. `PlayerCurrency.onPlayerAdded` depends on `SetupPlayer` not yielding — if that changes, `Cash` would briefly not exist and `StartGame` would silently skip seeding it.
-- **`CaptureGuard`** — capture-specific anti-exploit. `ValidateShot`/`ResolveShotQuality` are called from `CameraShotHandler` before the raycast (origin within 10 studs of the character's Head + NaN/inf rejection; re-derives Strong vs Weak from actual movement via `CameraStability.IsMoving`, downgrades only, never upgrades). `CheckRepeatPolicy(player, subject, typeDef)` is called from `RewardService.AwardFromCapture` and dispatches on the target type's `RepeatPolicy`: `"Unlimited"` always passes; `"Cooldown"` is the original always-on 8s per-`(player, subject)` window (now opt-in per type, not global — **currently unreachable**, since both shipped `CaptureTargets` entries ship `RepeatPolicy = "Unlimited"` by design decision; re-enabling it is a config flip, the logic was kept rather than deleted). An unrecognized policy fails safe by falling back to `"Cooldown"` rather than defaulting open.
+## Reference tables
 
-**Known gap (accepted by design):** unlimited repeat rewards on both `Monster` and `Objective` (`RepeatPolicy = "Unlimited"` on both). Rate is bounded only by the 0.5s per-shot `Cooldown` in `CameraShotHandler` — holding aim on one target is ~120,000 XP/min. The anti-farm mechanism (`CaptureGuard.CheckRepeatPolicy` → `"Cooldown"`) still exists and is one config-table edit away from re-enabling per type.
+**File suffix → Roblox class:** `Foo.luau` = ModuleScript · `Foo.local.luau` = LocalScript · `Foo.legacy.luau` = server `Script` (RunContext Legacy) · `init.luau` = folder-as-module.
+`.legacy.luau` files are **live and running**, not dead code.
 
-**Known gap (persistence):** no session locking — two servers holding the same player (fast rejoin / server hop) can clobber each other last-write-wins. The *destructive* failure mode (outage zeroing stored XP) is closed; this one isn't. Prefer a proven library over hand-rolling it.
+**Folder → service:** folder names at repo root map 1:1 to Roblox services. No Rojo project file; sync is via Studio MCP. `StarterPlayerScripts/` **does** have a local mirror (11 LocalScripts) — it did not historically.
 
-**Known gap (intentionally out of scope):** `origin` is client-supplied (`CameraSession.Capture` sends `camera.CFrame.Position` unchecked) — `CaptureGuard.ValidateShot`'s 10-stud proximity check is a mitigation, not a full fix; the true fix (deriving origin server-side entirely) is a larger change, deferred per `REWARD_SYSTEM.md`.
+| Attribute | On | Meaning |
+|---|---|---|
+| `IsCameraTool` / `CameraId` | Tool | Camera identity. **Never use `Tool.Name`** — overwritten to `"Camera"` at purchase/swap |
+| `IsMonster` / `IsObjective` | Model or Part | Capture targets. Owned by `Reward/CaptureTargets.luau`; never hardcode elsewhere |
+| `ObjectiveType` / `ObjectiveState` | Objective instance | Type registry key / shared state |
+| `IsEmpty` | Tool | Placeholder slot — `IsA("Tool")` alone can't tell empty from filled |
+| `IsCameraShelf` | Part | Shelf identity (not `part.Name`) |
+| `KeepDuringCamera` | ScreenGui | Exempt from `CameraSession.hideOtherGuis`. Roblox's `TouchGui` is exempted by name separately — hiding it breaks camera look on touch |
+| `KitGiven` | Player | Server-only. Set **last**, after the grant succeeds |
+| `CurrentCamera` | Player | Server-set by `CameraInventory`. **Never write from client** |
 
-## Confirmed Asset Paths
-- Support items: `ReplicatedStorage.Assets.Tool.SupportItem` (no `.Model` in path)
-- Camera 1: `ReplicatedStorage.Assets.Model.Tool.Camera.Camera1` (different tree structure from support items — don't assume parity)
+**Asset paths** (tree structure differs — don't assume parity):
+- `ReplicatedStorage.Assets.Tool.SupportItem`
+- `ReplicatedStorage.Assets.Model.Tool.Camera.Camera1`
 
-## Hard-Won Debugging Lessons
-1. `IsEmpty` attribute on placeholder Tools is mandatory
-2. LocalScripts silently do nothing outside valid containers (PlayerGui, Backpack, StarterPlayerScripts, etc.)
-3. Shop close must restore `Enum.MouseBehavior.Default`, not `LockCenter`
-4. Cleanup code inside a Tool destroyed in the same cascade won't run reliably — state ownership must live in a persistent module (`CameraSession` + `CameraClient`), not the Tool itself
-5. Use `CameraId` attribute, not `Tool.Name`, for camera type identification
-6. Roblox's default camera module spuriously consumes `MouseButton2 InputEnded` — zoom was scrapped in favor of first-person mode (`player.CameraMode = Enum.CameraMode.LockFirstPerson`)
-7. `KitGiven` must be reset by `EndGame` or re-triggering breaks
-8. ModuleScripts in `ServerScriptService` are inaccessible to clients — only `ReplicatedStorage` modules can be `require`d from LocalScripts
-9. Ownership of a resource (GUI, Lighting effect, connection) must be symmetric — whatever module *acquires* it should be the one that *releases* it, via the same reference. Destroying-by-name-lookup instead of by-reference is how teardown silently drifts from setup over time (this is what a `Trove` per owner object prevents).
-10. A duplicated block (e.g. the same update call twice in one tick) is easy to miss in review but doubles the effective rate of anything time-based (smoothing factors, cooldowns) — worth specifically re-reading loop bodies line-by-line, not just skimming for "does this look right."
-11. This project's local filesystem (`ReplicatedStorage/`, `ServerScriptService/`, `ServerStorage/`) is **live-synced with the open Roblox Studio session** in both directions — editing/creating/deleting a local `.luau` file applies directly to the corresponding Studio Instance, and vice versa. Do not both hand-edit a file locally AND push the same content via a separate Studio-side tool call in the same turn — that appends/duplicates the source instead of replacing it. `StarterPlayer` scripts (LocalScripts under `StarterPlayerScripts`/`StarterCharacterScripts`) have **no local mirror** — those must be read/edited directly via Studio tooling.
-12. Luau injected via the Studio MCP `execute_luau` tool runs in an **isolated `require()` cache from the real game's LocalScripts** (it executes under the Studio plugin's identity, not a normal `LocalScript`/`Script` capability level). Module-level state changes made by real running scripts (e.g. `CameraToolController`'s `equippedTool`, set by the live `CameraToolWatcher`) are invisible to a separate `execute_luau` call requiring the same module — even though `game.*` paths and existing Instances are the same shared DataModel. State *does* persist correctly across multiple `execute_luau` calls (they share a cache with each other), just not with real LocalScripts. To test cross-script module wiring, either drive the whole chain from a single `execute_luau` call (manually invoking the same functions the real scripts would call, e.g. calling `CameraToolController.Init(tool)` yourself before equipping) or verify via observable side effects in the DataModel (Instances created, properties changed) rather than trusting a second module require to reflect the first script's state.
-   **This isolation is NOT client-only** — confirmed again on the `Server` datamodel while debugging `RewardStore`. Checking `RewardStore.IsReady(player)` via `execute_luau(datamodel_type="Server")` right after a real player joined showed `false` forever (no error, no warn, looked exactly like a hung DataStore call) even though the real `PlayerCurrency` Script's `PlayerAdded` handler had already loaded and readied that same player seconds earlier — because `execute_luau`'s `require(RewardStore)` returned an isolated copy with its own empty `sessions` table (a plain Lua table, not a DataModel Instance, so nothing shares it). Burned ~15 tool calls chasing a phantom hang before recognizing the pattern. **Resolved by testing outcomes on shared Instances only** (set `leaderstats.XP.Value`, stop Play to trigger a real `BindToClose`, restart, confirm the real value came back) instead of reading a module's internal Lua state through `execute_luau`. Rule of thumb: if `execute_luau` shows a real script's background operation "never completing" with zero errors, suspect isolation before suspecting a hang — and never trust an `execute_luau` read of module-internal state (tables, closures, non-Instance variables) that a *different* real script populated; only Instance properties/attributes are safe to cross-check that way.
-13. Studio's plain "Play Solo" reports `UserInputService.TouchEnabled = true` **and** `KeyboardEnabled = true` simultaneously (touch controls render on-screen for testing, while the host PC's real keyboard is also present) — any touch-only gate written as `TouchEnabled and not KeyboardEnabled` (used by `CameraTouchHud`) will treat Play Solo as a non-touch device and stay hidden. This is correct for a real phone (`KeyboardEnabled` is genuinely false there) but means touch-only UI can't be eyeballed under plain Play Solo — use Studio's **Test → Device** emulation (a specific phone/tablet profile), which sets `KeyboardEnabled = false` for real, to see it live.
-14. A boolean that *describes* a lookup result, computed separately from the lookup itself, will eventually disagree with it. `CameraInventory.FindSlot` returned `(slot, inCharacter)` and set `inCharacter = true` whenever the Character was **searched**, not when the slot was **found** there — so a first-time player with no camera anywhere got back `(nil, true)`, meaning "not found, but it's in the Character." `CameraInventory.Give` trusted the flag and parented the brand-new starter camera into the Character, which Roblox treats as **equipped** — so `Backpack:FindFirstChild("Camera")` was nil and the camera looked like it had never been granted. This was misdiagnosed for several sessions as a "Backpack not ready" timing race; it was never a race at all (the trigger is a ProximityPrompt, so the Backpack always exists by then). **Fix: return the container Instance the thing was actually found in, not a boolean about it** — the container can't drift out of sync with the slot because it *is* where the slot came from. Only `StartGame.giveStarterCamera` hit this, because `CameraShelfSwap` early-returns when `slot` is nil and so never reached `Give` with an empty slot. General lesson: when a symptom is "X wasn't created," check whether X was created *in the wrong place* before assuming a timing/ordering problem.
-15. Don't claim a completion flag before the work succeeds. `GivePlayerStarterKit` set `KitGiven = true` up front, so a failed camera grant left the player permanently marked as kitted with nothing, and re-triggering the prompt no-op'd forever (only death/`EndGame` cleared it). Combined with a silent `if not backpack then return end` (no `warn`), the failure was both unrecoverable and invisible in Output. Set the flag last, and make every early return say why.
-16. **A fallback default that is indistinguishable from real data must never reach a write path.** `RewardStore.Load` collapsed a failed `GetAsync` and a brand-new player into the same `{}`, and `RewardLedger` then did `Get(player, "XP") or 0` when building save data. So a transient DataStore outage → XP loads as 0 → player leaves → **0 is written over their real total**, for every online player at once. The `or 0` reads as harmless defensive coding and is actually destructive. Fix: an explicit session state (`Loading`/`Ready`/`Failed`), saves refused unless `Ready`, and `pcall` returning `(ok, result)` so "read failed" stays distinguishable from "key empty". General rule: *defaults are for display, never for persistence* — if you can't tell "no data" from "couldn't read data", you must not write.
-17. Studio's Play datamodel is cloned from the Edit datamodel **at the moment Play starts**, and the local→Studio file sync is asynchronous. Editing local `.luau` files and immediately hitting Play can run the **old** code — silently, with no error, because the module still loads fine. This wasted a full test cycle here (`ClearSession` was "a nil value" because Studio was running the previous 67-line `RewardStore`). **Before starting Play after local edits, confirm the Edit datamodel actually has the new source** — e.g. `execute_luau` in the `Edit` datamodel checking `#string.split(script.Source, "\n")` or grepping for a symbol you just added. `script_grep` returning "no matches" for something you definitely wrote is the tell.
-18. `Instance:GetDebugId()` requires **plugin capability** and errors (`lacking capability Plugin`) when called from a normal runtime `Script`/`LocalScript` — even though it works fine when called via the Studio MCP `execute_luau` tool, which runs with elevated plugin-level privileges. This makes `execute_luau` testing misleadingly permissive: code that calls `GetDebugId()` (or anything else gated the same way) will pass every `execute_luau` check and then error the instant a real player triggers it through a real remote. Caught building `CaptureGuard.CheckSubjectCooldown`, which tried to key a per-subject cooldown table off `subject:GetDebugId()`; fixed by using the `Instance` itself as a table key in a weak-keyed (`__mode = "k"`) per-player table instead. **Lesson: always do at least one end-to-end pass by firing the real remote from a `Client` `execute_luau` context (not just calling the server module's functions directly from a `Server`/`Edit` context) before calling a feature done** — direct-call testing exercises the logic but not the actual capability/security context real gameplay runs under.
+**Security boundary:** `CameraSessionTracker`'s InCamera flag is client-reported — UX guard only, never a security check.
 
-## Next Priority (as of last session)
-Reward System (XP + Score for photo captures) implemented per `REWARD_SYSTEM.md` — see the Reward System section above. Remaining from that doc: a real `RewardModifiers` entry to prove the seam (Phase 8, not started).
+## Uncommitted since `v0.1` (d311d04)
 
-The long-standing "starter camera not granted" bug is **fixed** — it was never a Backpack timing race; the camera was being parented into the Character (force-equipped) instead of the Backpack. See lessons 14–15.
+Everything below is on disk and working but not committed. Commit before starting the match rearchitecture.
 
-Still open: the starter kit is only reachable via a ProximityPrompt on a part named `TestButton` (`Workspace.TestButton.InventorySlot.StartGame.Script`), which looks like temporary scaffolding — whether it should be granted on `CharacterAdded` instead is an unmade design decision, not a bug.
-
-## Working Style Notes (for continuity)
-- Debugging: share exact error messages + Output window logs
-- Explorer hierarchy screenshots used to resolve path ambiguities
-- Willing to change scope mid-build for a simpler fix (e.g., zoom → first-person)
-- Prefers centralized ModuleScript configs with clear keys
+- **New:** `Modules/Objective/` + `GameService/Objective/` (full objective system) · `Modules/Flash/` + `GameService/Flash/` · `Shared/Signal.luau` · `Modules/UI/` · `Modules/Shop/` · `PlayerRuntimeStats.luau` · `Bootstrap.legacy.luau` · `StarterPlayerScripts/` (now disk-mirrored)
+- **Deleted:** `CameraFlashEffect.luau` (→ `Modules/Flash/`) · `ShopItems.luau` · `MonsterBootstrap.legacy.luau`
+- **Reworked:** `Remotes.luau` → `ALL_NAMES` + `Init()` · `PlayerStats` split (shared tunables stay; mutable per-player state → `PlayerRuntimeStats`, because `PlayerStats` is a server+client singleton and `Stamina` was one value shared by every player) · `CaptureTargets`/`CaptureRules`/`ShotResultCodes` extended for objectives
+- `graphify-out/` is stale relative to this — run `graphify update`.
