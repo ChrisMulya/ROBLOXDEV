@@ -53,11 +53,28 @@ function GameBoot.Start()
 		require(ServerScriptService.GameService.PlayerState.PlayerStateReplicator),
 		require(ServerScriptService.GameService.Match.MatchParticipants),
 		require(ServerScriptService.GameService.Match.MatchManager),
+		require(ServerScriptService.GameService.Match.MatchEndCondition),
+		-- MatchResultBuilder before MatchReplicator: Replicator's own Ending
+		-- listener calls Builder.Build() and needs Builder's Ending listener
+		-- (which captures resultCode/duration) to have already run.
+		require(ServerScriptService.GameService.Match.MatchResultBuilder),
 		require(ServerScriptService.GameService.Match.MatchReplicator),
+		require(ServerScriptService.GameService.Match.MatchCleanup),
+		-- After MatchCleanup: registers a save step into its registry.
+		-- Order-tolerant at boot (RegisterSaveStep just appends to a
+		-- table), but this position keeps the list's dependency direction
+		-- consistent with every other publisher-before-subscriber entry.
+		require(ServerScriptService.GameService.Reward.RewardCleanupHook),
+		require(ServerScriptService.GameService.Match.ReturnToLobbyService),
+		-- MatchClock before MatchArrival: MatchClock must be subscribed to
+		-- StateChanged before MatchArrival's first PlayerAdded can fire
+		-- Loading -> WaitingForPlayers (a player could already be connected
+		-- when boot runs in a Studio Play-test), same publisher-before-
+		-- subscriber rule as MatchResultBuilder/MatchReplicator above.
+		require(ServerScriptService.GameService.Match.MatchClock),
+		require(ServerScriptService.GameService.Match.MatchArrival),
 		require(ServerScriptService.GameService.Death.DeathService),
 		require(ServerScriptService.GameService.Spectate.SpectateService),
-		-- Phase 7: MatchEndCondition, MatchResultBuilder, MatchCleanup
-		-- Phase 8: ReturnToLobbyService
 	}
 
 	for _, service in ipairs(services) do

@@ -1,15 +1,20 @@
 -- Mirrors MatchManager's authoritative state onto an attribute on
 -- ReplicatedStorage.MatchInfo -- shared, identical-for-everyone state, so it
 -- rides an attribute rather than a remote (the ObjectiveReplicator rule).
--- No per-player payload exists yet (that's Phase 7's MatchResultSync) --
--- this is the only match module allowed to touch remotes, once one is
--- needed.
+-- The only match module allowed to touch remotes: on entering Ending, it
+-- also builds and sends the per-player MatchResultSync payload (private to
+-- each player, so it's a remote rather than an attribute).
 --
 -- Started after MatchManager in the boot list (publisher before subscriber)
 -- so no StateChanged fire is missed.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
 local MatchManager = require(script.Parent.MatchManager)
+local MatchParticipants = require(script.Parent.MatchParticipants)
+local MatchResultBuilder = require(script.Parent.MatchResultBuilder)
 
 local MatchReplicator = {}
 
@@ -36,6 +41,21 @@ function MatchReplicator.Start()
 
 	MatchManager.StateChanged:Connect(function(newState: string)
 		matchInfo:SetAttribute("MatchState", newState)
+
+		if newState == "Ending" then
+			local result = MatchResultBuilder.Build()
+			local resultSync = Remotes.Get("MatchResultSync")
+			for _, userId in ipairs(MatchParticipants.All()) do
+				local player = Players:GetPlayerByUserId(userId)
+				if player then
+					resultSync:FireClient(player, {
+						resultCode = result.resultCode,
+						durationSeconds = result.durationSeconds,
+						perPlayer = result.perPlayer[userId] or {},
+					})
+				end
+			end
+		end
 	end)
 end
 

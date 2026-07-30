@@ -1,12 +1,34 @@
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+local MatchStates = require(ReplicatedStorage.Modules.Shared.MatchStates)
 local MonsterAgent = require(script.Parent.MonsterAgent)
 local MonsterDamage = require(script.Parent.MonsterDamage)
 
 local MonsterService = {}
 
 local liveAgents = {} -- [model] = agent
+
+-- Lazy for the same reason as RewardService's isScoringActive: this module
+-- currently self-wires on both places (content-migration gap), and
+-- MatchManager is Game-Server-only.
+local function monstersCanSpawn(): boolean
+	if not ServerRole.Is("GameServer") then
+		return true
+	end
+	local MatchManager = require(script.Parent.Parent.Match.MatchManager)
+	return MatchStates.MonstersSpawn(MatchManager.Get())
+end
+
+local function gameplayActive(): boolean
+	if not ServerRole.Is("GameServer") then
+		return true
+	end
+	local MatchManager = require(script.Parent.Parent.Match.MatchManager)
+	return MatchStates.IsGameplayActive(MatchManager.Get())
+end
 
 -- MVP grey box has no authored asset yet, so it's built from scratch here --
 -- this keeps the system unblocked on Studio asset work. Swap this for a
@@ -42,6 +64,11 @@ local MODEL_BUILDERS = {
 }
 
 function MonsterService.Spawn(monsterId: string, cframe: CFrame, stage: number?): Model?
+	if not monstersCanSpawn() then
+		warn("MonsterService.Spawn: monsters aren't allowed to spawn outside of active gameplay")
+		return nil
+	end
+
 	local builder = MODEL_BUILDERS[monsterId]
 	if not builder then
 		warn("MonsterService.Spawn: no model builder for '" .. monsterId .. "' yet")
@@ -92,6 +119,13 @@ function MonsterService.Despawn(model: Model)
 end
 
 RunService.Heartbeat:Connect(function()
+	-- Freezes existing monsters in place rather than despawning them once
+	-- gameplay ends (Ending keeps the world visible for spectate/end
+	-- screen) -- ticking just stops, per the plan's Ending contract.
+	if not gameplayActive() then
+		return
+	end
+
 	local now = os.clock()
 	for model, agent in pairs(liveAgents) do
 		if not model.Parent then

@@ -8,11 +8,26 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local Signal = require(ReplicatedStorage.Modules.Shared.Signal)
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+local MatchStates = require(ReplicatedStorage.Modules.Shared.MatchStates)
 local CaptureTargets = require(ReplicatedStorage.Modules.Reward.CaptureTargets)
 local CaptureRules = require(ReplicatedStorage.Modules.Reward.CaptureRules)
 local RewardCalculator = require(ReplicatedStorage.Modules.Reward.RewardCalculator)
 local RewardLedger = require(script.Parent.RewardLedger)
 local CaptureGuard = require(script.Parent.CaptureGuard)
+
+-- Lazy: MatchManager is Game-Server-only, and this module is currently
+-- required on both places (see MAINHANDOFF's content-migration gap). A
+-- top-level require would be inert either way (module scope has no role
+-- assert), but resolving it only when actually gating on the Game Server
+-- keeps that gap from becoming this file's problem to solve.
+local function isScoringActive(): boolean
+	if not ServerRole.Is("GameServer") then
+		return true
+	end
+	local MatchManager = require(script.Parent.Parent.Match.MatchManager)
+	return MatchStates.IsScoringActive(MatchManager.Get())
+end
 
 local RewardService = {}
 
@@ -62,6 +77,13 @@ function RewardService.Grant(player: Player, amounts: { [string]: number }, meta
 		return false
 	end
 
+	-- The generic sink, for future reward sources (missions, achievements)
+	-- that call Grant directly rather than through AwardFromCapture, which
+	-- already gates itself above.
+	if not isScoringActive() then
+		return false
+	end
+
 	for rewardType, amount in pairs(amounts) do
 		if amount ~= 0 then
 			RewardLedger.Add(player, rewardType, amount)
@@ -86,6 +108,15 @@ end
 -- no explanation; see ShotResultCodes for the display strings.
 function RewardService.AwardFromCapture(player: Player, context)
 	local meters, bandLabel = RewardCalculator.Describe(context.distanceStuds)
+
+	-- The sink-level anti-exploit gate: once a Game Server leaves Playing
+	-- (Ending/Cleanup/Finished), no capture pays out. Checked before the
+	-- subject/rules pipeline runs, not just before Grant, so a refusal here
+	-- also skips the Awarded fire below -- ObjectiveService.Complete is only
+	-- ever reached through that fire, so this one check covers both.
+	if not isScoringActive() then
+		return { resultCode = "MatchNotScoring", meters = meters, bandLabel = bandLabel, amounts = nil }
+	end
 
 	local subject, typeName = CaptureTargets.Resolve(context.subject)
 	if not subject or not typeName or not subject:IsDescendantOf(workspace) then

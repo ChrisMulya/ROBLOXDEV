@@ -13,6 +13,7 @@ ShotResultCodes.Messages = {
 	UnknownTarget = "Not Capturable",
 	AlreadyCompleted = "Already Photographed",
 	ObjectiveUnavailable = "Not Available",
+	MatchNotScoring = "Match Has Ended",
 }
 
 -- "Awarded" has no message here -- the client renders the amounts instead.

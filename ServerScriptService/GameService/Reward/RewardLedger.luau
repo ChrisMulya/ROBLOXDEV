@@ -108,7 +108,9 @@ end
 -- { [rewardTypeName]: number } for every persistent type, or nil if any of
 -- them is missing. Deliberately no `or 0` fallback: a zero standing in for
 -- "we don't know" is what let a failed load overwrite real saved totals.
-local function currentPersistentValues(player: Player): { [string]: number }?
+-- Exported (not a local) because RewardCleanupHook needs this exact
+-- nil-safe logic for its Cleanup-time save step, rather than duplicating it.
+function RewardLedger.CurrentPersistentValues(player: Player): { [string]: number }?
 	local values = {}
 	for _, typeName in ipairs(RewardTypes.Persistent()) do
 		local amount = RewardLedger.Get(player, typeName)
@@ -122,14 +124,14 @@ local function currentPersistentValues(player: Player): { [string]: number }?
 end
 
 function RewardLedger.TeardownPlayer(player: Player)
-	RewardStore.Save(player, currentPersistentValues(player))
+	RewardStore.Save(player, RewardLedger.CurrentPersistentValues(player))
 	RewardStore.ClearSession(player)
 end
 
-RewardStore.StartAutosave(currentPersistentValues)
+RewardStore.StartAutosave(RewardLedger.CurrentPersistentValues)
 
 game:BindToClose(function()
-	RewardStore.SaveAll(currentPersistentValues)
+	RewardStore.SaveAll(RewardLedger.CurrentPersistentValues)
 end)
 
 return RewardLedger

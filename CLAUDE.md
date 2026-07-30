@@ -2,7 +2,8 @@
 
 Scripts live on disk and sync to Studio. Read and edit them as files.
 
-Never use `script_read` or `script_grep` — the scripts are already on disk;
+Don't use `script_read` or `script_grep` as default — the scripts are already on disk;
+ask for permission if needed to and state the reason
 those calls duplicate file content through MCP for no reason and are the
 main token cost in this workflow.
 

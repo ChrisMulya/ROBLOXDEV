@@ -4,11 +4,11 @@
 -- policy -> feature systems -> replicators. Publishers start before
 -- subscribers.
 --
--- Empty today. QueueService/PartyService/MatchLauncher/LobbyDeathPolicy/
--- ArrivalService land in later phases and get added here -- they do not
--- self-wire at require time (see the Service.Start() convention in the
--- plan). Existing self-wiring legacy Scripts (PlayerCurrency, BuyHandler,
--- etc.) are untouched by this and keep running exactly as before.
+-- QueueService/PartyService land in a later phase and get added here --
+-- they do not self-wire at require time (see the Service.Start() convention
+-- in the plan). Existing self-wiring legacy Scripts (PlayerCurrency,
+-- BuyHandler, etc.) are untouched by this and keep running exactly as
+-- before.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -29,7 +29,9 @@ function LobbyBoot.Start()
 		require(ServerScriptService.GameService.PlayerState.PlayerStateService),
 		require(ServerScriptService.GameService.PlayerState.PlayerStateReplicator),
 		require(ServerScriptService.GameService.Lobby.LobbyDeathPolicy),
-		-- Phase 9: PartyService, QueueService, MatchLauncher, ArrivalService
+		require(ServerScriptService.GameService.Lobby.MatchLauncher),
+		require(ServerScriptService.GameService.Lobby.ArrivalService),
+		-- Phase 9: PartyService, QueueService
 	}
 
 	for _, service in ipairs(services) do

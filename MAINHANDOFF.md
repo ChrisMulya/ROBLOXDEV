@@ -234,7 +234,262 @@ row surfacing a missing mirror only via a live test; the underlying content-migr
 question (flagged since Phase 1) is now touching server infra, client UI, and shared
 utilities simultaneously. Strongly recommend resolving it before Phase 7.
 
-Phase 7 (`MatchEndCondition`, `MatchResultBuilder`, `MatchCleanup`) not started.
+**Phase 7 (`MatchEndCondition`, `MatchResultBuilder`, `MatchCleanup`) — DONE, verified on the
+Game place via a real Play session.** Added `Shared/MatchResultCodes.luau` (code → message,
+mirrors `ShotResultCodes`), `Match/MatchEndCondition.luau` (the one module allowed to
+correlate `MatchParticipants` + `PlayerStateService`; reads `PlayerStateService.GetAll()`
+rather than `Players:GetPlayerByUserId` so a disconnected-but-still-tracked participant is
+read correctly; calls `MatchManager.RequestEnd("AllPlayersDown")` once no participant's state
+has `CountsAsActive`), `Match/MatchResultBuilder.luau` (`RegisterContributor`/`Build()`
+registry, captures `resultCode`/`durationSeconds` on entering `Ending`; **zero contributors
+registered this phase** — `perPlayer` slices are intentionally empty tables, future systems
+add their own), `Match/MatchCleanup.luau` (`RegisterSaveStep`/`RegisterTeardownStep`
+registry, each step run on its own thread with a bounded poll so one hung step can't block
+the rest; also owns the `Ending → Cleanup` hold and the final `Cleanup → Finished`
+transition). `Match/MatchReplicator.luau` (the only match module that touches remotes)
+extended to build and `FireClient` a per-player `MatchResultSync` payload on entering
+`Ending`. New remote `MatchResultSync`. `RewardLedger.luau` originally registered a save step
+(`RewardStore.SaveAll`, reusing the Ready-gate — decision #3) at its own module scope, guarded
+behind `ServerRole.Is("GameServer")`. **Superseded in Phase 7.5 below** — `RewardLedger` has no
+`Start()`, so that module-scope registration was a hidden keystone dependency on
+`PlayerCurrency.legacy` being required; see the Phase 7.5 entry for the fix.
+`RewardService.AwardFromCapture`/`Grant` and
+`MonsterService.Spawn`/its `Heartbeat` tick now gate on `MatchStates.IsScoringActive`/
+`MonstersSpawn`/`IsGameplayActive`, each guarded so a non-`GameServer` role is a no-op (both
+modules currently self-wire on both places per the content-migration gap below — the gate
+must not change Lobby behavior). Fixed a real correctness bug in the same edit:
+`AwardFromCapture` previously called `Grant` and fired `Awarded` (which drives
+`ObjectiveService.Complete`) regardless of `Grant`'s return value — the scoring gate is now
+checked at the top of `AwardFromCapture` itself, before the reward pipeline runs, so a
+refusal also correctly skips the `Awarded` fire. Wired `MatchEndCondition`/
+`MatchResultBuilder`/`MatchCleanup` into `GameBoot`'s ordered list, `MatchResultBuilder`
+specifically before `MatchReplicator` (its `Ending` listener captures `resultCode` before
+Replicator's `Ending` listener reads it via `Build()` — same-signal listener order matters
+here, same class of ordering concern as Phase 1's R1).
+
+Verified end-to-end via `execute_luau` on the Game place (manually driving each service's
+`Start()`, since Studio Play always reports a non-reserved server — same as every prior
+phase): seeded one participant, drove `Loading→WaitingForPlayers→Countdown→Playing`, set
+that sole participant to `Dead` — `MatchEndCondition` correctly fired
+`RequestEnd("AllPlayersDown")` with no manual trigger, landing on `Ending`. Confirmed
+`MatchResultBuilder.Build()` returned `resultCode = "AllPlayersDown"` and a real
+`durationSeconds`; confirmed the `MatchState` attribute and `MatchResultSync` remote fire
+produced zero console errors; after the `ENDING_HOLD_SECONDS` window elapsed (real time
+between tool calls, not force-advanced), state had progressed unattended all the way to
+`Finished` with no errors, and `Finished→Loading` was correctly rejected (terminal). **Not
+verified — could not be, on this place:** the `RewardService`/`MonsterService` gates and
+`RewardLedger`'s save-step registration, because **none of Reward/Monster/Objective/Camera
+exist on this Game place at all** (confirmed via `inspect_instance` — `GameService` here has
+only `Boot`/`PlayerState`/`Match`/`Death`/`Lobby`/`Spectate`). These edits were made and
+reasoned through carefully on disk but are unverified until that content-migration gap
+closes; treat them as reviewed, not proven.
+
+**This is now the fifth phase in a row blocked by, or working around, the same
+content-migration gap** (flagged since Phase 1, called out explicitly at the end of Phase 6).
+It has now stopped a *feature's own gate* from being testable at all, not just caused an
+extra mirroring step. Strongly recommend resolving it before Phase 8 (teleport round trip),
+which will need the full existing gameplay codebase present on the Game place to mean
+anything.
+
+**Phase 7.5 (Game place content migration) — CODE-SIDE PREP DONE; the actual migration is NOT
+done, and could not be attempted this session** (audit: `~/.claude/plans/before-
+phase-8-perform-scalable-mochi.md`; inserted into the blueprint as its own phase between 7 and
+8). Studio MCP was disconnected for this entire session — no `inspect_instance`/`execute_luau`
+calls were possible, so **nothing was mirrored onto the Game place** and the open item from the
+audit (locating the Game place's actual bootstrap Script, since it isn't at
+`GameService.Bootstrap`) is still unresolved.
+
+What *was* done, on disk only:
+- **Fixed the hidden-keystone defect the audit found**, rather than just documenting it.
+  `RewardLedger.luau`'s Phase 7 module-scope `MatchCleanup.RegisterSaveStep` call is removed —
+  `RewardLedger` no longer requires `ServerRole` or `MatchCleanup` at all. New
+  `Reward/RewardCleanupHook.luau` (`Start()` convention, `ServerRole.AssertGameServer()`)
+  performs that registration instead, wired into `GameBoot`'s ordered list right after
+  `MatchCleanup`. This means the save step's existence no longer depends on
+  `PlayerCurrency.legacy` happening to be mirrored/required — it depends only on
+  `RewardCleanupHook` being in the boot list, which is now explicit and greppable.
+- **`RewardLedger.CurrentPersistentValues`** — the old module-scope `currentPersistentValues`
+  local, exported as a real function so `RewardCleanupHook` can reuse its exact nil-safe
+  "refuse a partial save" logic rather than duplicating it. This is a one-function export, not
+  a redesign — the option-C plan said "`RewardLedger` untouched," and this is the one deviation
+  from that, made because duplicating the persistence-safety logic in two files was the worse
+  option. Flagged here rather than silently going beyond the plan.
+- **`Tools/CheckGameMirror.luau`** — the checked-in manifest + drift check the audit called for.
+  Lives at repo root under `Tools/`, a non-service-named folder the disk-sync pipeline ignores,
+  so it will never appear as a live instance in either place; it's meant to be pasted into
+  Studio's command bar by hand. Checks existence + `ClassName` for all 30 tier-1/2/3 paths from
+  the audit's §3 cut line. **Does not check Source-content drift** — that needs a real plugin or
+  Rojo, neither of which this repo has; the file's own header says so up front rather than
+  overclaiming what a plain command-bar script can do.
+
+**UPDATE, same session:** Studio MCP stayed disconnected for the rest of this session (a
+mid-session reconnect on the user's end did not attach to this already-running conversation),
+so all of the following was done by generating command-bar scripts for the user to paste
+themselves, not by direct tool access. All five items below are now done, live, on the Game
+place:
+
+1. **Bootstrap located and fixed.** It is `ServerScriptService.Bootstrap` — **not**
+   `GameService.Bootstrap` as the audit assumed; a real, separate top-level Script. It was
+   also found mis-named `Bootstrap.legacy` (literal suffix in the Roblox instance Name, unlike
+   `CameraShotHandler`/`PlayerCurrency` which correctly dropped it) — renamed to `Bootstrap`.
+   Its `Remotes.Init()` call was already present and correct; it was missing the
+   `require(ObjectiveService)` / `require(ObjectiveReplicator)` pair the disk file has — added.
+   Without that fix, the tier-2 objective files would have existed on this place but never
+   loaded, since `ObjectiveService` self-wires (registers into `RewardService`'s seams) at
+   require time only.
+2. **All ~30 tier-1/2/3 files mirrored**, via a single generated installer,
+   `Tools/InstallGameMirror.luau` (checked in, not synced into either place — see its own
+   header). Confirmed via `Tools/CheckGameMirror.luau`: `missing 0, wrong class 0`.
+3. **Spawn point + two tagged capture targets placed** in Workspace by hand (a `SpawnLocation`,
+   `Phase7_5MonsterTarget` with `IsMonster`, `Phase7_5ObjectiveTarget` with `IsObjective`).
+4. **Drift check clean** — see #2.
+5. **Checklist run, via `Tools/VerifyPhase75.luau`** (items 2, 3, 5, 6, 7, 8 in one Play-mode
+   pass) **+ `graphify update`** (item 10, run locally — zero import cycles, confirmed).
+   Items 5 and 6 were then **re-run and PASSED** via `Tools/InstallVerifyScript.luau` (real
+   Script, real require cache — see the G3 note below): `5-pre` registered, `5a` `Awarded` with
+   `Available → Completed` and an XP delta, `5b` `AlreadyCompleted` with XP unchanged, `6-pre`
+   reached `Cleanup`, and `6` confirmed by a live `GetAsync` read-back
+   (`storedXP == expected`) **while the player was still connected** — the only design that
+   can't be masked by `TeardownPlayer`'s own `PlayerRemoving` save.
+   Items 4 (real-client capture) and 9 (Lobby regression) not yet run.
+
+**Results — 9/9 attempted core items pass; two real bugs found during verification, neither in
+Phase 7.5's own new code:**
+- **Item 6 false failure was this session's own test-script bug**, not a product defect:
+  `Tools/VerifyPhase75.luau` originally called `RewardLedger.SetupPlayer(player)` defensively
+  ("in case `PlayerCurrency.legacy` hasn't run yet"), which is no longer true after the
+  Bootstrap fix. Calling it twice for one player races two concurrent `RewardStore.Load()`
+  calls, and the second can reset the session to `"Loading"` right as `MatchCleanup`'s save
+  step runs — `RewardStore.Save` then correctly *refuses* (its own Ready-gate working as
+  designed), which looked like a lost save but wasn't. Fixed by removing the redundant call.
+- **Items 5 and 6 both failed for one reason: G3, and the test harness was at fault, not the
+  product.** `Tools/VerifyPhase75.luau` runs from the **command bar**, which has plugin identity
+  and therefore an **isolated `require()` cache**. Its `require(RewardService)` returns a fresh
+  copy whose `contextProviders` list is empty — `ObjectiveService` registered its provider into
+  the copy loaded by the real `Bootstrap` Script — so the objective rule
+  `objectiveRegistered == true` could never pass (`ObjectiveUnavailable`, with
+  `context.objectiveRegistered` observed as `nil` via a diagnostic provider). Identically, the
+  isolated `RewardStore` had no loaded session for the player, so `IsReady()` was false forever
+  and the `Cleanup` save was correctly refused by its own Ready-gate. Monster captures passed
+  throughout only because `CaptureTargets.Monster` has `Rules = {}` and needs no provider.
+  **Superseded by `Tools/InstallVerifyScript.luau`**, which installs a temporary real Script
+  (`ServerScriptService.Phase75Verify`, delete after use) so items 5/6 run in the real cache.
+  *A mid-session misdiagnosis is recorded here deliberately: this was first written up as an
+  `ObjectiveRegistry.bootstrap()` scan/replication race, and a "Known broken" row was added for
+  it. That was wrong and has been removed — `IsRegistered` returned `true` because the isolated
+  cache re-ran `bootstrap()` on first require, which was mistaken for a late registration.*
+- **A second, independent test bug on item 5:** `Phase7_5ObjectiveTarget` carries no
+  `ObjectiveType` attribute, so it defaults to `Standard` → `Ownership = "Player"`. Player-owned
+  objective state lives in a Lua table inside `ObjectiveService`, **not** the `ObjectiveState`
+  attribute (only `Shared` ownership writes that attribute). So `state = nil` was correct even
+  on success, and the audit's own §5 checklist text — "assert its `ObjectiveState` attribute …
+  Instance-backed, G3-safe" — is **wrong for Player-owned objectives**. The replacement Script
+  asserts via `ObjectiveService.GetState(player, target)` instead.
+
+- **A third test bug on item 5, worth remembering because it will recur:** `Signal:Fire` is
+  DEFERRED. `ObjectiveService.Complete` runs from `RewardService.Awarded`, so reading
+  `GetState` synchronously right after `AwardFromCapture` returns still sees `Available`.
+  A bare `task.wait()` after each award fixes it. Same gotcha the Phase 3 entry records.
+- **`Phase75Verify` must run at most once per server lifetime.** `MatchManager` is a singleton
+  and `Finished` is terminal by design, so a second run in the same server produces
+  `illegal transition Finished -> WaitingForPlayers` and a cascade of stale-state failures that
+  look like product defects. The Script now carries a `_G.__Phase75VerifyRan` guard and a hard
+  abort unless `MatchManager.Is("Loading")`.
+
+**Standing tally for this phase: the product code needed exactly one change (`RewardCleanupHook`).
+Every other failure was in the test harness or in my own diagnosis.**
+
+**Item 4 (real-client capture, the G5 pass) — PASSED**, run live via Studio MCP
+(`Tools/InstallItem4Harness.luau` server half + a client-datamodel `FireServer` call — see that
+file's header for why the client half needs no real Script, unlike items 5/6). A real client
+fired `WeakCameraShot` at `Phase7_5MonsterTarget`; `ShotFeedback` came back
+`hit=true, resultCode=Awarded, amounts={Score=100, XP=600}`; the `leaderstats.XP` IntValue
+(Instance-backed, read directly, no isolated-cache risk) went `77793 → 78393`, and
+`ReplicatedStorage.MatchInfo:GetAttribute("MatchState")` stayed `"Playing"` throughout — the
+scoring gate didn't spuriously trip mid-shot.
+- **Tooling note found during this run:** `get_console_output` returned the same stale buffer
+  across multiple calls spanning a Play stop/restart and a fresh script install — do not trust
+  it as a liveness signal for a running temp Script. Instance-backed reads (attributes,
+  `leaderstats` values) executed fresh each call are the reliable way to observe live state from
+  the command bar; this is really the same G3 lesson applied one level further; console output
+  through this MCP tool is not.
+- Confirms `_G` is *also* isolated per G3, not just `require()`: a diagnostic `execute_luau` read
+  of `_G.__Phase75Item4Ran` from the command bar came back `nil` while the real temp Script (a
+  separate execution context) had already set it and was mid-poll. Same fix as always —
+  Instance-backed evidence only, read fresh, from whichever context actually needs verifying.
+
+**Item 9 (Lobby regression) — PASSED**, run live via Studio MCP against `BaseGame`. Used the
+Lobby's existing `GoldenJug` objective (`Workspace.GoldenJug.spout_geom`, `IsObjective`, no
+`ObjectiveType` attribute so `Standard`/`Player`-owned) rather than placing a new target — it
+was already there from earlier phases. Force-equipped a `Camera1` tool the same way as item 4,
+then fired `StrongCameraShot` from a real client (`WeakCameraShot` first returned
+`WrongShotQuality` — a legitimate per-objective rule, not a gate failure — `StrongCameraShot`
+then returned `resultCode=Awarded, amounts={Score=154, XP=308}`).
+`leaderstats.XP` went `78393 → 78701` (+308, matching the reported amount) — capture still
+awards on the Lobby, confirming `isScoringActive()`'s `not ServerRole.Is("GameServer")` early
+return. Same XP value carried in from the Game place's item-4 result (`78393`), confirming
+`RewardStore_v1` really is shared across both places via the common `GameId`, as designed.
+
+For "no `MatchCleanup` registration warning": verified by grep, not by a live console check —
+[LobbyBoot.luau](ServerScriptService/GameService/Boot/LobbyBoot.luau) never requires
+`MatchCleanup` or `RewardCleanupHook`, and `Bootstrap.legacy` only unconditionally requires
+`ObjectiveService`/`ObjectiveReplicator`. There is no code path on the Lobby that could ever
+call `RegisterSaveStep`, so the warning is structurally impossible there, not merely unobserved.
+
+**All 10 Phase 7.5 checklist items now pass. Nothing remains open in this phase.**
+
+**Phase 8 (Teleport round trip) — CODE DONE, NOT YET VERIFIED.** Per the plan's own section 17
+and the Phase 0 entry above, `ReserveServer`/`TeleportAsync` return HTTP 403 in Studio Play —
+this phase can only be verified on a **published two-place build**, not in Studio (see G10).
+
+Scope note: the plan's Phase 8 row names only `MatchLauncher`, `ReturnToLobbyService`,
+`ArrivalService`, and the `ReserveServer` call. Asked the user first, then added one more
+piece with explicit approval: nothing in that list drives `Loading → WaitingForPlayers →
+Countdown → Playing` after a real teleport, so without it the round trip would still need a
+manual command-bar transition, same as every phase before it. Built `MatchArrival.luau` +
+`MatchClock.luau` to close that gap.
+
+New files:
+- `Lobby/MatchLauncher.luau` — `Launch(players, modeId?)`: `ReserveServer`, builds
+  `{ participantUserIds, modeId }` TeleportData, `TeleportAsync`s the group. No caller yet
+  (Phase 9's `QueueService` calls it); exercised directly for now, same as the plan's own
+  "manual launch button is enough to exercise phases 1-8" note.
+- `Match/MatchArrival.luau` (Game) — consumes `TeleportData` on arrival, seeds
+  `MatchParticipants`, transitions `Loading → WaitingForPlayers`. Falls back to seeding the
+  arriving player solo when there's no `TeleportData` (direct join / Studio Play-test), so the
+  server stays runnable per rule 1. Also exposes `GetModeId()` for `MatchClock`.
+- `Match/MatchClock.luau` (Game) — the plan's own named (previously unbuilt) timer module:
+  `WaitingForPlayers` roster-complete/timeout → `Countdown`; `Countdown` ticks → `Playing`
+  (or back to `WaitingForPlayers` if the server empties mid-countdown); owns the
+  `Ending → Cleanup` hold, replacing `MatchCleanup`'s old placeholder constant per that
+  module's own comment inviting the swap.
+- `Match/ReturnToLobbyService.luau` (Game) — on `Finished`, `TeleportAsync`s everyone to the
+  Lobby carrying `MatchResultBuilder.Build()`'s full result as the shared TeleportData;
+  retries a player's failed return teleport with capped backoff via
+  `TeleportService.TeleportInitFailed`, then kicks; a 30s watchdog force-kicks any stragglers
+  so the server always empties (Roblox destroys an empty reserved server automatically — there
+  is no direct "shut down now" call).
+- `Lobby/ArrivalService.luau` — on a player's `PlayerAdded`, checks `TeleportData.summary`; if
+  present, extracts that player's own `perPlayer` slice server-side and fires the existing
+  `MatchResultSync` remote with it (display-only, never written to the DataStore). Progression
+  itself needs no explicit reload call here — `PlayerCurrency.legacy`'s own `PlayerAdded`
+  handler already runs unconditionally regardless of join origin.
+
+Modified: `Match/MatchCleanup.luau` (removed the superseded `ENDING_HOLD_SECONDS` timer/handler
+now that `MatchClock` owns that hold) · `Boot/GameBoot.luau` (added `ReturnToLobbyService`,
+`MatchClock`, `MatchArrival` — `MatchClock` before `MatchArrival`, publisher-before-subscriber)
+· `Boot/LobbyBoot.luau` (added `MatchLauncher`, `ArrivalService`).
+
+Deliberate simplification: `TeleportAsync`'s data table is one shared payload per batch call,
+not per-player, so `ReturnToLobbyService` sends the *entire* `perPlayer` table and
+`ArrivalService` picks out each player's own slice server-side — avoids one `TeleportAsync`
+call per returning player while keeping the same no-cross-player-leak guarantee.
+
+**Verification owed, requires a published build:** launch a match from the Lobby (command bar:
+`MatchLauncher.Launch(Players:GetPlayers())`), confirm arrival seeds the roster and reaches
+`Playing` on its own, end the match, confirm the server actually empties/shuts down, and
+confirm XP earned in the match is present back on the Lobby (`RewardStore_v1` read after
+return). None of this has been run yet.
 
 ## Architecture invariants
 
@@ -298,6 +553,7 @@ Non-derivable from code. These will burn a session if forgotten.
 - **G7 — Studio API Services off** ⇒ every join lands in `RewardStore` state `Failed`: XP shows 0 and *nothing is written*. Real data stays intact. Not a bug.
 - **G8 — `ServerScriptService` modules are unreachable from clients.** Shared code must live in `ReplicatedStorage`.
 - **G9 — Roblox does not guarantee Script execution order.** `Bootstrap.legacy.luau` is a decoupling point, *not* an ordered bootstrap. Safe today only because nothing subscribes to anything at boot — that stops being true the moment the match rearchitecture lands.
+- **G10 — User-reported: DataStore access only works from a genuine published Roblox server, not a Studio test client/server.** As stated this overclaims — `GetAsync`/`SetAsync` calls in Studio Play **did** work live this session (Phase 7.5 items 6 and 9, with Studio Access to API Services on; see G7). What's actually confirmed Studio-blocked is `ReserveServer`/`TeleportAsync` (Phase 0 above: HTTP 403 in Studio Play/Test even against a published place) — Phase 8's `MatchLauncher`/`ReturnToLobbyService` cannot be exercised in Studio at all and need a published two-place build. Recording both here since the two are easy to conflate and the next session should know which one actually blocks Studio testing.
 
 ## Reference tables
 
