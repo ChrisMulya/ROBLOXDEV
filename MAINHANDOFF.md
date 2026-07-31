@@ -491,6 +491,212 @@ call per returning player while keeping the same no-cross-player-leak guarantee.
 confirm XP earned in the match is present back on the Lobby (`RewardStore_v1` read after
 return). None of this has been run yet.
 
+**Roadmap revised post-Phase-8** (`~/.claude/plans/before-phase-8-perform-scalable-mochi.md`,
+repurposed from the Phase 7.5 audit — that audit's own conclusions are all implemented and
+recorded above). Two findings changed the plan: a player teleported into a match today arrives
+with **no character** (`MatchParticipants.Joined` has zero subscribers, nothing calls
+`LoadCharacter` on the Game place) and there is **no match duration**, so a match can never end
+on its own — both bugs live, both block meaningful Phase 8 verification. New phase order:
+`8.0` (commit + graph baseline) → `8.1` (observability/save-truth) → `8.5` (participant
+onboarding — the `StartGame`/`EndGame` reuse phase) → `8V` (published-build verification) →
+`9` (encounter director, moved up) → `10` (matchmaking, was Phase 9) → `11` (loadout
+persistence) → `12` (session-lock library) → `13` (forfeit, deferred). Full rationale, the
+26-item debt disposition table, and the dependency graph are in that plan file.
+
+**Phase 8.0 (commit + graph baseline) — DONE.** Committed everything through Phase 8
+(`1575291`), then regenerated the graph baseline against it (`ec0b7d8`) — zero import cycles
+confirmed. This was a revertability gate: 8.5 deletes a live legacy Script and a later phase
+changes DataStore write semantics, so both need a known-good tree to revert against.
+
+**Phase 8.1 (observability & save truth) — DONE, verified via `graphify update` (zero cycles);
+Studio playtest of the fixes still owed.** Fixed the four defects that made Phase 8's success
+and its worst failure observationally identical:
+- **`RewardStore.SaveAll`** now returns `(successCount, total)` instead of discarding every
+  per-player `Save` result. **`RewardCleanupHook`'s save step now returns a real boolean**
+  (`successCount == total`, warning on partial failure) instead of unconditionally `true` — this
+  was the single highest-leverage fix in the roadmap: previously a Cleanup save that failed for
+  every player was indistinguishable from one that succeeded for all of them.
+- **`MatchResultBuilder.Build()`** now returns a `perPlayer` snapshot frozen at `Ending`
+  (`capturedPerPlayer`, built once alongside the existing `capturedResultCode`/`capturedDuration`
+  freeze), instead of recomputing contributors on every call. Without this, a future contributor
+  reading run-scoped state would disagree between the in-match end screen (built pre-teardown)
+  and the Lobby arrival receipt (built post-teardown, reading zeros).
+- **First `MatchResultBuilder` contributor registered** — new `Reward/RewardResultHook.luau`
+  contributes `{xp, score}` per participant (current totals, not a match-scoped delta — no
+  per-match earning tracker exists yet). This is the R2 acceptance test ("adding a contributor
+  must not touch `MatchResultBuilder`") actually run for the first time.
+- **`MatchResultSync` now has a client listener on both places** — new
+  `Modules/UI/MatchReceipt.luau` (pure UI, renders `perPlayer` generically so a future
+  contributor's field appears with zero changes here) + `MatchReceiptController.luau`, required
+  from **both** `ClientBootstrap` role branches. Previously both existing `FireClient` calls
+  (`MatchReplicator` on `Ending`, `ArrivalService` on arrival) went nowhere.
+- **New `Shared/MatchLaunchResultCodes.luau`** — `MatchLauncher.Launch`'s codes
+  (`UnknownMode`/`NoPlayers`/`ReserveFailed`/`TeleportFailed`/`Launched`) now have a documented
+  vocabulary, same pattern as `ShotResultCodes` (the emitter still returns bare strings; the
+  codes module is the consumer-facing display-string map, not a runtime dependency).
+- **Dead code row removed**: `MatchResultCodes.Messages.EndingHoldElapsed` — that's a `Cleanup`
+  reason, and `capturedResultCode` only ever samples reasons landing on `Ending`.
+- **Mirror manifest extended + real drift detection added.** `Tools/CheckGameMirror.luau`'s
+  `MANIFEST` gained a "Tier 4: Match lifecycle + result codes" section (all of Phase 8's files
+  plus the Match-layer modules and everything built in 8.1 — none were in the manifest before,
+  so a clean run previously proved nothing about Phase 8). `Tools/InstallGameMirror.luau` now
+  stamps a `MirrorHash` attribute (FNV-1a over `Source`) on every ModuleScript/Script it places;
+  `CheckGameMirror` recomputes the hash from the live instance and reports **drifted** (hand-edited
+  since install) vs **unstamped** (placed by an older installer run, no hash to compare) vs clean
+  — upgrading the check from "nothing is missing" to "nothing has been hand-edited", for anything
+  mirrored from this point forward.
+- **Debt item #4 (`CurrencyUI` Show/Hide leak) reassessed as already resolved, not touched.**
+  On inspection the current code already disconnects `cashConnection` before every reconnect and
+  on every hide (`StarterPlayerScripts/CurrencyUI.local.luau`) — the fix was already in place
+  when the file was first committed. The debt row in this document was stale; no Trove rewrite
+  was applied to already-correct code.
+
+Modified: `Reward/RewardStore.luau`, `Reward/RewardCleanupHook.luau`,
+`Match/MatchResultBuilder.luau`, `Boot/GameBoot.luau` (added `RewardResultHook`),
+`StarterPlayerScripts/ClientBootstrap.local.luau` (both branches now require
+`MatchReceiptController`), `Shared/MatchResultCodes.luau`, `Lobby/MatchLauncher.luau` (comment
+only), `Tools/InstallGameMirror.luau`, `Tools/CheckGameMirror.luau`.
+
+New: `Reward/RewardResultHook.luau`, `Modules/UI/MatchReceipt.luau`,
+`Modules/UI/MatchReceiptController.luau`, `Shared/MatchLaunchResultCodes.luau`.
+
+**Verification owed:** Studio Play on the Game place — force a save failure (API Services off,
+G7) and confirm the Cleanup save step now reports failure (previously silent); confirm
+`MatchResultSync` renders a receipt with `xp`/`score` on both the in-match screen and (separately,
+once 8.5 lands) Lobby arrival. Run `CheckGameMirror` on the Game place once it's re-mirrored and
+confirm zero missing/wrong-class/drifted/unstamped. None of this has been run yet — the code
+changes are unverified in a live DataModel.
+
+**Phase 8.5 (participant onboarding) — DONE, verified via `graphify update` (zero cycles);
+Studio playtest still owed, and the mirrored Game place instances need the same edits applied
+(see below).** Closed the two bugs that made Phase 8 unverifiable even in principle: a
+teleported player got no character (`MatchParticipants.Joined` had zero subscribers, nothing
+called `LoadCharacter`), and no match duration existed, so a match could never end on its own.
+
+New files:
+- `Match/MatchSpawner.luau` (Game) — loads a character for each participant on
+  `WaitingForPlayers`, and via `MatchParticipants.Joined` (this signal's first subscriber ever)
+  for anyone whose Player instance appears later. Requires nothing above `MatchParticipants` —
+  Match-layer, not a feature.
+- `Player/KitLifecycleHook.luau` (Game) — grants the starter kit on `CharacterAdded` (not a state
+  transition — the Backpack is rebuilt on every character load, so a transition-tied grant would
+  be destroyed by any respawn), gated by the new `MatchStates.KitGranted` flag. Also subscribes
+  to `MatchParticipants.Joined` directly, to catch a participant whose character already existed
+  before they were seeded (closes a Studio Play-test race the same way `MatchSpawner` does).
+  Resets the kit on `Humanoid.Died`, and registers `"KitTeardown"` into `MatchCleanup`'s
+  teardown registry (zero entries there since Phase 7) — a feature-layer module requiring *down*
+  into Match, so it can't live in `Match/` itself.
+- `Modules/Loadout/LoadoutService.luau` — `GetCameraId(player): string`, today just
+  `player:GetAttribute("CurrentCamera") or "Camera1"`. `StartGame.giveStarterCamera` now routes
+  through this instead of reading the attribute directly, so a later phase can put a DataStore
+  behind the exact same signature (camera choice is currently unpersisted — doesn't survive a
+  teleport *or* a plain rejoin). Deliberately does not read `TeleportData` for this: a camera is
+  a purchase-backed capability grant, and `TeleportData` is client-routed, so a forged `cameraId`
+  would be a free upgrade.
+
+Modified:
+- `Shared/MatchStates.luau` — added the `KitGranted` core flag (true for
+  `WaitingForPlayers`/`Countdown`/`Playing`, false elsewhere) + `IsKitGranted(state)`, validated
+  by the existing `Validate()` loop like every other flag.
+- `Shared/MatchConfig.luau` — added `MatchDuration = 300` to `Modes.Default`.
+- `Match/MatchClock.luau` — added a `Playing` handler that calls
+  `MatchManager.RequestEnd("TimeExpired")` once `MatchDuration` elapses. Races harmlessly with
+  `MatchEndCondition` (`RequestEnd` is idempotent).
+- `Reward/CaptureTargets.luau` — flipped `RepeatPolicy` from `"Unlimited"` to `"Cooldown"` on
+  both `Monster` and `Objective` (debt #1 — ~120k XP/min was tolerable when nobody could hold a
+  camera in a match; 8.5 is the first phase where they can).
+- `CameraShelf/CameraInventory.luau` — **the one hard blocker.** Was indexing
+  `ReplicatedStorage.Assets.Tool.Camera` at module scope with no guard; the Game place's `Assets`
+  tree is Studio-placed content outside mirror scope, so requiring this on the Game place errored
+  at require time — and since `GameBoot`'s service list runs every `require()` before any
+  `Start()`, boot-list position couldn't have contained the blast radius regardless. Now a lazy
+  `FindFirstChild` chain returning `nil`; `Give` returns `false, "NoCameraAssets"` when the tree
+  is missing, which `StartGame.giveStarterCamera` already handled (places an empty placeholder,
+  doesn't claim `KitGiven`, safe to retry).
+- `Player/StartGame.luau`, `Player/EndGame.luau` — moved `Remotes.Get("ShowCurrencyUI"/
+  "HideCurrencyUI")` out of module scope into the functions that fire them (a `WaitForChild`
+  reachable from a boot list must not sit at module scope — safe today only because
+  `Bootstrap.legacy` happens to call `Remotes.Init()` before dispatching to `GameBoot`, which is
+  an ordering accident worth not depending on). `StartGame.giveStarterCamera` now calls
+  `LoadoutService.GetCameraId` instead of `CameraInventory.GetCurrentId` directly.
+- `Lobby/LobbyDeathPolicy.luau` — absorbs `PlayerStateHandler.legacy.luau`'s Lobby-side
+  behavior: `StartGameService.ResetKit(player)` added to its existing `Humanoid.Died` handler.
+- `Death/DeathService.luau` — comment only, updated to stop referencing the now-deleted file and
+  describe `KitLifecycleHook` as the coexisting `Humanoid.Died` listener instead.
+- `Boot/GameBoot.luau` — added `KitLifecycleHook` (right after `RewardResultHook` — registers a
+  teardown step, same rule as the save-step hooks) and `MatchSpawner` (after `MatchClock`).
+  **`MatchArrival` moved to the very end of the list**, after `SpectateService` — it fires the
+  first real transition (`Loading → WaitingForPlayers`), so every `StateChanged` subscriber must
+  already be connected first. This was previously correct only because `Signal` fires deferred;
+  now it's correct by construction.
+- `Tools/InstallGameMirror.luau` / `Tools/CheckGameMirror.luau` — added a "Tier 5: participant
+  onboarding" section covering every file above, plus `Shared/MatchStates`/`Shared/MatchConfig`
+  (never previously embedded — mirrored ad hoc in earlier phases) and refreshed the already-embedded
+  `MatchClock`/`CaptureTargets` copies, which today's edits had made stale.
+
+Deleted: `Player/PlayerStateHandler.legacy.luau` — its one behavior (reset `KitGiven` on death)
+had exactly one caller need, now split explicitly: `KitLifecycleHook` on the Game place (state-gated),
+`LobbyDeathPolicy` on the Lobby. This also removes the name collision with `PlayerStateService`
+and the duplicate `Humanoid.Died` listener both previously flagged as debt. **Deleted from disk
+only** — the live Studio instances on both places (this file was mirrored to both) still need
+deleting by hand; not done this session (no live Studio connection).
+
+Debt items resolved this phase: #1 (`RepeatPolicy`), #5 (death skipping `ClearPlayerTools` — now
+made correct by design: death never clears tools, only `Cleanup` does), #11 (`PlayerStateHandler.legacy`
+collision/duplicate listener), #20 (no match duration), #22 (`AcceptsJoins` now has readers), #23
+(`CameraInventory` asset path — confirmed `Assets.Tool.Camera` is real; MAINHANDOFF's reference
+table was stale, now corrected).
+
+**Verification owed:** none of this has been run in a live DataModel yet. Studio, Game place: a
+player should arrive → get a character with no command-bar step → get a camera Tool → be able to
+photograph and earn XP → have the match end on its own after `MatchDuration` → `Cleanup` runs
+`KitTeardown` (tools gone, Score zeroed, XP intact) → a mid-match respawn should regrant the kit.
+Also confirm `MatchStates.Validate()` fails loudly if `KitGranted` is stripped from a row (sanity
+check that the validator actually enforces the new flag). The mirrored Game place instances also
+need `Tools/InstallGameMirror.luau` re-run (Tier 5) before any of this is testable there, and the
+two live `PlayerStateHandler.legacy` Script instances (Lobby + Game) need manual deletion.
+
+**Phase 8V (verification) — PREP DONE; the actual live verification is a human-only step, not
+yet run.** 8V is fundamentally different from every phase before it: it's pure verification, no
+new game features, and per G10 `ReserveServer`/`TeleportAsync` return HTTP 403 even in Studio
+Play against a published place — the only way to exercise the round trip is a real Roblox
+client joining the actual live published game. No tool available this session reaches a live
+production server (Studio MCP reaches Studio's local Edit/Play DataModels only), so unlike every
+earlier phase, none of this could be executed directly.
+
+What was prepared instead: `MatchLauncher` has no real caller until Phase 10's `QueueService`
+exists, and a live published server has no command bar — every prior phase's verification relied
+on one. New `Lobby/DebugLaunchTrigger.luau` (**TEMPORARY, delete once Phase 10 ships**) listens
+for a `/launch` chat message from the place's Creator (`game.CreatorId`, `Enum.CreatorType.User`
+only — fails closed on a Group-owned place rather than guessing a rank) and calls
+`MatchLauncher.Launch(Players:GetPlayers())`, single-flight guarded so repeated messages can't
+stack overlapping launches. Wired into `LobbyBoot` right after `MatchLauncher` (callee before
+caller).
+
+**Before testing:** both places were already published, but *before* today's Phase 8.1/8.5 work
+(and 8V's own trigger) — none of it is live until republished. Confirm the Lobby's Studio
+Edit-mode session has today's disk changes (`LobbyBoot.luau`, new `DebugLaunchTrigger.luau`) —
+normal disk-sync should carry these over the same way it has for every Lobby file all session,
+unlike the Game place which has needed the manual `InstallGameMirror` catch-up. Then publish
+both places.
+
+**Verification checklist for the human tester** (nothing below has been run):
+1. Publish both places with today's code.
+2. Join the Lobby as the place's Creator account (chat command is Creator-restricted).
+3. Type `/launch` in chat.
+4. Confirm teleport to the Game place happens automatically.
+5. Confirm a character loads with **no manual step** and a camera Tool is equipped — this is
+   Phase 8.5's onboarding fix actually being exercised live for the first time.
+6. Optionally photograph a target to confirm scoring still works end-to-end.
+7. Either wait ~5 minutes for `MatchDuration` (300s) to force-end the match, or the roadmap's
+   Phase 6 spectate scenarios can be exercised here too if a second real player joins.
+8. Confirm the match ends and the Game server actually empties (Roblox server list / analytics
+   — it should not linger).
+9. Confirm arrival back on the Lobby, and that XP earned in the match is present
+   (`RewardStore_v1`, same key across both places by design).
+10. Delete `Lobby/DebugLaunchTrigger.luau` and its `LobbyBoot` line once Phase 10's `QueueService`
+    supersedes it — tracked as a reminder, not urgent.
+
 ## Architecture invariants
 
 Rules that outlive any single file. Violating one is a bug even if it works.
@@ -523,7 +729,6 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 
 ## Half-built / not wired
 
-- **`StartGame` / `EndGame` have no in-code caller.** Both fire only from Studio ProximityPrompts (`Workspace.TestButton.InventorySlot.StartGame.Script`). They are *inventory* functions despite the names — kit grant and kit teardown, not match lifecycle. The match rearchitecture makes them a real caller's job.
 - **`UITheme` / `UIBuilder` adopted by `CurrencyUI` only.** Six divergent "dark grey" values remain across five files. Blocked on palette sign-off. Use them in all new UI.
 - **`RewardModifiers`** — registry exists, zero entries. The Combo/Streak/Event seam, unproven.
 - **`FlashEvents`** (server) — bare Signal, zero subscribers. Reserved for monster perception.
@@ -534,11 +739,8 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 
 | Issue | Impact | Why deferred |
 |---|---|---|
-| `RepeatPolicy = "Unlimited"` on both capture targets | Holding aim on one target ≈ 120k XP/min | Anti-farm logic (`CaptureGuard.CheckRepeatPolicy` → `"Cooldown"`) exists and is one table edit from live |
-| No DataStore session locking | Fast rejoin / server hop = last-write-wins clobber | Prefer a proven library over hand-rolling. Destructive outage-zeroing case is already closed |
+| No DataStore session locking | Fast rejoin / server hop = last-write-wins clobber | Prefer a proven library over hand-rolling (roadmap Phase 12). A cheap launch-time gate lands in Phase 10 first. Destructive outage-zeroing case is already closed |
 | `origin` is client-supplied | Spoofable shot origin | `CaptureGuard.ValidateShot` 10-stud proximity check is a mitigation; server-derived origin is a larger change |
-| `CurrencyUI` Show/Hide connection leak | Slow growth | Fix is a `Trove`, same pattern as `CameraSession` |
-| Death resets `KitGiven` but skips `EndGame.ClearPlayerTools` | Cash/Score/objectives survive death | Unmade design decision, not a bug |
 
 ## Environment & tooling gotchas
 
@@ -575,7 +777,10 @@ Non-derivable from code. These will burn a session if forgotten.
 
 **Asset paths** (tree structure differs — don't assume parity):
 - `ReplicatedStorage.Assets.Tool.SupportItem`
-- `ReplicatedStorage.Assets.Model.Tool.Camera.Camera1`
+- `ReplicatedStorage.Assets.Tool.Camera.Camera1` — corrected 8.5 (roadmap debt #23): this entry
+  previously read `Assets.Model.Tool.Camera.Camera1`, contradicting both real call sites
+  (`CameraInventory.luau`, `CameraShelfSwap.luau`), which agree on `Assets.Tool.Camera`. The
+  code was right; this table was stale.
 
 **Security boundary:** `CameraSessionTracker`'s InCamera flag is client-reported — UX guard only, never a security check.
 

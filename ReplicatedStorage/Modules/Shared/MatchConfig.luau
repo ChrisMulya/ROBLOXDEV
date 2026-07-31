@@ -10,6 +10,7 @@ MatchConfig.Modes = {
 		MaxPlayers = 8,
 		WaitTimeout = 60, -- seconds WaitingForPlayers waits before Cleanup at zero players
 		CountdownSeconds = 5,
+		MatchDuration = 300, -- seconds Playing runs before MatchClock force-ends it (TimeExpired)
 		EndingHoldSeconds = 8, -- how long Ending stays up so the summary is readable
 	},
 }

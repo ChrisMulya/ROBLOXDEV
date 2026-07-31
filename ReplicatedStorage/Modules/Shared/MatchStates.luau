@@ -19,8 +19,13 @@ local CORE_FLAGS = {
 	"ScoringActive",
 	"MonstersSpawn",
 	"Terminal",
+	"KitGranted",
 }
 
+-- KitGranted: whether a participant may hold their starter kit right now.
+-- Added 8.5 -- the seam that lets KitLifecycleHook decide "may I grant/keep
+-- a kit" as a data lookup instead of a condition someone has to remember at
+-- every call site.
 MatchStates.All = {
 	Loading = {
 		GameplayActive = false,
@@ -29,6 +34,7 @@ MatchStates.All = {
 		ScoringActive = false,
 		MonstersSpawn = false,
 		Terminal = false,
+		KitGranted = false,
 	},
 	WaitingForPlayers = {
 		GameplayActive = false,
@@ -37,6 +43,7 @@ MatchStates.All = {
 		ScoringActive = false,
 		MonstersSpawn = false,
 		Terminal = false,
+		KitGranted = true,
 	},
 	Countdown = {
 		GameplayActive = false,
@@ -45,6 +52,7 @@ MatchStates.All = {
 		ScoringActive = false,
 		MonstersSpawn = false,
 		Terminal = false,
+		KitGranted = true,
 	},
 	Playing = {
 		GameplayActive = true,
@@ -53,6 +61,7 @@ MatchStates.All = {
 		ScoringActive = true,
 		MonstersSpawn = true,
 		Terminal = false,
+		KitGranted = true,
 	},
 	Ending = {
 		GameplayActive = false,
@@ -61,6 +70,7 @@ MatchStates.All = {
 		ScoringActive = false,
 		MonstersSpawn = false,
 		Terminal = false,
+		KitGranted = false,
 	},
 	Cleanup = {
 		GameplayActive = false,
@@ -69,6 +79,7 @@ MatchStates.All = {
 		ScoringActive = false,
 		MonstersSpawn = false,
 		Terminal = false,
+		KitGranted = false,
 	},
 	Finished = {
 		GameplayActive = false,
@@ -77,6 +88,7 @@ MatchStates.All = {
 		ScoringActive = false,
 		MonstersSpawn = false,
 		Terminal = true,
+		KitGranted = false,
 	},
 }
 
@@ -122,6 +134,11 @@ end
 function MatchStates.IsTerminal(state: string): boolean
 	local def = MatchStates.All[state]
 	return def ~= nil and def.Terminal
+end
+
+function MatchStates.IsKitGranted(state: string): boolean
+	local def = MatchStates.All[state]
+	return def ~= nil and def.KitGranted
 end
 
 function MatchStates.CanTransition(from: string, to: string): boolean

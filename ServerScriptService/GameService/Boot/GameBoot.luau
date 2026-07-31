@@ -65,16 +65,25 @@ function GameBoot.Start()
 		-- table), but this position keeps the list's dependency direction
 		-- consistent with every other publisher-before-subscriber entry.
 		require(ServerScriptService.GameService.Reward.RewardCleanupHook),
+		-- First MatchResultBuilder contributor -- registry before registrant,
+		-- same rule as RewardCleanupHook above.
+		require(ServerScriptService.GameService.Reward.RewardResultHook),
+		-- Registers a teardown step into MatchCleanup's registry (same rule
+		-- as RewardCleanupHook/RewardResultHook above).
+		require(ServerScriptService.GameService.Player.KitLifecycleHook),
 		require(ServerScriptService.GameService.Match.ReturnToLobbyService),
-		-- MatchClock before MatchArrival: MatchClock must be subscribed to
-		-- StateChanged before MatchArrival's first PlayerAdded can fire
-		-- Loading -> WaitingForPlayers (a player could already be connected
-		-- when boot runs in a Studio Play-test), same publisher-before-
-		-- subscriber rule as MatchResultBuilder/MatchReplicator above.
 		require(ServerScriptService.GameService.Match.MatchClock),
-		require(ServerScriptService.GameService.Match.MatchArrival),
+		-- Loads characters for the roster once WaitingForPlayers begins.
+		require(ServerScriptService.GameService.Match.MatchSpawner),
 		require(ServerScriptService.GameService.Death.DeathService),
 		require(ServerScriptService.GameService.Spectate.SpectateService),
+		-- MatchArrival LAST: it fires the first real transition
+		-- (Loading -> WaitingForPlayers), so every StateChanged subscriber
+		-- above (MatchClock, MatchSpawner, MatchResultBuilder, etc.) must
+		-- already be connected before that can happen -- this was previously
+		-- correct only by accident (Signal fires deferred), which required
+		-- re-deriving that fact every time a new subscriber was added.
+		require(ServerScriptService.GameService.Match.MatchArrival),
 	}
 
 	for _, service in ipairs(services) do

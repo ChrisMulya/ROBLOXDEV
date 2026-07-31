@@ -29,8 +29,11 @@ function RewardCleanupHook.Start()
 	ServerRole.AssertGameServer()
 
 	MatchCleanup.RegisterSaveStep("RewardLedger", function(): boolean
-		RewardStore.SaveAll(RewardLedger.CurrentPersistentValues)
-		return true
+		local successCount, total = RewardStore.SaveAll(RewardLedger.CurrentPersistentValues)
+		if successCount < total then
+			warn(("RewardCleanupHook: only %d/%d player saves succeeded"):format(successCount, total))
+		end
+		return successCount == total
 	end)
 end
 

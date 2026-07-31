@@ -16,9 +16,10 @@ require(ReplicatedStorage.Modules.Objective.ObjectiveVisualsController)
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 
 if ServerRole.Is("LobbyServer") then
-	-- Phase 9: QueueHud
+	require(ReplicatedStorage.Modules.UI.MatchReceiptController)
+	-- Phase 10: QueueHud
 elseif ServerRole.Is("GameServer") then
 	require(ReplicatedStorage.Modules.UI.DeathScreenController)
 	require(ReplicatedStorage.Modules.Spectate.SpectateController)
-	-- Phase 7: EndMatchScreen
+	require(ReplicatedStorage.Modules.UI.MatchReceiptController)
 end

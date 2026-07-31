@@ -81,6 +81,25 @@ local function runEndingHold()
 	end)
 end
 
+-- Without this, a match with no time limit can never end on its own --
+-- MatchEndCondition only fires when every participant stops counting as
+-- active, which never happens if nobody dies. RequestEnd is idempotent, so
+-- this racing MatchEndCondition (whoever fires first wins) is harmless.
+local function runPlaying()
+	local cfg = config()
+	local waited = 0
+
+	while MatchManager.Is("Playing") do
+		if waited >= cfg.MatchDuration then
+			MatchManager.RequestEnd("TimeExpired")
+			return
+		end
+
+		task.wait(1)
+		waited += 1
+	end
+end
+
 local started = false
 
 function MatchClock.Start()
@@ -96,6 +115,8 @@ function MatchClock.Start()
 			task.spawn(runWaitingForPlayers)
 		elseif newState == "Countdown" then
 			task.spawn(runCountdown)
+		elseif newState == "Playing" then
+			task.spawn(runPlaying)
 		elseif newState == "Ending" then
 			runEndingHold()
 		end

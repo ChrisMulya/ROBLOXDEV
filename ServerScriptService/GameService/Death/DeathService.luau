@@ -1,15 +1,11 @@
--- Death handling only. The only Humanoid.Died listener on this place (Game
--- Server) -- LobbyDeathPolicy binds Humanoid.Died itself on the Lobby,
--- entirely separately, and doesn't use this module. Owns no UI, no camera,
--- no teleport.
+-- Death handling only. Owns no UI, no camera, no teleport.
 --
--- Existing ServerScriptService/GameService/Player/PlayerStateHandler.legacy.luau
--- also binds Humanoid.Died on both places (-> StartGameService.ResetKit) and
--- is untouched here per the plan's "existing self-wiring scripts are not
--- migrated" rule -- the two listeners coexist without conflict (ResetKit
--- only touches the KitGiven attribute), though the name collision with this
--- module is confusing and still worth a rename/absorb later (see
--- MAINHANDOFF).
+-- Not the only Humanoid.Died listener on this place -- KitLifecycleHook
+-- binds its own, independently, to reset KitGiven (-> StartGameService.
+-- ResetKit). The two coexist without conflict: this module owns
+-- PlayerStateService transitions and spectate/respawn policy; KitLifecycle
+-- Hook only touches the KitGiven attribute. LobbyDeathPolicy binds
+-- Humanoid.Died separately again on the Lobby and doesn't use this module.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

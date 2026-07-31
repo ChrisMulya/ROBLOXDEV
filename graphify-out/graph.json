@@ -62,8 +62,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camerashelf_camerashelfgui",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "camerashelfgui.luau"
     },
     {
@@ -73,8 +73,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camerashelf_camerashelfgui_buildpanel",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "buildpanel()"
     },
     {
@@ -84,8 +84,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camerashelf_camerashelfgui_buildtitle",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "buildtitle()"
     },
     {
@@ -95,8 +95,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camerashelf_camerashelfgui_buildclosebutton",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "buildclosebutton()"
     },
     {
@@ -106,8 +106,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camerashelf_camerashelfgui_buildmessagelabel",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "buildmessagelabel()"
     },
     {
@@ -117,8 +117,8 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camerashelf_camerashelfgui_buildlistholder",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "buildlistholder()"
     },
     {
@@ -128,8 +128,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camerashelf_camerashelfgui_buildcamerarow",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "buildcamerarow()"
     },
     {
@@ -139,8 +139,8 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camerashelf_camerashelfgui_camerashelfgui_build",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "camerashelfgui.build()"
     },
     {
@@ -150,8 +150,8 @@
       "source_location": "L152",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camerashelf_camerashelfgui_camerashelfgui_showmessage",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "camerashelfgui.showmessage()"
     },
     {
@@ -161,8 +161,8 @@
       "source_location": "L158",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camerashelf_camerashelfgui_camerashelfgui_refresh",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "camerashelfgui.refresh()"
     },
     {
@@ -172,8 +172,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camerashelf_shelfresultcodes",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "shelfresultcodes.luau"
     },
     {
@@ -183,8 +183,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camerashelf_shelfresultcodes_shelfresultcodes_getmessage",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "shelfresultcodes.getmessage()"
     },
     {
@@ -348,8 +348,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastability",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "camerastability.luau"
     },
     {
@@ -359,8 +359,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastability_camerastability_ismoving",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "camerastability.ismoving()"
     },
     {
@@ -481,7 +481,7 @@
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastate_camerastate_getwalkspeedmultiplier",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "camerastate.getwalkspeedmultiplier()"
     },
     {
@@ -491,8 +491,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastats",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "camerastats.luau"
     },
     {
@@ -502,8 +502,8 @@
       "source_location": "L131",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastats_camerastats_getstats",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "camerastats.getstats()"
     },
     {
@@ -513,8 +513,8 @@
       "source_location": "L149",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastats_camerastats_getblursettings",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "camerastats.getblursettings()"
     },
     {
@@ -524,8 +524,8 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastats_camerastats_getmovementsettings",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "camerastats.getmovementsettings()"
     },
     {
@@ -535,8 +535,8 @@
       "source_location": "L157",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastats_camerastats_getstabilitysettings",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "camerastats.getstabilitysettings()"
     },
     {
@@ -546,8 +546,8 @@
       "source_location": "L161",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastats_camerastats_getshotsettings",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "camerastats.getshotsettings()"
     },
     {
@@ -557,8 +557,8 @@
       "source_location": "L165",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastats_camerastats_getcolorgradesettings",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "camerastats.getcolorgradesettings()"
     },
     {
@@ -568,8 +568,8 @@
       "source_location": "L169",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastats_camerastats_geteffectssettings",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "camerastats.geteffectssettings()"
     },
     {
@@ -579,8 +579,8 @@
       "source_location": "L173",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastats_camerastats_getviewfindersettings",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "camerastats.getviewfindersettings()"
     },
     {
@@ -590,8 +590,8 @@
       "source_location": "L180",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastats_camerastats_getflashsettings",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "camerastats.getflashsettings()"
     },
     {
@@ -601,8 +601,8 @@
       "source_location": "L187",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastats_camerastats_getidfromtool",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "camerastats.getidfromtool()"
     },
     {
@@ -612,8 +612,8 @@
       "source_location": "L194",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_camerastats_camerastats_getorderedids",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "camerastats.getorderedids()"
     },
     {
@@ -755,8 +755,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "cameraviewfinder.luau"
     },
     {
@@ -766,8 +766,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_createbar",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "createbar()"
     },
     {
@@ -777,8 +777,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_createbracket",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "createbracket()"
     },
     {
@@ -788,8 +788,8 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_createreticle",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "createreticle()"
     },
     {
@@ -799,8 +799,8 @@
       "source_location": "L129",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_createcornerlabel",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "createcornerlabel()"
     },
     {
@@ -810,8 +810,8 @@
       "source_location": "L150",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_creategrainframe",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "creategrainframe()"
     },
     {
@@ -821,8 +821,8 @@
       "source_location": "L161",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_createscanlinescontainer",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "createscanlinescontainer()"
     },
     {
@@ -832,8 +832,8 @@
       "source_location": "L174",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_createvignette",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "createvignette()"
     },
     {
@@ -843,8 +843,8 @@
       "source_location": "L204",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_ensurebuilt",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "ensurebuilt()"
     },
     {
@@ -854,8 +854,8 @@
       "source_location": "L253",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_applyvignette",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "applyvignette()"
     },
     {
@@ -865,8 +865,8 @@
       "source_location": "L268",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_applyscanlines",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "applyscanlines()"
     },
     {
@@ -876,8 +876,8 @@
       "source_location": "L287",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_applygrain",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "applygrain()"
     },
     {
@@ -887,8 +887,8 @@
       "source_location": "L298",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_cameraviewfinder_show",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "cameraviewfinder.show()"
     },
     {
@@ -898,8 +898,8 @@
       "source_location": "L316",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_cameraviewfinder_cameraviewfinder_hide",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "cameraviewfinder.hide()"
     },
     {
@@ -942,8 +942,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "replicatedstorage_modules_camera_viewfindertheme",
-      "community": 0,
-      "community_name": "CameraSession.luau",
+      "community": 5,
+      "community_name": "CameraViewfinder.luau",
       "norm_label": "viewfindertheme.luau"
     },
     {
@@ -1019,8 +1019,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "replicatedstorage_modules_flash_flashrenderers_init",
-      "community": 13,
-      "community_name": "Signal.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "flashrenderers/init.luau"
     },
     {
@@ -1030,9 +1030,31 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "replicatedstorage_modules_flash_flashsignal",
-      "community": 13,
-      "community_name": "Signal.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "flashsignal.luau"
+    },
+    {
+      "label": "LoadoutService.luau",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/Loadout/LoadoutService.luau",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_loadout_loadoutservice",
+      "community": 8,
+      "community_name": "StartGame.luau",
+      "norm_label": "loadoutservice.luau"
+    },
+    {
+      "label": "LoadoutService.GetCameraId()",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/Loadout/LoadoutService.luau",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_loadout_loadoutservice_loadoutservice_getcameraid",
+      "community": 8,
+      "community_name": "StartGame.luau",
+      "norm_label": "loadoutservice.getcameraid()"
     },
     {
       "label": "MonsterStats.luau",
@@ -1273,7 +1295,7 @@
       "_origin": "ast",
       "id": "replicatedstorage_modules_playerruntimestats",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "playerruntimestats.luau"
     },
     {
@@ -1284,7 +1306,7 @@
       "_origin": "ast",
       "id": "replicatedstorage_modules_playerruntimestats_playerruntimestats_get",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "playerruntimestats.get()"
     },
     {
@@ -1295,7 +1317,7 @@
       "_origin": "ast",
       "id": "replicatedstorage_modules_playerruntimestats_playerruntimestats_set",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "playerruntimestats.set()"
     },
     {
@@ -1306,7 +1328,7 @@
       "_origin": "ast",
       "id": "replicatedstorage_modules_playerruntimestats_playerruntimestats_add",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "playerruntimestats.add()"
     },
     {
@@ -1317,7 +1339,7 @@
       "_origin": "ast",
       "id": "replicatedstorage_modules_playerstats",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "playerstats.luau"
     },
     {
@@ -1328,7 +1350,7 @@
       "_origin": "ast",
       "id": "replicatedstorage_modules_playerstats_playerstats_get",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "playerstats.get()"
     },
     {
@@ -1339,7 +1361,7 @@
       "_origin": "ast",
       "id": "replicatedstorage_modules_playerstats_playerstats_set",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "playerstats.set()"
     },
     {
@@ -1350,7 +1372,7 @@
       "_origin": "ast",
       "id": "replicatedstorage_modules_playerstats_playerstats_add",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "playerstats.add()"
     },
     {
@@ -1757,19 +1779,41 @@
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchconfig",
       "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community_name": "MatchManager.luau",
       "norm_label": "matchconfig.luau"
     },
     {
       "label": "MatchConfig.Get()",
       "file_type": "code",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchConfig.luau",
-      "source_location": "L17",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchconfig_matchconfig_get",
       "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community_name": "MatchManager.luau",
       "norm_label": "matchconfig.get()"
+    },
+    {
+      "label": "MatchLaunchResultCodes.luau",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/Shared/MatchLaunchResultCodes.luau",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_shared_matchlaunchresultcodes",
+      "community": 40,
+      "community_name": "MatchLaunchResultCodes.luau",
+      "norm_label": "matchlaunchresultcodes.luau"
+    },
+    {
+      "label": "MatchLaunchResultCodes.GetMessage()",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/Shared/MatchLaunchResultCodes.luau",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_shared_matchlaunchresultcodes_matchlaunchresultcodes_getmessage",
+      "community": 40,
+      "community_name": "MatchLaunchResultCodes.luau",
+      "norm_label": "matchlaunchresultcodes.getmessage()"
     },
     {
       "label": "MatchResultCodes.luau",
@@ -1778,19 +1822,19 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchresultcodes",
-      "community": 40,
-      "community_name": "MatchResultCodes.luau",
+      "community": 14,
+      "community_name": "DeathScreen.luau",
       "norm_label": "matchresultcodes.luau"
     },
     {
       "label": "MatchResultCodes.GetMessage()",
       "file_type": "code",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchResultCodes.luau",
-      "source_location": "L17",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchresultcodes_matchresultcodes_getmessage",
-      "community": 40,
-      "community_name": "MatchResultCodes.luau",
+      "community": 14,
+      "community_name": "DeathScreen.luau",
       "norm_label": "matchresultcodes.getmessage()"
     },
     {
@@ -1808,18 +1852,18 @@
       "label": "MatchStates.IsValid()",
       "file_type": "code",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L93",
+      "source_location": "L105",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchstates_matchstates_isvalid",
-      "community": 45,
-      "community_name": "MatchStates.luau",
+      "community": 39,
+      "community_name": "MatchManager.luau",
       "norm_label": "matchstates.isvalid()"
     },
     {
       "label": "MatchStates.IsGameplayActive()",
       "file_type": "code",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L97",
+      "source_location": "L109",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchstates_matchstates_isgameplayactive",
       "community": 45,
@@ -1830,7 +1874,7 @@
       "label": "MatchStates.AcceptsJoins()",
       "file_type": "code",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L102",
+      "source_location": "L114",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchstates_matchstates_acceptsjoins",
       "community": 45,
@@ -1841,7 +1885,7 @@
       "label": "MatchStates.IsSpectateAllowed()",
       "file_type": "code",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L107",
+      "source_location": "L119",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchstates_matchstates_isspectateallowed",
       "community": 45,
@@ -1852,7 +1896,7 @@
       "label": "MatchStates.IsScoringActive()",
       "file_type": "code",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L112",
+      "source_location": "L124",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchstates_matchstates_isscoringactive",
       "community": 10,
@@ -1863,7 +1907,7 @@
       "label": "MatchStates.MonstersSpawn()",
       "file_type": "code",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L117",
+      "source_location": "L129",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchstates_matchstates_monstersspawn",
       "community": 45,
@@ -1874,33 +1918,44 @@
       "label": "MatchStates.IsTerminal()",
       "file_type": "code",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L122",
+      "source_location": "L134",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchstates_matchstates_isterminal",
-      "community": 45,
-      "community_name": "MatchStates.luau",
+      "community": 39,
+      "community_name": "MatchManager.luau",
       "norm_label": "matchstates.isterminal()"
+    },
+    {
+      "label": "MatchStates.IsKitGranted()",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
+      "source_location": "L139",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_shared_matchstates_matchstates_iskitgranted",
+      "community": 48,
+      "community_name": "MatchParticipants.luau",
+      "norm_label": "matchstates.iskitgranted()"
     },
     {
       "label": "MatchStates.CanTransition()",
       "file_type": "code",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L127",
+      "source_location": "L144",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchstates_matchstates_cantransition",
-      "community": 45,
-      "community_name": "MatchStates.luau",
+      "community": 39,
+      "community_name": "MatchManager.luau",
       "norm_label": "matchstates.cantransition()"
     },
     {
       "label": "MatchStates.Validate()",
       "file_type": "code",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L136",
+      "source_location": "L153",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_matchstates_matchstates_validate",
-      "community": 36,
-      "community_name": "ServerRole.luau",
+      "community": 45,
+      "community_name": "MatchStates.luau",
       "norm_label": "matchstates.validate()"
     },
     {
@@ -1998,8 +2053,8 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_playerstates_playerstates_countsasactive",
-      "community": 48,
-      "community_name": "evaluate",
+      "community": 46,
+      "community_name": "VerifyPhase75.luau",
       "norm_label": "playerstates.countsasactive()"
     },
     {
@@ -2130,8 +2185,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "replicatedstorage_modules_shared_serverrole_serverrole_assertgameserver",
-      "community": 36,
-      "community_name": "ServerRole.luau",
+      "community": 47,
+      "community_name": "ServerRole.AssertGameServer",
       "norm_label": "serverrole.assertgameserver()"
     },
     {
@@ -2641,6 +2696,105 @@
       "norm_label": "deathscreencontroller.luau"
     },
     {
+      "label": "MatchReceipt.luau",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_ui_matchreceipt",
+      "community": 14,
+      "community_name": "DeathScreen.luau",
+      "norm_label": "matchreceipt.luau"
+    },
+    {
+      "label": "buildPanel()",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_ui_matchreceipt_buildpanel",
+      "community": 14,
+      "community_name": "DeathScreen.luau",
+      "norm_label": "buildpanel()"
+    },
+    {
+      "label": "buildMessageLabel()",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_ui_matchreceipt_buildmessagelabel",
+      "community": 14,
+      "community_name": "DeathScreen.luau",
+      "norm_label": "buildmessagelabel()"
+    },
+    {
+      "label": "buildDetailLabel()",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_ui_matchreceipt_builddetaillabel",
+      "community": 14,
+      "community_name": "DeathScreen.luau",
+      "norm_label": "builddetaillabel()"
+    },
+    {
+      "label": "ensureBuilt()",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L60",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_ui_matchreceipt_ensurebuilt",
+      "community": 14,
+      "community_name": "DeathScreen.luau",
+      "norm_label": "ensurebuilt()"
+    },
+    {
+      "label": "formatDetail()",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L74",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_ui_matchreceipt_formatdetail",
+      "community": 14,
+      "community_name": "DeathScreen.luau",
+      "norm_label": "formatdetail()"
+    },
+    {
+      "label": "MatchReceipt.Show()",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L90",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_ui_matchreceipt_matchreceipt_show",
+      "community": 14,
+      "community_name": "DeathScreen.luau",
+      "norm_label": "matchreceipt.show()"
+    },
+    {
+      "label": "MatchReceipt.Hide()",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L99",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_ui_matchreceipt_matchreceipt_hide",
+      "community": 14,
+      "community_name": "DeathScreen.luau",
+      "norm_label": "matchreceipt.hide()"
+    },
+    {
+      "label": "MatchReceiptController.luau",
+      "file_type": "code",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceiptController.luau",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "replicatedstorage_modules_ui_matchreceiptcontroller",
+      "community": 27,
+      "community_name": "Remotes.luau",
+      "norm_label": "matchreceiptcontroller.luau"
+    },
+    {
       "label": "UIBuilder.luau",
       "file_type": "code",
       "source_file": "ReplicatedStorage/Modules/UI/UIBuilder.luau",
@@ -2691,8 +2845,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_boot_gameboot",
-      "community": 36,
-      "community_name": "ServerRole.luau",
+      "community": 45,
+      "community_name": "MatchStates.luau",
       "norm_label": "gameboot.luau"
     },
     {
@@ -2702,8 +2856,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_boot_gameboot_guardnonreservedserver",
-      "community": 36,
-      "community_name": "ServerRole.luau",
+      "community": 45,
+      "community_name": "MatchStates.luau",
       "norm_label": "guardnonreservedserver()"
     },
     {
@@ -2713,8 +2867,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_boot_gameboot_gameboot_start",
-      "community": 36,
-      "community_name": "ServerRole.luau",
+      "community": 45,
+      "community_name": "MatchStates.luau",
       "norm_label": "gameboot.start()"
     },
     {
@@ -2757,52 +2911,63 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camerashelf_camerainventory",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "camerainventory.luau"
+    },
+    {
+      "label": "templatesFolder()",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_camerashelf_camerainventory_templatesfolder",
+      "community": 8,
+      "community_name": "StartGame.luau",
+      "norm_label": "templatesfolder()"
     },
     {
       "label": "CameraInventory.FindSlot()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
-      "source_location": "L24",
+      "source_location": "L35",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camerashelf_camerainventory_camerainventory_findslot",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "camerainventory.findslot()"
     },
     {
       "label": "CameraInventory.GetCurrentId()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
-      "source_location": "L41",
+      "source_location": "L52",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camerashelf_camerainventory_camerainventory_getcurrentid",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "camerainventory.getcurrentid()"
     },
     {
       "label": "CameraInventory.Give()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
-      "source_location": "L48",
+      "source_location": "L59",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camerashelf_camerainventory_camerainventory_give",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "camerainventory.give()"
     },
     {
       "label": "CameraInventory.ClearSlot()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
-      "source_location": "L76",
+      "source_location": "L93",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camerashelf_camerainventory_camerainventory_clearslot",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "camerainventory.clearslot()"
     },
     {
@@ -2834,8 +2999,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camerashelf_camerashelfswap",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "camerashelfswap.luau"
     },
     {
@@ -2845,8 +3010,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camerashelf_camerashelfswap_camerashelfswap_takecamera",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "camerashelfswap.takecamera()"
     },
     {
@@ -2856,8 +3021,8 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camerashelf_camerashelfswap_camerashelfswap_clearcameraslot",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "camerashelfswap.clearcameraslot()"
     },
     {
@@ -2867,8 +3032,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camera_camerasessiontracker",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "camerasessiontracker.luau"
     },
     {
@@ -2878,8 +3043,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camera_camerasessiontracker_camerasessiontracker_isincamera",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "camerasessiontracker.isincamera()"
     },
     {
@@ -2889,8 +3054,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camera_camerashothandler_legacy",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "camerashothandler.legacy.luau"
     },
     {
@@ -2900,8 +3065,8 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camera_camerashothandler_legacy_getequippedcameratool",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "getequippedcameratool()"
     },
     {
@@ -2911,8 +3076,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_camera_camerashothandler_legacy_handleshot",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "handleshot()"
     },
     {
@@ -2985,7 +3150,7 @@
       "label": "DeathService.SetPolicy()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L29",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_death_deathservice_deathservice_setpolicy",
       "community": 13,
@@ -2996,7 +3161,7 @@
       "label": "onHumanoidDied()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L33",
+      "source_location": "L29",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_death_deathservice_onhumanoiddied",
       "community": 13,
@@ -3007,7 +3172,7 @@
       "label": "bindCharacter()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L72",
+      "source_location": "L68",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_death_deathservice_bindcharacter",
       "community": 13,
@@ -3018,7 +3183,7 @@
       "label": "onCharacterAdded()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L82",
+      "source_location": "L78",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_death_deathservice_oncharacteradded",
       "community": 13,
@@ -3029,7 +3194,7 @@
       "label": "DeathService.Start()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L91",
+      "source_location": "L87",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_death_deathservice_deathservice_start",
       "community": 13,
@@ -3043,8 +3208,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_flash_flashevents",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "flashevents.luau"
     },
     {
@@ -3081,6 +3246,50 @@
       "norm_label": "arrivalservice.start()"
     },
     {
+      "label": "DebugLaunchTrigger.luau",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_lobby_debuglaunchtrigger",
+      "community": 36,
+      "community_name": "ServerRole.luau",
+      "norm_label": "debuglaunchtrigger.luau"
+    },
+    {
+      "label": "isCreator()",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_lobby_debuglaunchtrigger_iscreator",
+      "community": 36,
+      "community_name": "ServerRole.luau",
+      "norm_label": "iscreator()"
+    },
+    {
+      "label": "onChatted()",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_lobby_debuglaunchtrigger_onchatted",
+      "community": 36,
+      "community_name": "ServerRole.luau",
+      "norm_label": "onchatted()"
+    },
+    {
+      "label": "DebugLaunchTrigger.Start()",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau",
+      "source_location": "L60",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_lobby_debuglaunchtrigger_debuglaunchtrigger_start",
+      "community": 36,
+      "community_name": "ServerRole.luau",
+      "norm_label": "debuglaunchtrigger.start()"
+    },
+    {
       "label": "LobbyDeathPolicy.luau",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
@@ -3095,7 +3304,7 @@
       "label": "onCharacterAdded()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
-      "source_location": "L11",
+      "source_location": "L17",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_lobby_lobbydeathpolicy_oncharacteradded",
       "community": 13,
@@ -3106,7 +3315,7 @@
       "label": "bindCharacter()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
-      "source_location": "L17",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_lobby_lobbydeathpolicy_bindcharacter",
       "community": 13,
@@ -3117,7 +3326,7 @@
       "label": "LobbyDeathPolicy.Start()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
-      "source_location": "L30",
+      "source_location": "L37",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_lobby_lobbydeathpolicy_lobbydeathpolicy_start",
       "community": 13,
@@ -3139,7 +3348,7 @@
       "label": "MatchLauncher.Launch()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Lobby/MatchLauncher.luau",
-      "source_location": "L17",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_lobby_matchlauncher_matchlauncher_launch",
       "community": 36,
@@ -3150,7 +3359,7 @@
       "label": "MatchLauncher.Start()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Lobby/MatchLauncher.luau",
-      "source_location": "L63",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_lobby_matchlauncher_matchlauncher_start",
       "community": 36,
@@ -3164,8 +3373,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matcharrival",
-      "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community": 7,
+      "community_name": "MatchArrival.luau",
       "norm_label": "matcharrival.luau"
     },
     {
@@ -3175,8 +3384,8 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matcharrival_matcharrival_getmodeid",
-      "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community": 7,
+      "community_name": "MatchArrival.luau",
       "norm_label": "matcharrival.getmodeid()"
     },
     {
@@ -3186,8 +3395,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matcharrival_seedfrom",
-      "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community": 7,
+      "community_name": "MatchArrival.luau",
       "norm_label": "seedfrom()"
     },
     {
@@ -3197,8 +3406,8 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matcharrival_matcharrival_start",
-      "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community": 7,
+      "community_name": "MatchArrival.luau",
       "norm_label": "matcharrival.start()"
     },
     {
@@ -3209,7 +3418,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchcleanup",
       "community": 47,
-      "community_name": "MatchCleanup.luau",
+      "community_name": "ServerRole.AssertGameServer",
       "norm_label": "matchcleanup.luau"
     },
     {
@@ -3220,7 +3429,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchcleanup_matchcleanup_registersavestep",
       "community": 47,
-      "community_name": "MatchCleanup.luau",
+      "community_name": "ServerRole.AssertGameServer",
       "norm_label": "matchcleanup.registersavestep()"
     },
     {
@@ -3230,8 +3439,8 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchcleanup_matchcleanup_registerteardownstep",
-      "community": 47,
-      "community_name": "MatchCleanup.luau",
+      "community": 48,
+      "community_name": "MatchParticipants.luau",
       "norm_label": "matchcleanup.registerteardownstep()"
     },
     {
@@ -3242,7 +3451,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchcleanup_runwithtimeout",
       "community": 47,
-      "community_name": "MatchCleanup.luau",
+      "community_name": "ServerRole.AssertGameServer",
       "norm_label": "runwithtimeout()"
     },
     {
@@ -3253,7 +3462,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchcleanup_runcleanup",
       "community": 47,
-      "community_name": "MatchCleanup.luau",
+      "community_name": "ServerRole.AssertGameServer",
       "norm_label": "runcleanup()"
     },
     {
@@ -3264,7 +3473,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchcleanup_matchcleanup_start",
       "community": 47,
-      "community_name": "MatchCleanup.luau",
+      "community_name": "ServerRole.AssertGameServer",
       "norm_label": "matchcleanup.start()"
     },
     {
@@ -3275,7 +3484,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchclock",
       "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community_name": "MatchManager.luau",
       "norm_label": "matchclock.luau"
     },
     {
@@ -3286,7 +3495,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchclock_config",
       "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community_name": "MatchManager.luau",
       "norm_label": "config()"
     },
     {
@@ -3297,7 +3506,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchclock_runwaitingforplayers",
       "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community_name": "MatchManager.luau",
       "norm_label": "runwaitingforplayers()"
     },
     {
@@ -3308,7 +3517,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchclock_runcountdown",
       "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community_name": "MatchManager.luau",
       "norm_label": "runcountdown()"
     },
     {
@@ -3319,18 +3528,29 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchclock_runendinghold",
       "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community_name": "MatchManager.luau",
       "norm_label": "runendinghold()"
+    },
+    {
+      "label": "runPlaying()",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Match/MatchClock.luau",
+      "source_location": "L88",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_match_matchclock_runplaying",
+      "community": 39,
+      "community_name": "MatchManager.luau",
+      "norm_label": "runplaying()"
     },
     {
       "label": "MatchClock.Start()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Match/MatchClock.luau",
-      "source_location": "L86",
+      "source_location": "L105",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchclock_matchclock_start",
       "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community_name": "MatchManager.luau",
       "norm_label": "matchclock.start()"
     },
     {
@@ -3340,8 +3560,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchendcondition",
-      "community": 48,
-      "community_name": "evaluate",
+      "community": 46,
+      "community_name": "VerifyPhase75.luau",
       "norm_label": "matchendcondition.luau"
     },
     {
@@ -3351,8 +3571,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchendcondition_evaluate",
-      "community": 48,
-      "community_name": "evaluate",
+      "community": 46,
+      "community_name": "VerifyPhase75.luau",
       "norm_label": "evaluate()"
     },
     {
@@ -3362,8 +3582,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchendcondition_matchendcondition_start",
-      "community": 48,
-      "community_name": "evaluate",
+      "community": 46,
+      "community_name": "VerifyPhase75.luau",
       "norm_label": "matchendcondition.start()"
     },
     {
@@ -3373,8 +3593,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchmanager",
-      "community": 45,
-      "community_name": "MatchStates.luau",
+      "community": 39,
+      "community_name": "MatchManager.luau",
       "norm_label": "matchmanager.luau"
     },
     {
@@ -3396,7 +3616,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchmanager_matchmanager_is",
       "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community_name": "MatchManager.luau",
       "norm_label": "matchmanager.is()"
     },
     {
@@ -3418,7 +3638,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchmanager_matchmanager_requesttransition",
       "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community_name": "MatchManager.luau",
       "norm_label": "matchmanager.requesttransition()"
     },
     {
@@ -3428,8 +3648,8 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchmanager_matchmanager_requestend",
-      "community": 48,
-      "community_name": "evaluate",
+      "community": 39,
+      "community_name": "MatchManager.luau",
       "norm_label": "matchmanager.requestend()"
     },
     {
@@ -3439,8 +3659,8 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchmanager_matchmanager_abort",
-      "community": 45,
-      "community_name": "MatchStates.luau",
+      "community": 39,
+      "community_name": "MatchManager.luau",
       "norm_label": "matchmanager.abort()"
     },
     {
@@ -3450,8 +3670,8 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchmanager_matchmanager_start",
-      "community": 45,
-      "community_name": "MatchStates.luau",
+      "community": 39,
+      "community_name": "MatchManager.luau",
       "norm_label": "matchmanager.start()"
     },
     {
@@ -3461,8 +3681,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchparticipants",
-      "community": 46,
-      "community_name": "VerifyPhase75.luau",
+      "community": 48,
+      "community_name": "MatchParticipants.luau",
       "norm_label": "matchparticipants.luau"
     },
     {
@@ -3472,8 +3692,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchparticipants_matchparticipants_seed",
-      "community": 46,
-      "community_name": "VerifyPhase75.luau",
+      "community": 7,
+      "community_name": "MatchArrival.luau",
       "norm_label": "matchparticipants.seed()"
     },
     {
@@ -3494,8 +3714,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchparticipants_matchparticipants_isparticipant",
-      "community": 46,
-      "community_name": "VerifyPhase75.luau",
+      "community": 48,
+      "community_name": "MatchParticipants.luau",
       "norm_label": "matchparticipants.isparticipant()"
     },
     {
@@ -3505,8 +3725,8 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchparticipants_matchparticipants_getpresent",
-      "community": 3,
-      "community_name": "SpectateService.luau",
+      "community": 48,
+      "community_name": "MatchParticipants.luau",
       "norm_label": "matchparticipants.getpresent()"
     },
     {
@@ -3516,8 +3736,8 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchparticipants_matchparticipants_countactive",
-      "community": 39,
-      "community_name": "MatchManager.RequestTransition",
+      "community": 48,
+      "community_name": "MatchParticipants.luau",
       "norm_label": "matchparticipants.countactive()"
     },
     {
@@ -3527,8 +3747,8 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchparticipants_matchparticipants_start",
-      "community": 46,
-      "community_name": "VerifyPhase75.luau",
+      "community": 48,
+      "community_name": "MatchParticipants.luau",
       "norm_label": "matchparticipants.start()"
     },
     {
@@ -3579,7 +3799,7 @@
       "label": "MatchResultBuilder.RegisterContributor()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
-      "source_location": "L27",
+      "source_location": "L32",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchresultbuilder_matchresultbuilder_registercontributor",
       "community": 46,
@@ -3587,10 +3807,21 @@
       "norm_label": "matchresultbuilder.registercontributor()"
     },
     {
+      "label": "buildPerPlayer()",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_match_matchresultbuilder_buildperplayer",
+      "community": 46,
+      "community_name": "VerifyPhase75.luau",
+      "norm_label": "buildperplayer()"
+    },
+    {
       "label": "MatchResultBuilder.Build()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
-      "source_location": "L31",
+      "source_location": "L53",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchresultbuilder_matchresultbuilder_build",
       "community": 46,
@@ -3601,12 +3832,45 @@
       "label": "MatchResultBuilder.Start()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
-      "source_location": "L54",
+      "source_location": "L63",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_match_matchresultbuilder_matchresultbuilder_start",
       "community": 46,
       "community_name": "VerifyPhase75.luau",
       "norm_label": "matchresultbuilder.start()"
+    },
+    {
+      "label": "MatchSpawner.luau",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Match/MatchSpawner.luau",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_match_matchspawner",
+      "community": 45,
+      "community_name": "MatchStates.luau",
+      "norm_label": "matchspawner.luau"
+    },
+    {
+      "label": "loadIfNeeded()",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Match/MatchSpawner.luau",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_match_matchspawner_loadifneeded",
+      "community": 45,
+      "community_name": "MatchStates.luau",
+      "norm_label": "loadifneeded()"
+    },
+    {
+      "label": "MatchSpawner.Start()",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Match/MatchSpawner.luau",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_match_matchspawner_matchspawner_start",
+      "community": 45,
+      "community_name": "MatchStates.luau",
+      "norm_label": "matchspawner.start()"
     },
     {
       "label": "ReturnToLobbyService.luau",
@@ -4220,8 +4484,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_playerstate_playerstateservice_playerstateservice_getall",
-      "community": 48,
-      "community_name": "evaluate",
+      "community": 46,
+      "community_name": "VerifyPhase75.luau",
       "norm_label": "playerstateservice.getall()"
     },
     {
@@ -4283,12 +4547,45 @@
       "label": "RemoveAllSlot.ClearPlayerTools()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Player/EndGame.luau",
-      "source_location": "L11",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_player_endgame_removeallslot_clearplayertools",
       "community": 9,
       "community_name": "ObjectiveService.luau",
       "norm_label": "removeallslot.clearplayertools()"
+    },
+    {
+      "label": "KitLifecycleHook.luau",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_player_kitlifecyclehook",
+      "community": 48,
+      "community_name": "MatchParticipants.luau",
+      "norm_label": "kitlifecyclehook.luau"
+    },
+    {
+      "label": "onCharacterAdded()",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_player_kitlifecyclehook_oncharacteradded",
+      "community": 48,
+      "community_name": "MatchParticipants.luau",
+      "norm_label": "oncharacteradded()"
+    },
+    {
+      "label": "KitLifecycleHook.Start()",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L52",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_player_kitlifecyclehook_kitlifecyclehook_start",
+      "community": 48,
+      "community_name": "MatchParticipants.luau",
+      "norm_label": "kitlifecyclehook.start()"
     },
     {
       "label": "PlayerCurrency.legacy.luau",
@@ -4324,91 +4621,58 @@
       "norm_label": "onplayerremoving()"
     },
     {
-      "label": "PlayerStateHandler.legacy.luau",
-      "file_type": "code",
-      "source_file": "ServerScriptService/GameService/Player/PlayerStateHandler.legacy.luau",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "serverscriptservice_gameservice_player_playerstatehandler_legacy",
-      "community": 27,
-      "community_name": "Remotes.luau",
-      "norm_label": "playerstatehandler.legacy.luau"
-    },
-    {
-      "label": "bindDeathHandler()",
-      "file_type": "code",
-      "source_file": "ServerScriptService/GameService/Player/PlayerStateHandler.legacy.luau",
-      "source_location": "L7",
-      "_origin": "ast",
-      "id": "serverscriptservice_gameservice_player_playerstatehandler_legacy_binddeathhandler",
-      "community": 27,
-      "community_name": "Remotes.luau",
-      "norm_label": "binddeathhandler()"
-    },
-    {
-      "label": "onPlayerAdded()",
-      "file_type": "code",
-      "source_file": "ServerScriptService/GameService/Player/PlayerStateHandler.legacy.luau",
-      "source_location": "L14",
-      "_origin": "ast",
-      "id": "serverscriptservice_gameservice_player_playerstatehandler_legacy_onplayeradded",
-      "community": 27,
-      "community_name": "Remotes.luau",
-      "norm_label": "onplayeradded()"
-    },
-    {
       "label": "StartGame.luau",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
       "source_location": "L1",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_player_startgame",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "startgame.luau"
     },
     {
       "label": "createEmptySlot()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L11",
+      "source_location": "L14",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_player_startgame_createemptyslot",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "createemptyslot()"
     },
     {
       "label": "StartGameService.ResetKit()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L20",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_player_startgame_startgameservice_resetkit",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 48,
+      "community_name": "MatchParticipants.luau",
       "norm_label": "startgameservice.resetkit()"
     },
     {
       "label": "giveStarterCamera()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L34",
+      "source_location": "L37",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_player_startgame_givestartercamera",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "givestartercamera()"
     },
     {
       "label": "StartGameService.GivePlayerStarterKit()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L55",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_player_startgame_startgameservice_giveplayerstarterkit",
-      "community": 27,
-      "community_name": "Remotes.luau",
+      "community": 8,
+      "community_name": "StartGame.luau",
       "norm_label": "startgameservice.giveplayerstarterkit()"
     },
     {
@@ -4418,8 +4682,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_reward_captureguard",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "captureguard.luau"
     },
     {
@@ -4429,8 +4693,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_reward_captureguard_isfinitevector",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "isfinitevector()"
     },
     {
@@ -4440,8 +4704,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_reward_captureguard_validateorigin",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "validateorigin()"
     },
     {
@@ -4451,8 +4715,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_reward_captureguard_captureguard_validateshot",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "captureguard.validateshot()"
     },
     {
@@ -4462,8 +4726,8 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_reward_captureguard_captureguard_resolveshotquality",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "captureguard.resolveshotquality()"
     },
     {
@@ -4473,8 +4737,8 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_reward_captureguard_checkcooldown",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "checkcooldown()"
     },
     {
@@ -4484,8 +4748,8 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_reward_captureguard_captureguard_checkrepeatpolicy",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 10,
+      "community_name": "RewardService.luau",
       "norm_label": "captureguard.checkrepeatpolicy()"
     },
     {
@@ -4496,7 +4760,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_reward_rewardcleanuphook",
       "community": 47,
-      "community_name": "MatchCleanup.luau",
+      "community_name": "ServerRole.AssertGameServer",
       "norm_label": "rewardcleanuphook.luau"
     },
     {
@@ -4507,7 +4771,7 @@
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_reward_rewardcleanuphook_rewardcleanuphook_start",
       "community": 47,
-      "community_name": "MatchCleanup.luau",
+      "community_name": "ServerRole.AssertGameServer",
       "norm_label": "rewardcleanuphook.start()"
     },
     {
@@ -4608,6 +4872,28 @@
       "community": 18,
       "community_name": "RewardLedger.luau",
       "norm_label": "rewardledger.teardownplayer()"
+    },
+    {
+      "label": "RewardResultHook.luau",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Reward/RewardResultHook.luau",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_reward_rewardresulthook",
+      "community": 47,
+      "community_name": "ServerRole.AssertGameServer",
+      "norm_label": "rewardresulthook.luau"
+    },
+    {
+      "label": "RewardResultHook.Start()",
+      "file_type": "code",
+      "source_file": "ServerScriptService/GameService/Reward/RewardResultHook.luau",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "serverscriptservice_gameservice_reward_rewardresulthook_rewardresulthook_start",
+      "community": 47,
+      "community_name": "ServerRole.AssertGameServer",
+      "norm_label": "rewardresulthook.start()"
     },
     {
       "label": "RewardService.luau",
@@ -4756,7 +5042,7 @@
       "label": "RewardStore.SaveAll()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Reward/RewardStore.luau",
-      "source_location": "L129",
+      "source_location": "L134",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_reward_rewardstore_rewardstore_saveall",
       "community": 18,
@@ -4767,7 +5053,7 @@
       "label": "RewardStore.ClearSession()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Reward/RewardStore.luau",
-      "source_location": "L152",
+      "source_location": "L165",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_reward_rewardstore_rewardstore_clearsession",
       "community": 18,
@@ -4778,7 +5064,7 @@
       "label": "RewardStore.StartAutosave()",
       "file_type": "code",
       "source_file": "ServerScriptService/GameService/Reward/RewardStore.luau",
-      "source_location": "L158",
+      "source_location": "L171",
       "_origin": "ast",
       "id": "serverscriptservice_gameservice_reward_rewardstore_rewardstore_startautosave",
       "community": 18,
@@ -5056,8 +5342,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "starterplayerscripts_cameraclient_local",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "cameraclient.local.luau"
     },
     {
@@ -5067,8 +5353,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "starterplayerscripts_cameraclient_local_getequippedcameratool",
-      "community": 5,
-      "community_name": "CameraStats.luau",
+      "community": 0,
+      "community_name": "CameraSession.luau",
       "norm_label": "getequippedcameratool()"
     },
     {
@@ -5078,8 +5364,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "starterplayerscripts_camerashelfclient_local",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "camerashelfclient.local.luau"
     },
     {
@@ -5089,8 +5375,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "starterplayerscripts_camerashelfclient_local_lockmovementandmouse",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "lockmovementandmouse()"
     },
     {
@@ -5100,8 +5386,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "starterplayerscripts_camerashelfclient_local_unlockmovementandmouse",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "unlockmovementandmouse()"
     },
     {
@@ -5111,8 +5397,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "starterplayerscripts_camerashelfclient_local_closeshelf",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "closeshelf()"
     },
     {
@@ -5122,8 +5408,8 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "starterplayerscripts_camerashelfclient_local_openshelf",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "openshelf()"
     },
     {
@@ -5133,8 +5419,8 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "starterplayerscripts_camerashelfclient_local_binddeathhandler",
-      "community": 7,
-      "community_name": "CameraShelfGui.luau",
+      "community": 27,
+      "community_name": "Remotes.luau",
       "norm_label": "binddeathhandler()"
     },
     {
@@ -5288,7 +5574,7 @@
       "_origin": "ast",
       "id": "starterplayerscripts_hudcontroller_local",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "hudcontroller.local.luau"
     },
     {
@@ -5299,7 +5585,7 @@
       "_origin": "ast",
       "id": "starterplayerscripts_hudcontroller_local_createbar",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "createbar()"
     },
     {
@@ -5310,7 +5596,7 @@
       "_origin": "ast",
       "id": "starterplayerscripts_hudcontroller_local_updatebar",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "updatebar()"
     },
     {
@@ -5365,7 +5651,7 @@
       "_origin": "ast",
       "id": "starterplayerscripts_playermovementcontroller_local",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "playermovementcontroller.local.luau"
     },
     {
@@ -5376,7 +5662,7 @@
       "_origin": "ast",
       "id": "starterplayerscripts_playermovementcontroller_local_setupcharacter",
       "community": 8,
-      "community_name": "PlayerRuntimeStats.luau",
+      "community_name": "StartGame.luau",
       "norm_label": "setupcharacter()"
     },
     {
@@ -5424,10 +5710,21 @@
       "norm_label": "checkgamemirror.luau"
     },
     {
+      "label": "hashSource()",
+      "file_type": "code",
+      "source_file": "Tools/CheckGameMirror.luau",
+      "source_location": "L109",
+      "_origin": "ast",
+      "id": "tools_checkgamemirror_hashsource",
+      "community": 43,
+      "community_name": "CheckGameMirror.luau",
+      "norm_label": "hashsource()"
+    },
+    {
       "label": "resolve()",
       "file_type": "code",
       "source_file": "Tools/CheckGameMirror.luau",
-      "source_location": "L74",
+      "source_location": "L118",
       "_origin": "ast",
       "id": "tools_checkgamemirror_resolve",
       "community": 43,
@@ -5457,10 +5754,21 @@
       "norm_label": "installgamemirror.luau"
     },
     {
+      "label": "hashSource()",
+      "file_type": "code",
+      "source_file": "Tools/InstallGameMirror.luau",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "tools_installgamemirror_hashsource",
+      "community": 38,
+      "community_name": "InstallGameMirror.luau",
+      "norm_label": "hashsource()"
+    },
+    {
       "label": "folder()",
       "file_type": "code",
       "source_file": "Tools/InstallGameMirror.luau",
-      "source_location": "L25",
+      "source_location": "L39",
       "_origin": "ast",
       "id": "tools_installgamemirror_folder",
       "community": 38,
@@ -5471,7 +5779,7 @@
       "label": "moduleScript()",
       "file_type": "code",
       "source_file": "Tools/InstallGameMirror.luau",
-      "source_location": "L36",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "tools_installgamemirror_modulescript",
       "community": 38,
@@ -5482,7 +5790,7 @@
       "label": "legacyScript()",
       "file_type": "code",
       "source_file": "Tools/InstallGameMirror.luau",
-      "source_location": "L48",
+      "source_location": "L63",
       "_origin": "ast",
       "id": "tools_installgamemirror_legacyscript",
       "community": 38,
@@ -8999,6 +9307,41 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/Loadout/LoadoutService.luau",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_loadout_loadoutservice",
+      "target": "replicatedstorage_modules_loadout_loadoutservice_loadoutservice_getcameraid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
+      "source_location": "4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_startgame",
+      "target": "replicatedstorage_modules_loadout_loadoutservice"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_startgame_givestartercamera",
+      "target": "replicatedstorage_modules_loadout_loadoutservice_loadoutservice_getcameraid"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "ReplicatedStorage/Modules/Monster/MonsterStats.luau",
       "source_location": "L28",
       "weight": 1.0,
@@ -10275,7 +10618,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchConfig.luau",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
       "source": "replicatedstorage_modules_shared_matchconfig",
@@ -10309,8 +10652,19 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "ReplicatedStorage/Modules/Shared/MatchResultCodes.luau",
+      "source_file": "ReplicatedStorage/Modules/Shared/MatchLaunchResultCodes.luau",
       "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_shared_matchlaunchresultcodes",
+      "target": "replicatedstorage_modules_shared_matchlaunchresultcodes_matchlaunchresultcodes_getmessage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/Shared/MatchResultCodes.luau",
+      "source_location": "L16",
       "weight": 1.0,
       "_origin": "ast",
       "source": "replicatedstorage_modules_shared_matchresultcodes",
@@ -10318,10 +10672,22 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L93",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt_matchreceipt_show",
+      "target": "replicatedstorage_modules_shared_matchresultcodes_matchresultcodes_getmessage"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L102",
+      "source_location": "L114",
       "weight": 1.0,
       "_origin": "ast",
       "source": "replicatedstorage_modules_shared_matchstates",
@@ -10332,7 +10698,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L127",
+      "source_location": "L144",
       "weight": 1.0,
       "_origin": "ast",
       "source": "replicatedstorage_modules_shared_matchstates",
@@ -10343,7 +10709,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L97",
+      "source_location": "L109",
       "weight": 1.0,
       "_origin": "ast",
       "source": "replicatedstorage_modules_shared_matchstates",
@@ -10354,7 +10720,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L112",
+      "source_location": "L139",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_shared_matchstates",
+      "target": "replicatedstorage_modules_shared_matchstates_matchstates_iskitgranted",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
+      "source_location": "L124",
       "weight": 1.0,
       "_origin": "ast",
       "source": "replicatedstorage_modules_shared_matchstates",
@@ -10365,7 +10742,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L107",
+      "source_location": "L119",
       "weight": 1.0,
       "_origin": "ast",
       "source": "replicatedstorage_modules_shared_matchstates",
@@ -10376,7 +10753,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L122",
+      "source_location": "L134",
       "weight": 1.0,
       "_origin": "ast",
       "source": "replicatedstorage_modules_shared_matchstates",
@@ -10387,7 +10764,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L93",
+      "source_location": "L105",
       "weight": 1.0,
       "_origin": "ast",
       "source": "replicatedstorage_modules_shared_matchstates",
@@ -10398,7 +10775,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L117",
+      "source_location": "L129",
       "weight": 1.0,
       "_origin": "ast",
       "source": "replicatedstorage_modules_shared_matchstates",
@@ -10409,7 +10786,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ReplicatedStorage/Modules/Shared/MatchStates.luau",
-      "source_location": "L136",
+      "source_location": "L153",
       "weight": 1.0,
       "_origin": "ast",
       "source": "replicatedstorage_modules_shared_matchstates",
@@ -10434,7 +10811,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "17",
+      "source_location": "13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice",
@@ -10457,11 +10834,35 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
+      "source_file": "ServerScriptService/GameService/Match/MatchSpawner.luau",
+      "source_location": "19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchspawner",
+      "target": "replicatedstorage_modules_shared_matchstates"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
       "source_file": "ServerScriptService/GameService/Monster/MonsterService.luau",
       "source_location": "6",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_monster_monsterservice",
+      "target": "replicatedstorage_modules_shared_matchstates"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "23",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook",
       "target": "replicatedstorage_modules_shared_matchstates"
     },
     {
@@ -10506,7 +10907,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L39",
+      "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice_onhumanoiddied",
@@ -10523,6 +10924,18 @@
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_monster_monsterservice_gameplayactive",
       "target": "replicatedstorage_modules_shared_matchstates_matchstates_isgameplayactive"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Match/MatchSpawner.luau",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchspawner_matchspawner_start",
+      "target": "replicatedstorage_modules_shared_matchstates_matchstates_acceptsjoins"
     },
     {
       "relation": "calls",
@@ -10571,6 +10984,18 @@
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchmanager_matchmanager_abort",
       "target": "replicatedstorage_modules_shared_matchstates_matchstates_isterminal"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook_oncharacteradded",
+      "target": "replicatedstorage_modules_shared_matchstates_matchstates_iskitgranted"
     },
     {
       "relation": "calls",
@@ -10626,7 +11051,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ServerScriptService/GameService/Lobby/MatchLauncher.luau",
-      "source_location": "13",
+      "source_location": "16",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_matchlauncher",
@@ -10985,6 +11410,18 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceiptController.luau",
+      "source_location": "9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceiptcontroller",
+      "target": "replicatedstorage_modules_shared_remotes"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
       "source_file": "ServerScriptService/GameService/Bootstrap.legacy.luau",
       "source_location": "30",
       "weight": 1.0,
@@ -11082,7 +11519,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "4",
+      "source_location": "5",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_startgame",
@@ -11182,6 +11619,30 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchreplicator_matchreplicator_start",
+      "target": "replicatedstorage_modules_shared_remotes_remotes_get"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Player/EndGame.luau",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_endgame_removeallslot_clearplayertools",
+      "target": "replicatedstorage_modules_shared_remotes_remotes_get"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
+      "source_location": "L84",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_startgame_startgameservice_giveplayerstarterkit",
       "target": "replicatedstorage_modules_shared_remotes_remotes_get"
     },
     {
@@ -11328,8 +11789,20 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
+      "source_file": "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau",
+      "source_location": "19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_lobby_debuglaunchtrigger",
+      "target": "replicatedstorage_modules_shared_serverrole"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
       "source_file": "ServerScriptService/GameService/Lobby/MatchLauncher.luau",
-      "source_location": "12",
+      "source_location": "15",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_matchlauncher",
@@ -11401,10 +11874,22 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
-      "source_location": "14",
+      "source_location": "18",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchresultbuilder",
+      "target": "replicatedstorage_modules_shared_serverrole"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ServerScriptService/GameService/Match/MatchSpawner.luau",
+      "source_location": "18",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchspawner",
       "target": "replicatedstorage_modules_shared_serverrole"
     },
     {
@@ -11436,11 +11921,35 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "22",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook",
+      "target": "replicatedstorage_modules_shared_serverrole"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
       "source_file": "ServerScriptService/GameService/Reward/RewardCleanupHook.luau",
       "source_location": "14",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_reward_rewardcleanuphook",
+      "target": "replicatedstorage_modules_shared_serverrole"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ServerScriptService/GameService/Reward/RewardResultHook.luau",
+      "source_location": "15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_reward_rewardresulthook",
       "target": "replicatedstorage_modules_shared_serverrole"
     },
     {
@@ -11605,7 +12114,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Match/MatchClock.luau",
-      "source_location": "L92",
+      "source_location": "L111",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchclock_matchclock_start",
@@ -11641,10 +12150,22 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
-      "source_location": "L60",
+      "source_location": "L69",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchresultbuilder_matchresultbuilder_start",
+      "target": "replicatedstorage_modules_shared_serverrole_serverrole_assertgameserver"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Match/MatchSpawner.luau",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchspawner_matchspawner_start",
       "target": "replicatedstorage_modules_shared_serverrole_serverrole_assertgameserver"
     },
     {
@@ -11664,11 +12185,35 @@
       "context": "call",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L58",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook_kitlifecyclehook_start",
+      "target": "replicatedstorage_modules_shared_serverrole_serverrole_assertgameserver"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Reward/RewardCleanupHook.luau",
       "source_location": "L29",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_reward_rewardcleanuphook_rewardcleanuphook_start",
+      "target": "replicatedstorage_modules_shared_serverrole_serverrole_assertgameserver"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Reward/RewardResultHook.luau",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_reward_rewardresulthook_rewardresulthook_start",
       "target": "replicatedstorage_modules_shared_serverrole_serverrole_assertgameserver"
     },
     {
@@ -11712,8 +12257,20 @@
       "context": "call",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau",
+      "source_location": "L66",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_lobby_debuglaunchtrigger_debuglaunchtrigger_start",
+      "target": "replicatedstorage_modules_shared_serverrole_serverrole_assertlobbyserver"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Lobby/MatchLauncher.luau",
-      "source_location": "L69",
+      "source_location": "L72",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_matchlauncher_matchlauncher_start",
@@ -11791,7 +12348,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "18",
+      "source_location": "14",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice",
@@ -12446,6 +13003,167 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt",
+      "target": "replicatedstorage_modules_ui_matchreceipt_builddetaillabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L31",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt",
+      "target": "replicatedstorage_modules_ui_matchreceipt_buildmessagelabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt",
+      "target": "replicatedstorage_modules_ui_matchreceipt_buildpanel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt",
+      "target": "replicatedstorage_modules_ui_matchreceipt_ensurebuilt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L74",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt",
+      "target": "replicatedstorage_modules_ui_matchreceipt_formatdetail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L99",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt",
+      "target": "replicatedstorage_modules_ui_matchreceipt_matchreceipt_hide",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L90",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt",
+      "target": "replicatedstorage_modules_ui_matchreceipt_matchreceipt_show",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L66",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt_ensurebuilt",
+      "target": "replicatedstorage_modules_ui_matchreceipt_buildpanel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L67",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt_ensurebuilt",
+      "target": "replicatedstorage_modules_ui_matchreceipt_buildmessagelabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L68",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt_ensurebuilt",
+      "target": "replicatedstorage_modules_ui_matchreceipt_builddetaillabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt_ensurebuilt",
+      "target": "replicatedstorage_modules_ui_uibuilder_uibuilder_createscreengui"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt_ensurebuilt",
+      "target": "replicatedstorage_modules_ui_uibuilder_uibuilder_getplayergui"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L91",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt_matchreceipt_show",
+      "target": "replicatedstorage_modules_ui_matchreceipt_ensurebuilt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ReplicatedStorage/Modules/UI/MatchReceipt.luau",
+      "source_location": "L94",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "replicatedstorage_modules_ui_matchreceipt_matchreceipt_show",
+      "target": "replicatedstorage_modules_ui_matchreceipt_formatdetail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "ReplicatedStorage/Modules/UI/UIBuilder.luau",
       "source_location": "L17",
       "weight": 1.0,
@@ -12550,7 +13268,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
-      "source_location": "L76",
+      "source_location": "L93",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_camerashelf_camerainventory",
@@ -12561,7 +13279,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
-      "source_location": "L24",
+      "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_camerashelf_camerainventory",
@@ -12572,7 +13290,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
-      "source_location": "L41",
+      "source_location": "L52",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_camerashelf_camerainventory",
@@ -12583,7 +13301,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
-      "source_location": "L48",
+      "source_location": "L59",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_camerashelf_camerainventory",
@@ -12591,11 +13309,34 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_camerashelf_camerainventory",
+      "target": "serverscriptservice_gameservice_camerashelf_camerainventory_templatesfolder",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
-      "source_location": "L79",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_camerashelf_camerainventory_camerainventory_give",
+      "target": "serverscriptservice_gameservice_camerashelf_camerainventory_templatesfolder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
+      "source_location": "L96",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_camerashelf_camerainventory_camerainventory_clearslot",
@@ -12607,7 +13348,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/CameraShelf/CameraInventory.luau",
-      "source_location": "L58",
+      "source_location": "L75",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_camerashelf_camerainventory_camerainventory_give",
@@ -12631,18 +13372,6 @@
       "context": "call",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
-      "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L35",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "serverscriptservice_gameservice_player_startgame_givestartercamera",
-      "target": "serverscriptservice_gameservice_camerashelf_camerainventory_camerainventory_getcurrentid"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/CameraShelf/CameraShelfSwap.luau",
       "source_location": "L40",
       "weight": 1.0,
@@ -12656,7 +13385,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L37",
+      "source_location": "L40",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_startgame_givestartercamera",
@@ -12899,7 +13628,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L58",
+      "source_location": "L54",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice_onhumanoiddied",
@@ -12909,7 +13638,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L72",
+      "source_location": "L68",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice",
@@ -12920,7 +13649,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L29",
+      "source_location": "L25",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice",
@@ -12931,7 +13660,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L91",
+      "source_location": "L87",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice",
@@ -12942,7 +13671,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L82",
+      "source_location": "L78",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice",
@@ -12953,7 +13682,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L33",
+      "source_location": "L29",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice",
@@ -12965,7 +13694,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L78",
+      "source_location": "L74",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice_bindcharacter",
@@ -12978,7 +13707,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L39",
+      "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice_onhumanoiddied",
@@ -12990,7 +13719,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L66",
+      "source_location": "L62",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice_onhumanoiddied",
@@ -13002,7 +13731,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L40",
+      "source_location": "L36",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice_onhumanoiddied",
@@ -13013,7 +13742,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L109",
+      "source_location": "L105",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice_deathservice_start",
@@ -13025,7 +13754,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L86",
+      "source_location": "L82",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice_oncharacteradded",
@@ -13037,7 +13766,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L99",
+      "source_location": "L95",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice_deathservice_start",
@@ -13050,7 +13779,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L83",
+      "source_location": "L79",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice_oncharacteradded",
@@ -13062,7 +13791,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Death/DeathService.luau",
-      "source_location": "L84",
+      "source_location": "L80",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_death_deathservice_oncharacteradded",
@@ -13105,8 +13834,77 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_lobby_debuglaunchtrigger",
+      "target": "serverscriptservice_gameservice_lobby_debuglaunchtrigger_debuglaunchtrigger_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_lobby_debuglaunchtrigger",
+      "target": "serverscriptservice_gameservice_lobby_debuglaunchtrigger_iscreator",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_lobby_debuglaunchtrigger",
+      "target": "serverscriptservice_gameservice_lobby_debuglaunchtrigger_onchatted",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau",
+      "source_location": "L42",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_lobby_debuglaunchtrigger_onchatted",
+      "target": "serverscriptservice_gameservice_lobby_debuglaunchtrigger_iscreator",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau",
+      "source_location": "L70",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_lobby_debuglaunchtrigger_debuglaunchtrigger_start",
+      "target": "serverscriptservice_gameservice_lobby_debuglaunchtrigger_onchatted",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau",
+      "source_location": "L51",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_lobby_debuglaunchtrigger_onchatted",
+      "target": "serverscriptservice_gameservice_lobby_matchlauncher_matchlauncher_launch"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
-      "source_location": "L17",
+      "source_location": "L23",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_lobbydeathpolicy",
@@ -13117,7 +13915,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
-      "source_location": "L30",
+      "source_location": "L37",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_lobbydeathpolicy",
@@ -13128,7 +13926,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
-      "source_location": "L11",
+      "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_lobbydeathpolicy",
@@ -13140,7 +13938,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
-      "source_location": "L38",
+      "source_location": "L45",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_lobbydeathpolicy_lobbydeathpolicy_start",
@@ -13153,7 +13951,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
-      "source_location": "L12",
+      "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_lobbydeathpolicy_oncharacteradded",
@@ -13165,7 +13963,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
-      "source_location": "L13",
+      "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_lobbydeathpolicy_oncharacteradded",
@@ -13177,7 +13975,19 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
-      "source_location": "L23",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_lobby_lobbydeathpolicy_bindcharacter",
+      "target": "serverscriptservice_gameservice_player_startgame_startgameservice_resetkit"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
+      "source_location": "L29",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_lobbydeathpolicy_bindcharacter",
@@ -13188,7 +13998,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau",
-      "source_location": "L39",
+      "source_location": "L46",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_lobbydeathpolicy_lobbydeathpolicy_start",
@@ -13199,7 +14009,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Lobby/MatchLauncher.luau",
-      "source_location": "L17",
+      "source_location": "L20",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_matchlauncher",
@@ -13210,7 +14020,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Lobby/MatchLauncher.luau",
-      "source_location": "L63",
+      "source_location": "L66",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_lobby_matchlauncher",
@@ -13380,6 +14190,18 @@
     {
       "relation": "calls",
       "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L87",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook_kitlifecyclehook_start",
+      "target": "serverscriptservice_gameservice_match_matchcleanup_matchcleanup_registerteardownstep"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Match/MatchCleanup.luau",
       "source_location": "L75",
@@ -13428,7 +14250,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Match/MatchClock.luau",
-      "source_location": "L86",
+      "source_location": "L105",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchclock",
@@ -13455,6 +14277,17 @@
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchclock",
       "target": "serverscriptservice_gameservice_match_matchclock_runendinghold",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Match/MatchClock.luau",
+      "source_location": "L88",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchclock",
+      "target": "serverscriptservice_gameservice_match_matchclock_runplaying",
       "confidence_score": 1.0
     },
     {
@@ -13489,6 +14322,18 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchclock_runendinghold",
+      "target": "serverscriptservice_gameservice_match_matchclock_config",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Match/MatchClock.luau",
+      "source_location": "L89",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchclock_runplaying",
       "target": "serverscriptservice_gameservice_match_matchclock_config",
       "confidence_score": 1.0
     },
@@ -13593,7 +14438,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Match/MatchClock.luau",
-      "source_location": "L100",
+      "source_location": "L121",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchclock_matchclock_start",
@@ -13623,6 +14468,30 @@
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchclock_runendinghold",
       "target": "serverscriptservice_gameservice_match_matchmanager_matchmanager_requesttransition"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Match/MatchClock.luau",
+      "source_location": "L92",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchclock_runplaying",
+      "target": "serverscriptservice_gameservice_match_matchmanager_matchmanager_is"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Match/MatchClock.luau",
+      "source_location": "L94",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchclock_runplaying",
+      "target": "serverscriptservice_gameservice_match_matchmanager_matchmanager_requestend"
     },
     {
       "relation": "contains",
@@ -13824,6 +14693,18 @@
       "context": "call",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Match/MatchSpawner.luau",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchspawner_matchspawner_start",
+      "target": "serverscriptservice_gameservice_match_matchmanager_matchmanager_get"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Monster/MonsterService.luau",
       "source_location": "L30",
       "weight": 1.0,
@@ -13841,6 +14722,18 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_monster_monsterservice_monsterscanspawn",
+      "target": "serverscriptservice_gameservice_match_matchmanager_matchmanager_get"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook_oncharacteradded",
       "target": "serverscriptservice_gameservice_match_matchmanager_matchmanager_get"
     },
     {
@@ -13873,7 +14766,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
-      "source_location": "L68",
+      "source_location": "L78",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchresultbuilder_matchresultbuilder_start",
@@ -13999,11 +14892,23 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
-      "source_location": "L34",
+      "source_location": "L39",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "serverscriptservice_gameservice_match_matchresultbuilder_matchresultbuilder_build",
+      "source": "serverscriptservice_gameservice_match_matchresultbuilder_buildperplayer",
       "target": "serverscriptservice_gameservice_match_matchparticipants_matchparticipants_all"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook_oncharacteradded",
+      "target": "serverscriptservice_gameservice_match_matchparticipants_matchparticipants_isparticipant"
     },
     {
       "relation": "calls",
@@ -14016,6 +14921,30 @@
       "source": "serverscriptservice_gameservice_match_matchparticipants_matchparticipants_countactive",
       "target": "serverscriptservice_gameservice_match_matchparticipants_matchparticipants_getpresent",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Match/MatchSpawner.luau",
+      "source_location": "L43",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchspawner_matchspawner_start",
+      "target": "serverscriptservice_gameservice_match_matchparticipants_matchparticipants_getpresent"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L88",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook_kitlifecyclehook_start",
+      "target": "serverscriptservice_gameservice_match_matchparticipants_matchparticipants_getpresent"
     },
     {
       "relation": "calls",
@@ -14091,7 +15020,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
-      "source_location": "L31",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchresultbuilder",
+      "target": "serverscriptservice_gameservice_match_matchresultbuilder_buildperplayer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
+      "source_location": "L53",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchresultbuilder",
@@ -14102,7 +15042,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
-      "source_location": "L27",
+      "source_location": "L32",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchresultbuilder",
@@ -14113,7 +15053,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
-      "source_location": "L54",
+      "source_location": "L63",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_matchresultbuilder",
@@ -14137,12 +15077,70 @@
       "context": "call",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Reward/RewardResultHook.luau",
+      "source_location": "L31",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_reward_rewardresulthook_rewardresulthook_start",
+      "target": "serverscriptservice_gameservice_match_matchresultbuilder_matchresultbuilder_registercontributor"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Match/MatchResultBuilder.luau",
+      "source_location": "L79",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchresultbuilder_matchresultbuilder_start",
+      "target": "serverscriptservice_gameservice_match_matchresultbuilder_buildperplayer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Match/ReturnToLobbyService.luau",
       "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_match_returntolobbyservice_buildteleportdata",
       "target": "serverscriptservice_gameservice_match_matchresultbuilder_matchresultbuilder_build"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Match/MatchSpawner.luau",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchspawner",
+      "target": "serverscriptservice_gameservice_match_matchspawner_loadifneeded",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Match/MatchSpawner.luau",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchspawner",
+      "target": "serverscriptservice_gameservice_match_matchspawner_matchspawner_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Match/MatchSpawner.luau",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_match_matchspawner_matchspawner_start",
+      "target": "serverscriptservice_gameservice_match_matchspawner_loadifneeded",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -14891,7 +15889,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ServerScriptService/GameService/Player/EndGame.luau",
-      "source_location": "7",
+      "source_location": "9",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_endgame",
@@ -15035,7 +16033,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Player/EndGame.luau",
-      "source_location": "L34",
+      "source_location": "L36",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_endgame_removeallslot_clearplayertools",
@@ -15193,7 +16191,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Player/EndGame.luau",
-      "source_location": "L11",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_endgame",
@@ -15206,7 +16204,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ServerScriptService/GameService/Player/EndGame.luau",
-      "source_location": "6",
+      "source_location": "8",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_endgame",
@@ -15218,11 +16216,81 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ServerScriptService/GameService/Player/EndGame.luau",
-      "source_location": "L33",
+      "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_endgame_removeallslot_clearplayertools",
       "target": "serverscriptservice_gameservice_reward_rewardledger_rewardledger_resetrunscoped"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L89",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook_kitlifecyclehook_start",
+      "target": "serverscriptservice_gameservice_player_endgame_removeallslot_clearplayertools"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook",
+      "target": "serverscriptservice_gameservice_player_kitlifecyclehook_kitlifecyclehook_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook",
+      "target": "serverscriptservice_gameservice_player_kitlifecyclehook_oncharacteradded",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L62",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook_kitlifecyclehook_start",
+      "target": "serverscriptservice_gameservice_player_kitlifecyclehook_oncharacteradded",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook_oncharacteradded",
+      "target": "serverscriptservice_gameservice_player_startgame_startgameservice_giveplayerstarterkit"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Player/KitLifecycleHook.luau",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_player_kitlifecyclehook_oncharacteradded",
+      "target": "serverscriptservice_gameservice_player_startgame_startgameservice_resetkit"
     },
     {
       "relation": "contains",
@@ -15285,54 +16353,8 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "ServerScriptService/GameService/Player/PlayerStateHandler.legacy.luau",
-      "source_location": "L7",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "serverscriptservice_gameservice_player_playerstatehandler_legacy",
-      "target": "serverscriptservice_gameservice_player_playerstatehandler_legacy_binddeathhandler",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "ServerScriptService/GameService/Player/PlayerStateHandler.legacy.luau",
-      "source_location": "L14",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "serverscriptservice_gameservice_player_playerstatehandler_legacy",
-      "target": "serverscriptservice_gameservice_player_playerstatehandler_legacy_onplayeradded",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "ServerScriptService/GameService/Player/PlayerStateHandler.legacy.luau",
-      "source_location": "L10",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "serverscriptservice_gameservice_player_playerstatehandler_legacy_binddeathhandler",
-      "target": "serverscriptservice_gameservice_player_startgame_startgameservice_resetkit"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "ServerScriptService/GameService/Player/PlayerStateHandler.legacy.luau",
-      "source_location": "L16",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "serverscriptservice_gameservice_player_playerstatehandler_legacy_onplayeradded",
-      "target": "serverscriptservice_gameservice_player_playerstatehandler_legacy_binddeathhandler",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L11",
+      "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_startgame",
@@ -15343,7 +16365,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L34",
+      "source_location": "L37",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_startgame",
@@ -15354,7 +16376,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L55",
+      "source_location": "L58",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_startgame",
@@ -15365,7 +16387,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L20",
+      "source_location": "L23",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_startgame",
@@ -15377,7 +16399,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L47",
+      "source_location": "L50",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_startgame_givestartercamera",
@@ -15389,7 +16411,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L72",
+      "source_location": "L75",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_startgame_startgameservice_giveplayerstarterkit",
@@ -15401,7 +16423,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Player/StartGame.luau",
-      "source_location": "L66",
+      "source_location": "L69",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_player_startgame_startgameservice_giveplayerstarterkit",
@@ -15756,6 +16778,18 @@
     {
       "relation": "calls",
       "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ServerScriptService/GameService/Reward/RewardResultHook.luau",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_reward_rewardresulthook_rewardresulthook_start",
+      "target": "serverscriptservice_gameservice_reward_rewardledger_rewardledger_get"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Reward/RewardLedger.luau",
       "source_location": "L127",
@@ -15788,6 +16822,17 @@
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_reward_rewardledger_rewardledger_teardownplayer",
       "target": "serverscriptservice_gameservice_reward_rewardstore_rewardstore_save"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ServerScriptService/GameService/Reward/RewardResultHook.luau",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "serverscriptservice_gameservice_reward_rewardresulthook",
+      "target": "serverscriptservice_gameservice_reward_rewardresulthook_rewardresulthook_start",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -15930,7 +16975,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Reward/RewardStore.luau",
-      "source_location": "L152",
+      "source_location": "L165",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_reward_rewardstore",
@@ -15974,7 +17019,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Reward/RewardStore.luau",
-      "source_location": "L129",
+      "source_location": "L134",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_reward_rewardstore",
@@ -15985,7 +17030,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Reward/RewardStore.luau",
-      "source_location": "L158",
+      "source_location": "L171",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_reward_rewardstore",
@@ -16092,7 +17137,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Reward/RewardStore.luau",
-      "source_location": "L163",
+      "source_location": "L176",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_reward_rewardstore_rewardstore_startautosave",
@@ -16104,7 +17149,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Reward/RewardStore.luau",
-      "source_location": "L137",
+      "source_location": "L145",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_reward_rewardstore_rewardstore_saveall",
@@ -16116,7 +17161,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ServerScriptService/GameService/Reward/RewardStore.luau",
-      "source_location": "L166",
+      "source_location": "L179",
       "weight": 1.0,
       "_origin": "ast",
       "source": "serverscriptservice_gameservice_reward_rewardstore_rewardstore_startautosave",
@@ -16985,7 +18030,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "Tools/CheckGameMirror.luau",
-      "source_location": "L74",
+      "source_location": "L109",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_checkgamemirror",
+      "target": "tools_checkgamemirror_hashsource",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Tools/CheckGameMirror.luau",
+      "source_location": "L118",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tools_checkgamemirror",
@@ -16996,7 +18052,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "Tools/InstallGameMirror.luau",
-      "source_location": "L25",
+      "source_location": "L39",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tools_installgamemirror",
@@ -17007,7 +18063,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "Tools/InstallGameMirror.luau",
-      "source_location": "L48",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_installgamemirror",
+      "target": "tools_installgamemirror_hashsource",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Tools/InstallGameMirror.luau",
+      "source_location": "L63",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tools_installgamemirror",
@@ -17018,11 +18085,35 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "Tools/InstallGameMirror.luau",
-      "source_location": "L36",
+      "source_location": "L50",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tools_installgamemirror",
       "target": "tools_installgamemirror_modulescript",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Tools/InstallGameMirror.luau",
+      "source_location": "L73",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_installgamemirror_legacyscript",
+      "target": "tools_installgamemirror_hashsource",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Tools/InstallGameMirror.luau",
+      "source_location": "L59",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_installgamemirror_modulescript",
+      "target": "tools_installgamemirror_hashsource",
       "confidence_score": 1.0
     },
     {
@@ -18159,5 +19250,5 @@
       "source_file": "MONSTERS.md"
     }
   ],
-  "built_at_commit": "4d6edad7c86d40d17379082f6bd4d326f4dc1e40"
+  "built_at_commit": "ec0b7d850f4c40e3cc827dace3427fdbd4b46c1f"
 }

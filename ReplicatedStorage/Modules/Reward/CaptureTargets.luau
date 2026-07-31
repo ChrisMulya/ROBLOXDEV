@@ -14,7 +14,7 @@ CaptureTargets.Types = {
 		Attribute = "IsMonster",
 		Priority = 100,
 		Rules = {}, -- no gating: always awards, per design decision
-		RepeatPolicy = "Unlimited", -- anti-farm seam, currently disabled -- see REWARD_SYSTEM.md
+		RepeatPolicy = "Cooldown", -- flipped 8.5: a real player now holds a camera in a match (Phase 8.5)
 		Payout = {
 			Strategy = "Curve",
 			UseDistanceMultiplier = true,
@@ -36,7 +36,7 @@ CaptureTargets.Types = {
 			{ Rule = "RequireContextEquals", Field = "objectiveRegistered", Value = true, Code = "ObjectiveUnavailable" },
 			{ Rule = "RequireContextEquals", Field = "objectiveState", Value = "Available", Code = "AlreadyCompleted" },
 		},
-		RepeatPolicy = "Unlimited",
+		RepeatPolicy = "Cooldown", -- flipped 8.5: a real player now holds a camera in a match (Phase 8.5)
 		Payout = {
 			Strategy = "FlatRoll",
 			Base = { XP = 1000, Score = 500 },

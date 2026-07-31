@@ -10,7 +10,6 @@ MatchResultCodes.Messages = {
 	TimeExpired = "Time's up.",
 	Aborted = "Match ended early.",
 	HostShutdown = "Server shutting down.",
-	EndingHoldElapsed = "Match complete.",
 }
 
 -- Any other/unknown code falls back to a generic string rather than nil.

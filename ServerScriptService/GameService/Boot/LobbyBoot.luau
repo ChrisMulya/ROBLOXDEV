@@ -30,8 +30,11 @@ function LobbyBoot.Start()
 		require(ServerScriptService.GameService.PlayerState.PlayerStateReplicator),
 		require(ServerScriptService.GameService.Lobby.LobbyDeathPolicy),
 		require(ServerScriptService.GameService.Lobby.MatchLauncher),
+		-- TEMPORARY, Phase 8V only -- delete once Phase 10's QueueService
+		-- becomes the real caller of MatchLauncher.
+		require(ServerScriptService.GameService.Lobby.DebugLaunchTrigger),
 		require(ServerScriptService.GameService.Lobby.ArrivalService),
-		-- Phase 9: PartyService, QueueService
+		-- Phase 10: PartyService, QueueService
 	}
 
 	for _, service in ipairs(services) do

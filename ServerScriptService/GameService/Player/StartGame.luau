@@ -1,8 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerStats = require(ReplicatedStorage.Modules.PlayerStats)
 local CameraInventory = require(script.Parent.Parent.CameraShelf.CameraInventory)
+local LoadoutService = require(ReplicatedStorage.Modules.Loadout.LoadoutService)
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
-local ShowCurrencyUI = Remotes.Get("ShowCurrencyUI")
+-- Remotes.Get is a WaitForChild -- kept out of module scope (called inside
+-- GivePlayerStarterKit instead) so a require from a boot list can't hang if
+-- something ever requires this before Remotes.Init() has run.
 
 local StartGameService = {}
 
@@ -32,7 +35,7 @@ end
 -- kit -- a retry once the asset is fixed replaces the placeholder cleanly,
 -- since Give destroys whatever occupies the slot.
 local function giveStarterCamera(player): boolean
-	local cameraId = CameraInventory.GetCurrentId(player) or CameraInventory.DefaultCameraId
+	local cameraId = LoadoutService.GetCameraId(player)
 
 	local ok = CameraInventory.Give(player, cameraId)
 	if not ok and cameraId ~= CameraInventory.DefaultCameraId then
@@ -78,7 +81,7 @@ function StartGameService.GivePlayerStarterKit(player)
 		cash.Value = PlayerStats.StartingCash
 	end
 
-	ShowCurrencyUI:FireClient(player)
+	Remotes.Get("ShowCurrencyUI"):FireClient(player)
 
 	player:SetAttribute("KitGiven", true)
 end

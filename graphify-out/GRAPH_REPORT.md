@@ -1,16 +1,16 @@
 # Graph Report - ROBLOX-DEV  (2026-07-30)
 
 ## Corpus Check
-- 131 files · ~61,702 words
+- 138 files · ~74,659 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 597 nodes · 986 edges · 53 communities (47 shown, 6 thin omitted)
-- Extraction: 80% EXTRACTED · 20% INFERRED · 0% AMBIGUOUS · INFERRED: 198 edges (avg confidence: 0.8)
+- 625 nodes · 1053 edges · 53 communities (47 shown, 6 thin omitted)
+- Extraction: 79% EXTRACTED · 21% INFERRED · 0% AMBIGUOUS · INFERRED: 223 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4d6edad7`
+- Built from commit: `ec0b7d85`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -20,10 +20,10 @@
 - Monster System Blueprint
 - SpectateService.luau
 - MonsterService.Spawn
-- CameraStats.luau
+- CameraViewfinder.luau
 - Reward System
-- CameraShelfGui.luau
-- PlayerRuntimeStats.luau
+- MatchArrival.luau
+- StartGame.luau
 - ObjectiveService.luau
 - RewardService.luau
 - PurchaseNotification.luau
@@ -46,16 +46,17 @@
 - WorldLightRenderer.luau
 - ServerRole.luau
 - SpectateCameraController.luau
-- MatchManager.RequestTransition
+- InstallGameMirror.luau
+- MatchManager.luau
 - MatchStates.luau
 - VerifyPhase75.luau
-- MatchCleanup.luau
-- evaluate
+- ServerRole.AssertGameServer
+- MatchParticipants.luau
 - ReturnToLobbyService.luau
 
 ## God Nodes (most connected - your core abstractions)
 1. `CameraSession.Enter()` - 18 edges
-2. `ServerRole.AssertGameServer()` - 12 edges
+2. `ServerRole.AssertGameServer()` - 15 edges
 3. `Reward System` - 12 edges
 4. `SpectateService.SetTarget()` - 11 edges
 5. `CameraStats.GetStats()` - 10 edges
@@ -66,8 +67,6 @@
 10. `ensureBuilt()` - 9 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `MatchManager.RequestTransition()` --calls--> `MatchStates.IsValid()`  [INFERRED]
-  ServerScriptService/GameService/Match/MatchManager.luau → ReplicatedStorage/Modules/Shared/MatchStates.luau
 - `SpectateService.SetTarget()` --calls--> `MatchStates.IsSpectateAllowed()`  [INFERRED]
   ServerScriptService/GameService/Spectate/SpectateService.luau → ReplicatedStorage/Modules/Shared/MatchStates.luau
 - `MatchManager.Start()` --calls--> `ServerRole.AssertGameServer()`  [INFERRED]
@@ -76,6 +75,8 @@
   MAINHANDOFF.md → MONSTERS.md
 - `onPhotoPressed()` --calls--> `CameraSession.Capture()`  [INFERRED]
   StarterPlayerScripts/CameraTouchHudClient.local.luau → ReplicatedStorage/Modules/Camera/CameraSession.luau
+- `setupCharacter()` --calls--> `CameraState.GetWalkSpeedMultiplier()`  [INFERRED]
+  StarterPlayerScripts/Playermovementcontroller.local.luau → ReplicatedStorage/Modules/Camera/CameraState.luau
 
 ## Import Cycles
 - None detected.
@@ -89,7 +90,7 @@
 
 ### Community 0 - "CameraSession.luau"
 Cohesion: 0.07
-Nodes (42): CameraEffects.Apply(), CameraEffects.Clear(), CameraEffects.GetBlurAlpha(), CameraEffects.UpdateFromSpeed(), CameraSession.Capture(), CameraSession.Enter(), CameraSession.Exit(), CameraSession.IsActive() (+34 more)
+Nodes (39): CameraEffects.Apply(), CameraEffects.Clear(), CameraEffects.GetBlurAlpha(), CameraEffects.UpdateFromSpeed(), CameraSession.Capture(), CameraSession.Enter(), CameraSession.Exit(), CameraSession.IsActive() (+31 more)
 
 ### Community 1 - "CameraSession"
 Cohesion: 0.20
@@ -100,36 +101,36 @@ Cohesion: 0.15
 Nodes (16): Strong/Weak Shot Client-Trust Exploit (Known Gap), CameraShotHandler (server), PhotoCapture (server), Behavior Hook Layer (OnSpawn/OnUpdate/OnPhotographed/etc.), 3 Monsters x 3 Behavior Variants Recommendation, Behaviors/GreyCube, Evolution Doubles Per-Monster Cost (Risk), Monster System Blueprint (+8 more)
 
 ### Community 3 - "SpectateService.luau"
-Cohesion: 0.16
-Nodes (22): PlayerStates.CanControlCharacter(), PlayerStates.CanSpectate(), Remotes.Get(), MatchParticipants.GetPresent(), PlayerStateService.Get(), assignBest(), fireSync(), onMatchStateChanged() (+14 more)
+Cohesion: 0.17
+Nodes (21): PlayerStates.CanControlCharacter(), PlayerStates.CanSpectate(), Remotes.Get(), PlayerStateService.Get(), assignBest(), fireSync(), onMatchStateChanged(), onPlayerRemoving() (+13 more)
 
 ### Community 4 - "MonsterService.Spawn"
 Cohesion: 0.13
 Nodes (11): MonsterStats.Get(), MonsterAgent.New(), MonsterAgent.SetState(), MonsterAgent.Tick(), getCooldownTable(), MonsterDamage.ClearAgent(), MonsterDamage.TryKill(), MonsterMovement.MoveTo() (+3 more)
 
-### Community 5 - "CameraStats.luau"
-Cohesion: 0.14
-Nodes (19): CameraStability.IsMoving(), CameraStats.GetBlurSettings(), CameraStats.GetColorGradeSettings(), CameraStats.GetEffectsSettings(), CameraStats.GetFlashSettings(), CameraStats.GetIdFromTool(), CameraStats.GetMovementSettings(), CameraStats.GetShotSettings() (+11 more)
+### Community 5 - "CameraViewfinder.luau"
+Cohesion: 0.24
+Nodes (13): applyGrain(), applyScanlines(), applyVignette(), CameraViewfinder.Hide(), CameraViewfinder.Show(), createBar(), createBracket(), createCornerLabel() (+5 more)
 
 ### Community 6 - "Reward System"
 Cohesion: 0.06
 Nodes (30): Build order, Contract 1 — Units, Contract 2 — Scoring, Contract 3 — Reward routing, Files, Known bias: distance is measured to the hit point, Photo Scoring Blueprint, ⚠ Security — this must land before the payout (+22 more)
 
-### Community 7 - "CameraShelfGui.luau"
-Cohesion: 0.17
-Nodes (14): CameraStats.GetOrderedIds(), buildCameraRow(), buildCloseButton(), buildListHolder(), buildMessageLabel(), buildPanel(), buildTitle(), CameraShelfGui.Build() (+6 more)
+### Community 7 - "MatchArrival.luau"
+Cohesion: 0.50
+Nodes (4): MatchArrival.GetModeId(), MatchArrival.Start(), seedFrom(), MatchParticipants.Seed()
 
-### Community 8 - "PlayerRuntimeStats.luau"
-Cohesion: 0.19
-Nodes (7): CameraState.GetWalkSpeedMultiplier(), PlayerRuntimeStats.Add(), PlayerRuntimeStats.Get(), PlayerRuntimeStats.Set(), PlayerStats.Get(), updateBar(), setupCharacter()
+### Community 8 - "StartGame.luau"
+Cohesion: 0.09
+Nodes (18): CameraState.GetWalkSpeedMultiplier(), LoadoutService.GetCameraId(), PlayerRuntimeStats.Add(), PlayerRuntimeStats.Get(), PlayerRuntimeStats.Set(), PlayerStats.Get(), CameraSessionTracker.IsInCamera(), CameraInventory.ClearSlot() (+10 more)
 
 ### Community 9 - "ObjectiveService.luau"
 Cohesion: 0.11
 Nodes (22): ObjectiveStateClient.GetEffectiveState(), ObjectiveStates.IsValid(), ObjectiveTypes.Get(), ObjectiveTypes.TypeOf(), ObjectiveVisuals.Clear(), ObjectiveVisuals.ClearAll(), clearAllVisible(), considerInstance() (+14 more)
 
 ### Community 10 - "RewardService.luau"
-Cohesion: 0.11
-Nodes (20): CaptureRules.Check(), CaptureTargets.AttributeFor(), CaptureTargets.Get(), CaptureTargets.IsType(), CaptureTargets.Resolve(), CaptureTargets.TypeOf(), applyModifiers(), calculateCurve() (+12 more)
+Cohesion: 0.08
+Nodes (29): CameraStability.IsMoving(), CaptureRules.Check(), CaptureTargets.AttributeFor(), CaptureTargets.Get(), CaptureTargets.IsType(), CaptureTargets.Resolve(), CaptureTargets.TypeOf(), applyModifiers() (+21 more)
 
 ### Community 11 - "PurchaseNotification.luau"
 Cohesion: 0.17
@@ -140,12 +141,12 @@ Cohesion: 0.57
 Nodes (5): bootstrap(), considerInstance(), register(), unregister(), watchAttribute()
 
 ### Community 13 - "Signal.luau"
-Cohesion: 0.11
+Cohesion: 0.12
 Nodes (15): PlayerStates.CanTransition(), PlayerStates.IsValid(), DeathPolicy.Get(), bindCharacter(), DeathService.Start(), onCharacterAdded(), onHumanoidDied(), bindCharacter() (+7 more)
 
 ### Community 14 - "DeathScreen.luau"
-Cohesion: 0.15
-Nodes (12): ensureBuilt(), SpectateHud.Update(), buildButtonHolder(), buildMessageLabel(), buildPanel(), DeathScreen.Show(), ensureBuilt(), renderButtons() (+4 more)
+Cohesion: 0.10
+Nodes (19): MatchResultCodes.GetMessage(), ensureBuilt(), SpectateHud.Update(), buildButtonHolder(), buildMessageLabel(), buildPanel(), DeathScreen.Show(), ensureBuilt() (+11 more)
 
 ### Community 15 - "PlayerStats ModuleScript"
 Cohesion: 0.25
@@ -176,36 +177,40 @@ Cohesion: 0.33
 Nodes (6): CameraShelfHandler (server), Cooldown (Shared Utility), MonsterDamage, MonsterMovement, States/Chase, States/Checking
 
 ### Community 27 - "Remotes.luau"
-Cohesion: 0.07
-Nodes (15): ShotResultCodes.GetMessage(), CameraSessionTracker.IsInCamera(), CameraInventory.ClearSlot(), CameraInventory.FindSlot(), CameraInventory.GetCurrentId(), CameraInventory.Give(), CameraShelfSwap.ClearCameraSlot(), CameraShelfSwap.TakeCamera() (+7 more)
+Cohesion: 0.06
+Nodes (16): CameraStats.GetOrderedIds(), buildCameraRow(), buildCloseButton(), buildListHolder(), buildMessageLabel(), buildPanel(), buildTitle(), CameraShelfGui.Build() (+8 more)
 
 ### Community 36 - "ServerRole.luau"
-Cohesion: 0.15
-Nodes (13): MatchStates.Validate(), PlayerStates.Validate(), resolve(), ServerRole.AssertGameServer(), ServerRole.AssertLobbyServer(), ServerRole.Get(), ServerRole.Is(), GameBoot.Start() (+5 more)
+Cohesion: 0.16
+Nodes (13): PlayerStates.Validate(), resolve(), ServerRole.AssertLobbyServer(), ServerRole.Get(), ServerRole.Is(), LobbyBoot.Start(), ArrivalService.Start(), handleArrival() (+5 more)
 
 ### Community 37 - "SpectateCameraController.luau"
 Cohesion: 0.60
 Nodes (3): ensureFreeCameraAnchor(), SpectateCameraController.SetTarget(), tryExitCameraSession()
 
-### Community 39 - "MatchManager.RequestTransition"
-Cohesion: 0.25
-Nodes (12): MatchConfig.Get(), MatchArrival.GetModeId(), MatchArrival.Start(), seedFrom(), config(), MatchClock.Start(), runCountdown(), runEndingHold() (+4 more)
+### Community 38 - "InstallGameMirror.luau"
+Cohesion: 0.60
+Nodes (3): hashSource(), legacyScript(), moduleScript()
+
+### Community 39 - "MatchManager.luau"
+Cohesion: 0.22
+Nodes (15): MatchConfig.Get(), MatchStates.CanTransition(), MatchStates.IsTerminal(), MatchStates.IsValid(), config(), MatchClock.Start(), runCountdown(), runEndingHold() (+7 more)
 
 ### Community 45 - "MatchStates.luau"
 Cohesion: 0.16
-Nodes (11): MatchStates.CanTransition(), MatchStates.IsGameplayActive(), MatchStates.IsSpectateAllowed(), MatchStates.IsTerminal(), MatchStates.IsValid(), MatchStates.MonstersSpawn(), MatchManager.Abort(), MatchManager.Get() (+3 more)
+Nodes (12): MatchStates.AcceptsJoins(), MatchStates.IsGameplayActive(), MatchStates.IsSpectateAllowed(), MatchStates.MonstersSpawn(), MatchStates.Validate(), GameBoot.Start(), guardNonReservedServer(), MatchManager.Get() (+4 more)
 
 ### Community 46 - "VerifyPhase75.luau"
-Cohesion: 0.17
-Nodes (7): MatchManager.GetElapsed(), MatchParticipants.All(), MatchParticipants.Seed(), ensureMatchInfoFolder(), MatchReplicator.Start(), MatchResultBuilder.Build(), MatchResultBuilder.Start()
+Cohesion: 0.16
+Nodes (12): PlayerStates.CountsAsActive(), evaluate(), MatchEndCondition.Start(), MatchManager.GetElapsed(), MatchParticipants.All(), ensureMatchInfoFolder(), MatchReplicator.Start(), buildPerPlayer() (+4 more)
 
-### Community 47 - "MatchCleanup.luau"
-Cohesion: 0.32
-Nodes (5): MatchCleanup.RegisterSaveStep(), MatchCleanup.Start(), runCleanup(), runWithTimeout(), RewardCleanupHook.Start()
+### Community 47 - "ServerRole.AssertGameServer"
+Cohesion: 0.27
+Nodes (7): ServerRole.AssertGameServer(), MatchCleanup.RegisterSaveStep(), MatchCleanup.Start(), runCleanup(), runWithTimeout(), RewardCleanupHook.Start(), RewardResultHook.Start()
 
-### Community 48 - "evaluate"
-Cohesion: 0.40
-Nodes (5): PlayerStates.CountsAsActive(), evaluate(), MatchEndCondition.Start(), MatchManager.RequestEnd(), PlayerStateService.GetAll()
+### Community 48 - "MatchParticipants.luau"
+Cohesion: 0.24
+Nodes (8): MatchStates.IsKitGranted(), MatchCleanup.RegisterTeardownStep(), MatchParticipants.CountActive(), MatchParticipants.GetPresent(), MatchParticipants.IsParticipant(), KitLifecycleHook.Start(), onCharacterAdded(), StartGameService.ResetKit()
 
 ### Community 49 - "ReturnToLobbyService.luau"
 Cohesion: 0.60
@@ -226,14 +231,14 @@ _Questions this graph is uniquely positioned to answer:_
 - **What is the exact relationship between `Graphify Knowledge Graph Workflow` and `Hard-Won Debugging Lessons`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **Why does `MonsterService.Spawn()` connect `MonsterService.Spawn` to `MatchStates.luau`?**
-  _High betweenness centrality (0.045) - this node is a cross-community bridge._
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
 - **Are the 14 inferred relationships involving `CameraSession.Enter()` (e.g. with `CameraEffects.Apply()` and `CameraEffects.Clear()`) actually correct?**
   _`CameraSession.Enter()` has 14 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 10 inferred relationships involving `ServerRole.AssertGameServer()` (e.g. with `GameBoot.Start()` and `MatchArrival.Start()`) actually correct?**
-  _`ServerRole.AssertGameServer()` has 10 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 13 inferred relationships involving `ServerRole.AssertGameServer()` (e.g. with `GameBoot.Start()` and `MatchArrival.Start()`) actually correct?**
+  _`ServerRole.AssertGameServer()` has 13 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `SpectateService.SetTarget()` (e.g. with `MatchStates.IsSpectateAllowed()` and `PlayerStates.CanSpectate()`) actually correct?**
   _`SpectateService.SetTarget()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `The core idea`, `Contract 1 — Units`, `Known bias: distance is measured to the hit point` to the rest of the system?**
   _49 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `CameraSession.luau` be split into smaller, more focused modules?**
-  _Cohesion score 0.07142857142857142 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07207792207792207 - nodes in this community are weakly interconnected._

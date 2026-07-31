@@ -6,10 +6,21 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CameraInventory = {}
 
-local CAMERA_TEMPLATES_FOLDER = ReplicatedStorage.Assets.Tool.Camera
 local CAMERA_SLOT_NAME = "Camera"
 
 CameraInventory.DefaultCameraId = "Camera1"
+
+-- Lazy, not a module-scope index -- Studio-placed content (Workspace/Assets)
+-- is out of the Game place's mirror scope (Phase 7.5 audit), so a hard index
+-- here would error at require() time and abort the rest of GameBoot's
+-- service list (all requires run before any Start(), so boot-list position
+-- can't contain it). Returns nil instead of erroring when the tree is
+-- missing or incomplete.
+local function templatesFolder(): Instance?
+	local assets = ReplicatedStorage:FindFirstChild("Assets")
+	local tool = assets and assets:FindFirstChild("Tool")
+	return tool and tool:FindFirstChild("Camera")
+end
 
 -- Returns the player's Camera slot Tool and the container holding it (their
 -- Backpack, or their Character if it's currently equipped), or (nil, nil) if
@@ -46,7 +57,13 @@ end
 -- placeholder OR a different camera) and replaces it with cameraId.
 -- Returns ok, code.
 function CameraInventory.Give(player: Player, cameraId: string): (boolean, string)
-	local template = CAMERA_TEMPLATES_FOLDER:FindFirstChild(cameraId)
+	local folder = templatesFolder()
+	if not folder then
+		warn("CameraInventory: no camera assets tree present on this place")
+		return false, "NoCameraAssets"
+	end
+
+	local template = folder:FindFirstChild(cameraId)
 	if not template then
 		warn("CameraInventory: no camera template for CameraId:", cameraId)
 		return false, "InvalidCamera"

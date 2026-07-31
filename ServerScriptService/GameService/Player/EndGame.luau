@@ -2,7 +2,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
-local HideCurrencyUI = Remotes.Get("HideCurrencyUI")
+-- Remotes.Get is a WaitForChild -- kept out of module scope (called inside
+-- ClearPlayerTools instead) so a require from a boot list can't hang if
+-- something ever requires this before Remotes.Init() has run.
 local RewardLedger = require(ServerScriptService.GameService.Reward.RewardLedger)
 local ObjectiveService = require(ServerScriptService.GameService.Objective.ObjectiveService)
 
@@ -33,7 +35,7 @@ function RemoveAllSlot.ClearPlayerTools(player)
 	RewardLedger.ResetRunScoped(player) -- Score; XP is persistent and untouched
 	ObjectiveService.Reset(player) -- ResetPolicy == "OnRunEnd" objectives only; "Never" ones stay Completed
 
-	HideCurrencyUI:FireClient(player)
+	Remotes.Get("HideCurrencyUI"):FireClient(player)
 end
 
 return RemoveAllSlot

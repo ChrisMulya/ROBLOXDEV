@@ -2,9 +2,15 @@
 -- immediately, no UI, no spectating, no teleport, no progression write.
 -- DeathService/DeathPolicy are Game-Server-only companions; this module
 -- binds Humanoid.Died itself since nothing else does that on this place.
+--
+-- Also resets KitGiven on death -- absorbed from the now-deleted
+-- PlayerStateHandler.legacy.luau, which bound its own independent
+-- Humanoid.Died listener for exactly this on both places. The Game place's
+-- equivalent now lives in KitLifecycleHook instead.
 
 local Players = game:GetService("Players")
 local PlayerStateService = require(script.Parent.Parent.PlayerState.PlayerStateService)
+local StartGameService = require(script.Parent.Parent.Player.StartGame)
 
 local LobbyDeathPolicy = {}
 
@@ -21,6 +27,7 @@ local function bindCharacter(player: Player, character: Model)
 	end
 	humanoid.Died:Connect(function()
 		PlayerStateService.Set(player, "Dead", "HumanoidDied")
+		StartGameService.ResetKit(player)
 		player:LoadCharacter()
 	end)
 end

@@ -5,6 +5,9 @@
 -- No caller of its own yet -- Phase 9's QueueService calls this once a
 -- threshold is met. Until then it's exercised directly (the "manual launch
 -- button" the plan calls sufficient to exercise phases 1-8 end to end).
+--
+-- Codes returned below match Shared/MatchLaunchResultCodes's keys exactly --
+-- see that module for the display strings, same pattern as ShotResultCodes.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")

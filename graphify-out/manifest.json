@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Player/EndGame.luau": {
-    "mtime": 1785265809.0693712,
-    "ast_hash": "fd83c3ea12b5ae207ca3bf2bd52b1d0b",
+    "mtime": 1785423605.4866626,
+    "ast_hash": "6ca49572df318a601c09834161660e83",
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Player/PlayerCurrency.legacy.luau": {
@@ -54,14 +54,9 @@
     "ast_hash": "b12e2d970e50c3541ee70c39d009e946",
     "semantic_hash": ""
   },
-  "ServerScriptService/GameService/Player/PlayerStateHandler.legacy.luau": {
-    "mtime": 1785265915.318303,
-    "ast_hash": "667593343a89c1edc1e4db31d5e21bc8",
-    "semantic_hash": ""
-  },
   "ServerScriptService/GameService/Player/StartGame.luau": {
-    "mtime": 1785265807.1851466,
-    "ast_hash": "4dc52cd478b39e5ccc554287c06b895c",
+    "mtime": 1785423593.5936773,
+    "ast_hash": "731c65ebb9686be1135e986b45bd70cc",
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Shop/BuyHandler.legacy.luau": {
@@ -140,8 +135,8 @@
     "semantic_hash": "f8ec5cda636155c90518c418724cf35e"
   },
   "ServerScriptService/GameService/CameraShelf/CameraInventory.luau": {
-    "mtime": 1785240605.6202726,
-    "ast_hash": "7ed955b113dba9555af2c2a975c93560",
+    "mtime": 1785423560.5556083,
+    "ast_hash": "90dea5e87a0aa0b0ea4f7d3ad7808509",
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Camera/CameraSessionTracker.luau": {
@@ -195,8 +190,8 @@
     "semantic_hash": ""
   },
   "MAINHANDOFF.md": {
-    "mtime": 1785417166.1062133,
-    "ast_hash": "b5e138a9bc4c9a3b2f1521e7457c57b8",
+    "mtime": 1785424101.5049753,
+    "ast_hash": "56856bc331442d7b70fbab2e3701dcb8",
     "semantic_hash": ""
   },
   "MONSTERS.md": {
@@ -270,8 +265,8 @@
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Reward/RewardStore.luau": {
-    "mtime": 1785241504.7380736,
-    "ast_hash": "fce31f852254a82c38eace9d182e461a",
+    "mtime": 1785422718.884751,
+    "ast_hash": "f81dce346a1777dcddda6dd6e60ec0d1",
     "semantic_hash": ""
   },
   "PHOTO_SCORING.md": {
@@ -290,8 +285,8 @@
     "semantic_hash": ""
   },
   "ReplicatedStorage/Modules/Reward/CaptureTargets.luau": {
-    "mtime": 1785281263.3600953,
-    "ast_hash": "a06e4b2f89e779012a2b7a8bd50e4f75",
+    "mtime": 1785423545.777729,
+    "ast_hash": "f2593363f3ae5d8f54cf3c4e9b91f6bf",
     "semantic_hash": ""
   },
   "ReplicatedStorage/Modules/Reward/ShotResultCodes.luau": {
@@ -420,8 +415,8 @@
     "semantic_hash": ""
   },
   "StarterPlayerScripts/ClientBootstrap.local.luau": {
-    "mtime": 1785343071.9160023,
-    "ast_hash": "2d9a3d83356289dbd4922087a708ba9e",
+    "mtime": 1785422882.094805,
+    "ast_hash": "b90f7860d54dd2fca7b17d238fa2914a",
     "semantic_hash": ""
   },
   "ReplicatedStorage/Modules/PlayerRuntimeStats.luau": {
@@ -455,18 +450,18 @@
     "semantic_hash": ""
   },
   "ReplicatedStorage/Modules/Shared/MatchConfig.luau": {
-    "mtime": 1785340442.1779566,
-    "ast_hash": "8c41f0fdfc2ae4a108bbdf231372982c",
+    "mtime": 1785423513.4209166,
+    "ast_hash": "ee60c1bd5411c09e9ec3f3d0aa0008b4",
     "semantic_hash": ""
   },
   "ReplicatedStorage/Modules/Shared/MatchResultCodes.luau": {
-    "mtime": 1785344741.473371,
-    "ast_hash": "6e3999425f0d5c419cf719b8472ce9a1",
+    "mtime": 1785422852.579929,
+    "ast_hash": "4fae23a4d20c83a79cebe0cca773683c",
     "semantic_hash": ""
   },
   "ReplicatedStorage/Modules/Shared/MatchStates.luau": {
-    "mtime": 1785340418.8959126,
-    "ast_hash": "b29621f371e7c9e35d9fa69cbf2795f8",
+    "mtime": 1785423507.4233868,
+    "ast_hash": "8f7f78234b642359dbeaf62e6519a26c",
     "semantic_hash": ""
   },
   "ReplicatedStorage/Modules/Shared/PlaceIds.luau": {
@@ -520,13 +515,13 @@
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Boot/GameBoot.luau": {
-    "mtime": 1785417065.153152,
-    "ast_hash": "be9310fd7bfc88f4e6df4f7f2f7fe71c",
+    "mtime": 1785423680.8963604,
+    "ast_hash": "0d5a628715330dc66c011a3dee73e2c9",
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Boot/LobbyBoot.luau": {
-    "mtime": 1785417087.0937383,
-    "ast_hash": "8a82a19639f811765327e61944451ac8",
+    "mtime": 1785424626.0163977,
+    "ast_hash": "f302a66bfd49e0cb6c0638d4cd6b0456",
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Death/DeathPolicy.luau": {
@@ -535,13 +530,13 @@
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Death/DeathService.luau": {
-    "mtime": 1785342272.152136,
-    "ast_hash": "6ae9e77f4692d201d7c07c25d4bdf139",
+    "mtime": 1785423657.7847662,
+    "ast_hash": "69cb8f515fd5a2acbcbc0153a32b3be0",
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Lobby/LobbyDeathPolicy.luau": {
-    "mtime": 1785342279.797624,
-    "ast_hash": "53af893b27e68353fca089553da955bb",
+    "mtime": 1785423646.9892774,
+    "ast_hash": "03208f14b5a08b31c0a9d045b0988b3c",
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Match/MatchCleanup.luau": {
@@ -570,8 +565,8 @@
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Match/MatchResultBuilder.luau": {
-    "mtime": 1785344766.1717815,
-    "ast_hash": "4132acddc5adb90a217c6c58b4d41115",
+    "mtime": 1785422759.892604,
+    "ast_hash": "52231b04958f1b25f60ee4a7baddd542",
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/PlayerState/PlayerStateReplicator.luau": {
@@ -585,8 +580,8 @@
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Reward/RewardCleanupHook.luau": {
-    "mtime": 1785368354.9698656,
-    "ast_hash": "3e8f1a23a9919c6001a961d25f5e3fb4",
+    "mtime": 1785422724.7151337,
+    "ast_hash": "859fbc95e13b5802b10f3ecf9bf08285",
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Spectate/SpectateService.luau": {
@@ -600,13 +595,13 @@
     "semantic_hash": ""
   },
   "Tools/CheckGameMirror.luau": {
-    "mtime": 1785368797.19882,
-    "ast_hash": "80494a1f5b017ea03315a13539d756a5",
+    "mtime": 1785423994.218365,
+    "ast_hash": "e6dac2fe69d2ae6027bd6dad8d4532a8",
     "semantic_hash": ""
   },
   "Tools/InstallGameMirror.luau": {
-    "mtime": 1785369325.6195266,
-    "ast_hash": "d67bf45bc7b9da04f44c5857f1bfa314",
+    "mtime": 1785423985.2053223,
+    "ast_hash": "433ad454f8a96b98f677eec649d8def6",
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Lobby/ArrivalService.luau": {
@@ -615,8 +610,8 @@
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Lobby/MatchLauncher.luau": {
-    "mtime": 1785417048.1792996,
-    "ast_hash": "442ce4e6aebefb264a61ca069837ecd8",
+    "mtime": 1785422831.0410929,
+    "ast_hash": "da795f79dab523bca81ab8e1e413fcfe",
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Match/MatchArrival.luau": {
@@ -625,8 +620,8 @@
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Match/MatchClock.luau": {
-    "mtime": 1785416995.7849934,
-    "ast_hash": "7192eb60bcb274e52d2198e8d31c8668",
+    "mtime": 1785423527.1494846,
+    "ast_hash": "b97618a1adf8ab6d7b3d42c04aa0044b",
     "semantic_hash": ""
   },
   "ServerScriptService/GameService/Match/ReturnToLobbyService.luau": {
@@ -652,6 +647,46 @@
   "Tools/VerifyPhase75.luau": {
     "mtime": 1785371988.1230588,
     "ast_hash": "7b1ca98ed3598b8044d803e0bf582fa5",
+    "semantic_hash": ""
+  },
+  "ReplicatedStorage/Modules/Shared/MatchLaunchResultCodes.luau": {
+    "mtime": 1785422810.3066308,
+    "ast_hash": "1d096ad7a28528872c8205e939a2743a",
+    "semantic_hash": ""
+  },
+  "ReplicatedStorage/Modules/UI/MatchReceipt.luau": {
+    "mtime": 1785422869.1194723,
+    "ast_hash": "a2ad9f8f04689dacd2575eb926205736",
+    "semantic_hash": ""
+  },
+  "ReplicatedStorage/Modules/UI/MatchReceiptController.luau": {
+    "mtime": 1785422876.143998,
+    "ast_hash": "aafba276c3c9a8e177f64d7c3ef8dc61",
+    "semantic_hash": ""
+  },
+  "ServerScriptService/GameService/Reward/RewardResultHook.luau": {
+    "mtime": 1785422785.15902,
+    "ast_hash": "e1dddf97cc3f4db9b406fd2dd6fcb928",
+    "semantic_hash": ""
+  },
+  "ReplicatedStorage/Modules/Loadout/LoadoutService.luau": {
+    "mtime": 1785423576.7394423,
+    "ast_hash": "ef176c3d39e91f1d733617c28518c219",
+    "semantic_hash": ""
+  },
+  "ServerScriptService/GameService/Match/MatchSpawner.luau": {
+    "mtime": 1785423616.2941687,
+    "ast_hash": "e11787b709cd8cf2c830b9ab5bc529b7",
+    "semantic_hash": ""
+  },
+  "ServerScriptService/GameService/Player/KitLifecycleHook.luau": {
+    "mtime": 1785423773.8499544,
+    "ast_hash": "6138a933a5e08d25e0992a6faec7d8fc",
+    "semantic_hash": ""
+  },
+  "ServerScriptService/GameService/Lobby/DebugLaunchTrigger.luau": {
+    "mtime": 1785424591.1806612,
+    "ast_hash": "e3e9377fcb6e641f519830ad7bc66352",
     "semantic_hash": ""
   }
 }

@@ -126,16 +126,27 @@ end
 -- Saves every player concurrently. Sequential saves could exceed Roblox's
 -- ~30s BindToClose budget once retries/backoff are involved, silently
 -- dropping whoever sat at the end of the list.
-function RewardStore.SaveAll(getValues: (Player) -> { [string]: number })
+--
+-- Returns (successCount, total) so a caller (MatchCleanup's save step, in
+-- particular) can tell a real failure from success -- this used to be
+-- silently discarded, which meant a save that failed for every player was
+-- indistinguishable from one that succeeded for all of them.
+function RewardStore.SaveAll(getValues: (Player) -> { [string]: number }): (number, number)
+	local players = Players:GetPlayers()
+	local total = #players
+	local successCount = 0
 	local pending = 0
 	local done = Instance.new("BindableEvent")
 
-	for _, player in ipairs(Players:GetPlayers()) do
+	for _, player in ipairs(players) do
 		pending += 1
 		task.spawn(function()
-			pcall(function()
-				RewardStore.Save(player, getValues(player))
+			local ok, saved = pcall(function()
+				return RewardStore.Save(player, getValues(player))
 			end)
+			if ok and saved then
+				successCount += 1
+			end
 			pending -= 1
 			if pending == 0 then
 				done:Fire()
@@ -147,6 +158,8 @@ function RewardStore.SaveAll(getValues: (Player) -> { [string]: number })
 		done.Event:Wait()
 	end
 	done:Destroy()
+
+	return successCount, total
 end
 
 function RewardStore.ClearSession(player: Player)
