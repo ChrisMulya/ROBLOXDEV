@@ -1,22 +1,22 @@
--- Queue UI: one toggle button (Join/Leave) plus a position/size readout.
--- Pure UI -- takes data via Update(), reports intent via the
--- SetActionHandler callback, shows/hides via Show()/Hide(). No remote calls,
--- no state ownership. Same convention as SpectateHud (UIBuilder/UITheme,
--- lazy ensureBuilt()), extended with a real interactive control since this
--- is the production replacement for DebugLaunchTrigger's chat command --
--- unlike SpectateHud, nobody else initiates this action for the player.
+-- Transient message strip for queue outcomes. Stays hidden until there is
+-- something to say, then hides itself again.
+--
+-- The Join/Leave button this HUD used to own is gone: the lobby's queue pads
+-- are the only way to enter a queue, and occupancy/countdown are rendered in
+-- world space over the pad itself (QueuePadDisplay). What's left is the one
+-- thing a pad can't show -- a message aimed at one player ("Queue Is Full",
+-- "Couldn't Start A Match"). Pure UI: no remote calls, no state ownership.
 
 local UIBuilder = require(script.Parent.Parent.UI.UIBuilder)
 local UITheme = require(script.Parent.Parent.UI.UITheme)
 
 local QueueHud = {}
 
+local MESSAGE_DURATION = 4
+
 local screenGui: ScreenGui? = nil
 local statusLabel: TextLabel? = nil
-local actionButton: TextButton? = nil
-
-local actionHandler: ((string) -> ())? = nil
-local isQueued = false
+local hideToken = 0
 
 local function ensureBuilt()
 	if screenGui then
@@ -24,12 +24,13 @@ local function ensureBuilt()
 	end
 
 	screenGui = UIBuilder.CreateScreenGui("QueueHudGui", UIBuilder.GetPlayerGui())
+	screenGui.Enabled = false
 
 	local holder = Instance.new("Frame")
 	holder.Name = "QueueHolder"
 	holder.AnchorPoint = Vector2.new(0.5, 1)
 	holder.Position = UDim2.new(0.5, 0, 1, -20)
-	holder.Size = UDim2.fromOffset(220, 80)
+	holder.Size = UDim2.fromOffset(260, 36)
 	holder.BackgroundColor3 = UITheme.Colors.PanelBackground
 	holder.BackgroundTransparency = 0.2
 	holder.BorderSizePixel = 0
@@ -37,67 +38,35 @@ local function ensureBuilt()
 
 	statusLabel = Instance.new("TextLabel")
 	statusLabel.Name = "Status"
-	statusLabel.Size = UDim2.new(1, -20, 0, 24)
-	statusLabel.Position = UDim2.fromOffset(10, 6)
+	statusLabel.Size = UDim2.new(1, -20, 1, 0)
+	statusLabel.Position = UDim2.fromOffset(10, 0)
 	statusLabel.BackgroundTransparency = 1
 	statusLabel.Font = UITheme.Fonts.Bold
 	statusLabel.TextColor3 = UITheme.Colors.Text
 	statusLabel.TextSize = 14
-	statusLabel.Text = "Not Queued"
+	statusLabel.Text = ""
 	statusLabel.Parent = holder
+end
 
-	actionButton = Instance.new("TextButton")
-	actionButton.Name = "Action"
-	actionButton.Size = UDim2.new(1, -20, 0, 34)
-	actionButton.Position = UDim2.fromOffset(10, 36)
-	actionButton.BackgroundColor3 = UITheme.Colors.Accent
-	actionButton.Font = UITheme.Fonts.Bold
-	actionButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-	actionButton.TextSize = 16
-	actionButton.Text = "Join Queue"
-	actionButton.Parent = holder
+-- An empty message is a no-op rather than an empty strip: "Ok" resolves to ""
+-- through QueueResultCodes.GetMessage, and success needs no announcement --
+-- the pad's own countdown already showed it.
+function QueueHud.SetMessage(message: string)
+	if message == "" then
+		return
+	end
 
-	actionButton.MouseButton1Click:Connect(function()
-		if actionHandler then
-			actionHandler(isQueued and "Leave" or "Join")
+	ensureBuilt()
+	statusLabel.Text = message
+	screenGui.Enabled = true
+
+	hideToken += 1
+	local token = hideToken
+	task.delay(MESSAGE_DURATION, function()
+		if token == hideToken then
+			QueueHud.Hide()
 		end
 	end)
-end
-
-function QueueHud.SetActionHandler(fn: (string) -> ())
-	actionHandler = fn
-end
-
-function QueueHud.Update(payload: { queued: boolean, position: number?, size: number, message: string? })
-	ensureBuilt()
-
-	isQueued = payload.queued
-	actionButton.Text = isQueued and "Leave Queue" or "Join Queue"
-
-	if payload.message and payload.message ~= "" then
-		statusLabel.Text = payload.message
-	elseif isQueued then
-		statusLabel.Text = ("Queued: %d / %d"):format(payload.position or 0, payload.size)
-	else
-		statusLabel.Text = "Not Queued"
-	end
-
-	screenGui.Enabled = true
-end
-
--- Updates only the status text, leaving the queued/button state exactly as
--- it was -- for transient result messages (errors, rate limits) that must
--- not be mistaken for a change in whether the player is actually queued.
-function QueueHud.SetMessage(message: string)
-	ensureBuilt()
-	if message ~= "" then
-		statusLabel.Text = message
-	end
-end
-
-function QueueHud.Show()
-	ensureBuilt()
-	screenGui.Enabled = true
 end
 
 function QueueHud.Hide()

@@ -16,6 +16,7 @@ local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 if ServerRole.Is("LobbyServer") then
 	require(ReplicatedStorage.Modules.UI.MatchReceiptController)
 	require(ReplicatedStorage.Modules.Queue.QueueController)
+	require(ReplicatedStorage.Modules.Queue.QueuePadDisplay)
 elseif ServerRole.Is("GameServer") then
 	require(ReplicatedStorage.Modules.UI.DeathScreenController)
 	require(ReplicatedStorage.Modules.Spectate.SpectateController)

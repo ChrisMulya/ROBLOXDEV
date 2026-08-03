@@ -32,9 +32,11 @@ Remotes.ALL_NAMES = {
 	"SpectateResult",
 	"SpectateStateSync",
 	"MatchResultSync",
-	"QueueRequest",
+	-- Queueing is entered by standing on a lobby pad, not by a client request:
+	-- there is no QueueRequest, and pad state reaches every client as replicated
+	-- pad attributes rather than a per-player sync. QueueResult remains for the
+	-- one thing attributes can't carry -- a message aimed at one player.
 	"QueueResult",
-	"QueueStateSync",
 }
 
 function Remotes.Get(name: string): RemoteEvent

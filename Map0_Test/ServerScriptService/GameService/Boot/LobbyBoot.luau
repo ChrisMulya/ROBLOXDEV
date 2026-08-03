@@ -41,10 +41,13 @@ function LobbyBoot.Start()
 		require(ServerScriptService.GameService.Lobby.MatchLauncher),
 		require(ServerScriptService.GameService.Lobby.ArrivalService),
 		require(ServerScriptService.GameService.Lobby.PartyService),
-		-- QueueService last: it's the caller of MatchLauncher and the
-		-- registrant of LaunchGate's "Roster" precondition -- callee before
-		-- caller, registry before registrant.
+		-- QueueService before its own caller: it's the caller of MatchLauncher
+		-- and the registrant of LaunchGate's "Roster" precondition -- callee
+		-- before caller, registry before registrant.
 		require(ServerScriptService.GameService.Lobby.QueueService),
+		-- QueuePadService last: it's the sensor that drives QueueService, and
+		-- it registers pads into it -- same callee-before-caller rule.
+		require(ServerScriptService.GameService.Lobby.QueuePadService),
 	}
 
 	for _, service in ipairs(services) do

@@ -2,8 +2,8 @@
 -- mode id), and teleports the group there. Handles ReserveServer/TeleportAsync
 -- failure by reporting it back rather than teleporting a partial/broken group.
 --
--- Codes returned below match Shared/MatchLaunchResultCodes's keys exactly --
--- see that module for the display strings, same pattern as ShotResultCodes.
+-- Codes returned below match keys in Shared/QueueResultCodes exactly -- see
+-- that module for the display strings, same pattern as ShotResultCodes.
 --
 -- Phase 12.5 item 2: Launch() returning true only means TeleportAsync's
 -- initial request was ACCEPTED, not that anyone arrived -- Roblox can still
@@ -97,7 +97,7 @@ local function handleInitFailed(player: Player, _teleportResult, message: string
 			player.Name, attempt, tostring(message)))
 		retryAttempts[player.UserId] = nil
 		LaunchGate.OnLaunchAborted({ player })
-		Remotes.Get("QueueResult"):FireClient(player, "LaunchFailed")
+		Remotes.Get("QueueResult"):FireClient(player, "TeleportInitFailed")
 		return
 	end
 
