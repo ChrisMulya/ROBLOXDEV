@@ -1,7 +1,9 @@
 local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RewardLedger = require(ServerScriptService.GameService.Reward.RewardLedger)
+local LoadoutService = require(ReplicatedStorage.Modules.Loadout.LoadoutService)
 -- ObjectiveService/ObjectiveReplicator boot from GameService/Bootstrap.legacy.luau now --
 -- this file no longer doubles as their hidden keystone.
 
@@ -14,8 +16,15 @@ local RewardLedger = require(ServerScriptService.GameService.Reward.RewardLedger
 -- thread precisely so leaderstats is fully populated within this handler.
 -- If that ever changes, `leaderstats` here would briefly exist without Cash
 -- and StartGame's `leaderstats:FindFirstChild("Cash")` would silently miss.
+--
+-- LoadoutService.Load runs the same way -- fire-and-forget on its own
+-- thread, both places, for the same reason: this handler must not yield.
+-- This is the earliest both-places PlayerAdded hook that already exists,
+-- so it's also the earliest point the Game place's camera-choice load can
+-- start, ahead of KitLifecycleHook's CharacterAdded-triggered grant.
 local function onPlayerAdded(player)
 	RewardLedger.SetupPlayer(player)
+	task.spawn(LoadoutService.Load, player)
 
 	local leaderstats = player:FindFirstChild("leaderstats")
 	if not leaderstats then
@@ -31,6 +40,7 @@ end
 
 local function onPlayerRemoving(player)
 	RewardLedger.TeardownPlayer(player)
+	LoadoutService.ClearSession(player)
 end
 
 Players.PlayerAdded:Connect(onPlayerAdded)

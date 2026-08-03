@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CameraInventory = require(script.Parent.CameraInventory)
 local CameraSessionTracker = require(script.Parent.Parent.Camera.CameraSessionTracker)
+local LoadoutService = require(ReplicatedStorage.Modules.Loadout.LoadoutService)
 
 local CameraShelfSwap = {}
 
@@ -28,16 +29,24 @@ function CameraShelfSwap.TakeCamera(player, cameraId)
 	-- StartGame DOES run, it hands out the right camera from the start.
 	if not slot then
 		player:SetAttribute("CurrentCamera", cameraId)
+		LoadoutService.Save(player, cameraId)
 		print(player.Name, "has no Camera slot yet -- saved preference:", cameraId)
 		return true, "PreferenceSaved"
 	end
 
-	-- Already holding this exact camera -- informational, not an error.
+	-- Already holding this exact camera -- informational, not an error. No
+	-- Save() needed: the persisted value already matches, or this player
+	-- somehow holds it without ever choosing it here, in which case there's
+	-- nothing new worth persisting.
 	if not slot:GetAttribute("IsEmpty") and slot:GetAttribute("CameraId") == cameraId then
 		return true, "AlreadyHolding"
 	end
 
-	return CameraInventory.Give(player, cameraId)
+	local ok, reason = CameraInventory.Give(player, cameraId)
+	if ok then
+		LoadoutService.Save(player, cameraId)
+	end
+	return ok, reason
 end
 
 function CameraShelfSwap.ClearCameraSlot(player)
