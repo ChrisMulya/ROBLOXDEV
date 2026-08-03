@@ -28,6 +28,16 @@ function RewardCleanupHook.Start()
 
 	ServerRole.AssertGameServer()
 
+	-- Phase 12.5 item 3: these two constants live in different files but
+	-- must maintain this relationship, or every Cleanup abandons the save
+	-- step before RewardStore.Save's own confirmation wait can complete.
+	-- Was previously enforced only by a comment in RewardStore.luau, which
+	-- either file could silently drift out of sync with.
+	if RewardStore.SAVE_CONFIRM_TIMEOUT_SECONDS >= MatchCleanup.STEP_TIMEOUT_SECONDS then
+		warn(("RewardCleanupHook: RewardStore.SAVE_CONFIRM_TIMEOUT_SECONDS (%d) must be less than MatchCleanup.STEP_TIMEOUT_SECONDS (%d) -- every save step will be abandoned before a save can confirm"):format(
+			RewardStore.SAVE_CONFIRM_TIMEOUT_SECONDS, MatchCleanup.STEP_TIMEOUT_SECONDS))
+	end
+
 	MatchCleanup.RegisterSaveStep("RewardLedger", function(): boolean
 		local successCount, total = RewardStore.SaveAll(RewardLedger.CurrentPersistentValues)
 		if successCount < total then

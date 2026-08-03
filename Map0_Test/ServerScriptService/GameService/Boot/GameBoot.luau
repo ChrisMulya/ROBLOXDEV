@@ -51,6 +51,14 @@ function GameBoot.Start()
 	local services = {
 		require(ServerScriptService.GameService.PlayerState.PlayerStateService),
 		require(ServerScriptService.GameService.PlayerState.PlayerStateReplicator),
+		-- Phase 12.5 item 5: runs on both places, no dependents in this
+		-- list -- placed early so IsInCamera is truthful as soon as the
+		-- server is up, same reasoning as PlayerStateService above.
+		require(ServerScriptService.GameService.Camera.CameraSessionTracker),
+		-- Phase 12.5 item 6: subscribes to ProfileStore's global diagnostic
+		-- signals. No dependencies, no dependents -- placed early so it's
+		-- listening before any Reward operation could fire them.
+		require(ServerScriptService.GameService.Reward.RewardStoreDiagnostics),
 		require(ServerScriptService.GameService.Match.MatchParticipants),
 		require(ServerScriptService.GameService.Match.MatchManager),
 		require(ServerScriptService.GameService.Match.MatchEndCondition),

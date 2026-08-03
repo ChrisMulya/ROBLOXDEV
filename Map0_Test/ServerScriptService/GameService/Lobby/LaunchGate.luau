@@ -20,6 +20,14 @@
 -- until OnLaunched actually fires, so there is nothing left to roll back --
 -- a failed Check or a failed Launch now just leaves every candidate's
 -- session exactly as it was.
+--
+-- RegisterOnLaunchAborted/OnLaunchAborted (Phase 12.5 item 2): for the case
+-- OnLaunched itself doesn't cover -- MatchLauncher.Launch returning true
+-- only means TeleportAsync was accepted, not that anyone arrived. A later,
+-- async TeleportInitFailed means OnLaunched already fired and already
+-- released whatever a candidate's precondition held (RewardLaunchHook's
+-- session, for one) for a player who never actually left. MatchLauncher
+-- calls this once it gives up retrying that specific player's teleport.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
@@ -28,6 +36,7 @@ local LaunchGate = {}
 
 local preconditions: { { name: string, fn: ({ Player }) -> (boolean, string) } } = {}
 local onLaunchedHandlers: { { name: string, fn: ({ Player }) -> () } } = {}
+local onLaunchAbortedHandlers: { { name: string, fn: ({ Player }) -> () } } = {}
 
 function LaunchGate.RegisterPrecondition(name: string, fn: ({ Player }) -> (boolean, string))
 	table.insert(preconditions, { name = name, fn = fn })
@@ -35,6 +44,10 @@ end
 
 function LaunchGate.RegisterOnLaunched(name: string, fn: ({ Player }) -> ())
 	table.insert(onLaunchedHandlers, { name = name, fn = fn })
+end
+
+function LaunchGate.RegisterOnLaunchAborted(name: string, fn: ({ Player }) -> ())
+	table.insert(onLaunchAbortedHandlers, { name = name, fn = fn })
 end
 
 -- First failure wins. Preconditions run in registration order, so boot order
@@ -53,6 +66,12 @@ end
 
 function LaunchGate.OnLaunched(players: { Player })
 	for _, entry in ipairs(onLaunchedHandlers) do
+		entry.fn(players)
+	end
+end
+
+function LaunchGate.OnLaunchAborted(players: { Player })
+	for _, entry in ipairs(onLaunchAbortedHandlers) do
 		entry.fn(players)
 	end
 end

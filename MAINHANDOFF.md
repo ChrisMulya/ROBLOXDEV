@@ -753,8 +753,15 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 
 | Issue | Impact | Why deferred |
 |---|---|---|
-| No DataStore session locking | Fast rejoin / server hop = last-write-wins clobber | Prefer a proven library over hand-rolling (roadmap Phase 12). A cheap launch-time gate lands in Phase 10 first. Destructive outage-zeroing case is already closed |
 | `origin` is client-supplied | Spoofable shot origin | `CaptureGuard.ValidateShot` 10-stud proximity check is a mitigation; server-derived origin is a larger change |
+
+**Resolved, not deferred:** "No DataStore session locking" (this table's own former row) — Phase 12 migrated `RewardStore` to ProfileStore (real `StartSessionAsync`/`EndSession`/`OnSessionEnd`); Phase 12.5 closed the two gaps that migration itself introduced (a one-shot migration gate, and a launch-abort session leak — see `RewardStore.Reacquire`/`LaunchGate.OnLaunchAborted`).
+
+## Tracked sunset conditions
+
+Decisions waiting on data, not files nobody dares touch.
+
+- **`RewardStore_v1` legacy read (`RewardStore.luau`: `legacyBackend`, `attemptLegacyRead`, the `RobloxMetaData.MigratedFromV1` migration block in `Load`).** Temporary by design — every real player's XP was confirmed migrated to `RewardStore_v2` as of Phase 12.5 (swept via `Tools/CheckXpMigration.luau`, `SWEEP_ALL_V1 = true`: one real account, cleanly migrated; the only other v1 keys were Studio Play-test artifacts, deleted). New joins only need this path if an account played before Phase 12 and has genuinely never joined since. **Sunset condition:** once `RewardStoreDiagnostics`/`RewardStore.Load`'s own migration logging shows zero migrations across a full retention window (suggest: 90 days from whenever this is next checked), delete `legacyBackend`, `attemptLegacyRead`, and the migration block in `Load`. Re-run the sweep tool first to confirm zero `STILL EXPOSED` accounts before deleting.
 
 ## Environment & tooling gotchas
 

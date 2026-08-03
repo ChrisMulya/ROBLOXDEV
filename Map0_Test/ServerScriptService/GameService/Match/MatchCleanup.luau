@@ -16,7 +16,12 @@ local MatchManager = require(script.Parent.MatchManager)
 
 local MatchCleanup = {}
 
-local STEP_TIMEOUT_SECONDS = 10
+-- Real module field, not a local (Phase 12.5 item 3): RewardStore's own
+-- SAVE_CONFIRM_TIMEOUT_SECONDS must stay below this, or RewardCleanupHook's
+-- save step gets abandoned before a save can ever confirm (roadmap R-6).
+-- RewardCleanupHook.Start() asserts the relationship at boot.
+MatchCleanup.STEP_TIMEOUT_SECONDS = 10
+local STEP_TIMEOUT_SECONDS = MatchCleanup.STEP_TIMEOUT_SECONDS
 
 -- { {name, fn} }, registration order.
 local saveSteps = {}

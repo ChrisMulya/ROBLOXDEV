@@ -10,6 +10,10 @@ MatchLaunchResultCodes.Messages = {
 	NoPlayers = "No Players To Launch",
 	ReserveFailed = "Couldn't Reserve A Server -- Try Again",
 	TeleportFailed = "Couldn't Start The Match -- Try Again",
+	-- Phase 12.5 item 2: TeleportAsync was accepted (Launch returned true)
+	-- but a later, async TeleportInitFailed means this specific player
+	-- never actually left after retrying with backoff.
+	TeleportInitFailed = "Couldn't Complete Your Teleport -- Try Queueing Again",
 }
 
 -- "Launched" has no message -- the client just follows the teleport. Any

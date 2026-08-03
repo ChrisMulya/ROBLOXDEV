@@ -13,10 +13,30 @@
 -- that wasn't a ProfileStore profile" -- pointing ProfileStore at the old
 -- name would very likely read every existing player's real progress as
 -- corrupt. Load() below falls back to a read-only legacy GetAsync against
--- the OLD store, once, only on a profile's very first-ever session
--- (SessionLoadCount == 1) -- covers both a genuinely new player (legacy
--- read finds nothing, harmless) and a pre-Phase-12 player (their real XP
--- gets copied in before Reconcile's defaults would otherwise stick).
+-- the OLD store, once per profile, and copies matching values in before
+-- Reconcile's defaults would otherwise stick.
+--
+-- Phase 12.5 fix (item 1): the one-time gate used to be
+-- `profile.SessionLoadCount == 1`, which fires exactly once per player,
+-- ever. If that single legacy read failed (transient outage/throttle),
+-- nothing was copied but the profile was still marked Ready, and every
+-- later join saw SessionLoadCount >= 2 -- the copy never retried and the
+-- v1 total was orphaned permanently. Gated on a durable
+-- `RobloxMetaData.MigratedFromV1` marker instead (ProfileStore saves that
+-- table automatically), set ONLY when the legacy read definitively
+-- succeeds -- a failed read leaves the marker unset and retries next join.
+--
+-- Why RobloxMetaData and not Profile.Data: zeroedBaseline() below does
+-- double duty as the ProfileStore template AND as the failure-shape
+-- returned to RewardLedger.SetupPlayer, which iterates pairs(baseline) and
+-- calls getValue() per key -- a non-reward-type key there would trigger
+-- RewardLedger's "unknown reward type" warning on every load.
+-- RobloxMetaData never enters that loop.
+--
+-- SUNSET: the v1 read is temporary. Once RewardStoreDiagnostics/this
+-- module's migration logging shows no migrations for a full retention
+-- window, delete legacyBackend, attemptLegacyRead, and the migration block
+-- in Load(). See MAINHANDOFF.md for the tracked sunset condition.
 --
 -- The central rule from before this phase still holds: A SESSION IS NOT
 -- SAVABLE UNTIL A LOAD HAS DEFINITIVELY COMPLETED. Save() refuses unless
@@ -30,13 +50,16 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local RewardTypes = require(ReplicatedStorage.Modules.Reward.RewardTypes)
 local ProfileStoreLib = require(ServerScriptService.Vendor.ProfileStore)
 
--- Sized against Match/MatchCleanup.luau's own STEP_TIMEOUT_SECONDS = 10 (R-6):
--- RewardCleanupHook's save step wraps a full RewardStore.SaveAll call in that
--- 10s budget, so every individual confirmation wait here must leave margin
--- for the DataStore round trip itself, not consume the whole budget alone.
-local SAVE_CONFIRM_TIMEOUT_SECONDS = 8
-
 local RewardStore = {}
+
+-- Real module fields, not locals (Phase 12.5 item 3): this value and
+-- Match/MatchCleanup.STEP_TIMEOUT_SECONDS must maintain
+-- SAVE_CONFIRM_TIMEOUT_SECONDS < STEP_TIMEOUT_SECONDS, or
+-- RewardCleanupHook's save step gets abandoned before a save can ever
+-- confirm (roadmap R-6). RewardCleanupHook.Start() asserts this
+-- relationship at boot -- a comment alone didn't stop either number
+-- drifting independently.
+RewardStore.SAVE_CONFIRM_TIMEOUT_SECONDS = 8
 
 local function zeroedBaseline(): { [string]: number }
 	local baseline = {}
@@ -49,7 +72,7 @@ end
 RewardStore.Backend = ProfileStoreLib.New("RewardStore_v2", zeroedBaseline())
 
 -- Read-only. Never written again -- ProfileStore owns "RewardStore_v2" from
--- here on. Only consulted once, for a profile's first-ever session.
+-- here on. Only consulted once per profile (see MigratedFromV1 above).
 local legacyBackend = DataStoreService:GetDataStore("RewardStore_v1")
 local LEGACY_MAX_ATTEMPTS = 3
 local LEGACY_RETRY_BASE_SECONDS = 0.5
@@ -78,12 +101,41 @@ local function attemptLegacyRead(fn)
 	return false, nil
 end
 
+-- Item 6: ProfileStore.DataStoreState starts as "NotReady" and resolves
+-- asynchronously (driven by StartSessionAsync's own internal
+-- WaitForStoreReady), so reading it at module scope -- or on the very first
+-- call of a freshly-started server -- would see "NotReady" and wrongly
+-- conclude Mock is needed even on a perfectly healthy server. Gives
+-- resolution up to 5s before concluding the real DataStore genuinely isn't
+-- reachable. Only called from Load/Reacquire (the two places that call
+-- :StartSessionAsync) -- Save and friends operate on the Profile object
+-- StartSessionAsync already returned, via profile:Save()/EndSession(), so
+-- they must not independently re-select a backend.
+local function activeStore()
+	local state = ProfileStoreLib.DataStoreState
+	if state == "NotReady" then
+		local waited = 0
+		while ProfileStoreLib.DataStoreState == "NotReady" and waited < 5 do
+			task.wait(0.25)
+			waited += 0.25
+		end
+		state = ProfileStoreLib.DataStoreState
+	end
+
+	if state == "Access" then
+		return RewardStore.Backend
+	end
+
+	warn(("RewardStore: DataStoreState is '%s' -- routing through ProfileStore.Backend.Mock. Nothing will persist to the real DataStore this session."):format(state))
+	return RewardStore.Backend.Mock
+end
+
 -- Fire-and-forget from PlayerCurrency.legacy's PlayerAdded handler, same
 -- call site as before this phase. Returns (baseline, ok) unchanged in
 -- shape -- RewardLedger.SetupPlayer's existing "add baseline into the
 -- IntValues" logic needs no changes.
 function RewardStore.Load(player: Player): ({ [string]: number }, boolean)
-	local profile = RewardStore.Backend:StartSessionAsync(keyFor(player), {
+	local profile = activeStore():StartSessionAsync(keyFor(player), {
 		-- Stop waiting on a session-lock conflict (or any other retry loop)
 		-- once the player isn't here to receive the result anymore.
 		Cancel = function()
@@ -100,20 +152,33 @@ function RewardStore.Load(player: Player): ({ [string]: number }, boolean)
 	profile:AddUserId(player.UserId)
 	profile:Reconcile() -- fills any RewardTypes.Persistent() key missing from Data with the template's 0, without touching a real stored value
 
-	-- One-time legacy fallback -- see file header. SessionLoadCount == 1
-	-- means this ProfileStore profile has never existed before now, which
-	-- is true for both a brand-new player (legacy read finds nothing) and
-	-- a pre-Phase-12 player (legacy read finds their real total).
-	if profile.SessionLoadCount == 1 then
+	-- One-time-per-profile legacy fallback -- see file header. The marker
+	-- is only set once the legacy read DEFINITIVELY succeeds (legacyOk ==
+	-- true), whether or not it actually found data -- "new player, nothing
+	-- stored" is a successful migration; a failed read is not, and must
+	-- retry on the next join.
+	if not profile.RobloxMetaData.MigratedFromV1 then
 		local legacyOk, legacyData = attemptLegacyRead(function()
 			return legacyBackend:GetAsync(keyFor(player))
 		end)
-		if legacyOk and legacyData then
-			for _, typeName in ipairs(RewardTypes.Persistent()) do
-				if legacyData[typeName] ~= nil then
-					profile.Data[typeName] = legacyData[typeName]
+
+		if legacyOk then
+			profile.RobloxMetaData.MigratedFromV1 = true
+
+			if legacyData then
+				local copied = {}
+				for _, typeName in ipairs(RewardTypes.Persistent()) do
+					if legacyData[typeName] ~= nil then
+						profile.Data[typeName] = legacyData[typeName]
+						table.insert(copied, ("%s=%s"):format(typeName, tostring(legacyData[typeName])))
+					end
 				end
+				print(("RewardStore: migrated %s from v1 -- %s"):format(player.Name, table.concat(copied, " ")))
+			else
+				print(("RewardStore: migration check for %s -- no v1 data found (new player)"):format(player.Name))
 			end
+		else
+			warn(("RewardStore: legacy migration read failed for %s -- will retry on next join"):format(player.Name))
 		end
 	end
 
@@ -179,14 +244,14 @@ function RewardStore.Save(player: Player, values: { [string]: number }?): boolea
 	profile:Save()
 
 	local waited = 0
-	while not confirmed and waited < SAVE_CONFIRM_TIMEOUT_SECONDS and profile:IsActive() do
+	while not confirmed and waited < RewardStore.SAVE_CONFIRM_TIMEOUT_SECONDS and profile:IsActive() do
 		task.wait(0.1)
 		waited += 0.1
 	end
 	connection:Disconnect()
 
 	if not confirmed then
-		warn(("RewardStore: save for %s did not confirm within %ds"):format(player.Name, SAVE_CONFIRM_TIMEOUT_SECONDS))
+		warn(("RewardStore: save for %s did not confirm within %ds"):format(player.Name, RewardStore.SAVE_CONFIRM_TIMEOUT_SECONDS))
 	end
 
 	return confirmed
@@ -244,6 +309,49 @@ function RewardStore.ClearSession(player: Player)
 		profile:EndSession()
 	end
 	sessions[player.UserId] = nil
+end
+
+-- Phase 12.5 item 2 (roadmap R-3, resurfaced): re-establishes a Lobby
+-- session for a candidate whose launch was aborted AFTER OnLaunched already
+-- released it. TeleportAsync returning true means the request was accepted,
+-- not that anyone arrived -- an async TeleportInitFailed can still strand a
+-- player here with no session, refusing every future write until rejoin.
+--
+-- Deliberately does NOT route through RewardLedger.SetupPlayer, which ADDS
+-- a baseline into the existing IntValues -- correct for a fresh join, wrong
+-- here, since those IntValues already hold the correct total (OnLaunched
+-- only fires after LaunchGate.Check forced a confirmed save, so stored ==
+-- live at the moment of release). Re-adding would double-count -- the exact
+-- hazard the roadmap flags, and it already bit once in Phase 7.5. This only
+-- re-acquires the lock; the leaderstat values are untouched.
+function RewardStore.Reacquire(player: Player)
+	if RewardStore.IsReady(player) then
+		return
+	end
+
+	local profile = activeStore():StartSessionAsync(keyFor(player), {
+		Cancel = function()
+			return player.Parent == nil
+		end,
+	})
+
+	if not profile then
+		warn(("RewardStore: could not reacquire a session for %s after an aborted launch -- writes refused until rejoin"):format(player.Name))
+		return
+	end
+
+	profile.OnSessionEnd:Connect(function()
+		if sessions[player.UserId] == profile then
+			sessions[player.UserId] = nil
+		end
+	end)
+
+	if not player.Parent then
+		profile:EndSession()
+		return
+	end
+
+	sessions[player.UserId] = profile
 end
 
 return RewardStore

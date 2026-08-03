@@ -17,6 +17,14 @@
 -- handler that only fires once MatchLauncher.Launch has actually succeeded,
 -- releasing the session for real (RewardStore.ClearSession -> Profile:
 -- EndSession) now that it's certain those players are leaving this server.
+--
+-- Phase 12.5 item 2 (roadmap R-3, resurfaced): MatchLauncher.Launch
+-- returning true means TeleportAsync was ACCEPTED, not that anyone
+-- arrived -- an async TeleportInitFailed can still strand a player on the
+-- Lobby with their session already released by OnLaunched. Registers a
+-- matching OnLaunchAborted handler that re-acquires the session
+-- (RewardStore.Reacquire) for exactly that player once MatchLauncher
+-- reports the abort, so writes aren't refused until they happen to rejoin.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -31,25 +39,34 @@ local RewardLaunchHook = {}
 -- SAVE_CONFIRM_TIMEOUT_SECONDS) for a real ProfileStore confirmation per
 -- player, so saving N candidates one at a time could take N times that
 -- long. Same task.spawn + BindableEvent shape as RewardStore.SaveAll.
+--
+-- Phase 12.5 item 4: a candidate who disconnects between accumulation and
+-- this check is skipped in both loops rather than failing the whole batch.
+-- That's LaunchGate's "Roster" precondition's job (registered by
+-- QueueService, runs after this one) -- Progression denying everyone still
+-- present over one departed player was needlessly punitive.
 local function checkProgression(players: { Player }): (boolean, string)
 	for _, player in ipairs(players) do
-		if not RewardStore.IsReady(player) then
+		if player.Parent and not RewardStore.IsReady(player) then
 			return false, "ProgressionNotReady"
 		end
 	end
 
 	local results: { [Player]: boolean } = {}
-	local pending = #players
+	local pending = 0
 	local done = Instance.new("BindableEvent")
 
 	for _, player in ipairs(players) do
-		task.spawn(function()
-			results[player] = RewardStore.Save(player, RewardLedger.CurrentPersistentValues(player))
-			pending -= 1
-			if pending == 0 then
-				done:Fire()
-			end
-		end)
+		if player.Parent then
+			pending += 1
+			task.spawn(function()
+				results[player] = RewardStore.Save(player, RewardLedger.CurrentPersistentValues(player))
+				pending -= 1
+				if pending == 0 then
+					done:Fire()
+				end
+			end)
+		end
 	end
 
 	if pending > 0 then
@@ -58,7 +75,7 @@ local function checkProgression(players: { Player }): (boolean, string)
 	done:Destroy()
 
 	for _, player in ipairs(players) do
-		if not results[player] then
+		if player.Parent and not results[player] then
 			return false, "ProgressionSaveFailed"
 		end
 	end
@@ -69,6 +86,12 @@ end
 local function onLaunched(players: { Player })
 	for _, player in ipairs(players) do
 		RewardStore.ClearSession(player)
+	end
+end
+
+local function onLaunchAborted(players: { Player })
+	for _, player in ipairs(players) do
+		RewardStore.Reacquire(player)
 	end
 end
 
@@ -84,6 +107,7 @@ function RewardLaunchHook.Start()
 
 	LaunchGate.RegisterPrecondition("Progression", checkProgression)
 	LaunchGate.RegisterOnLaunched("Progression", onLaunched)
+	LaunchGate.RegisterOnLaunchAborted("Progression", onLaunchAborted)
 end
 
 return RewardLaunchHook
