@@ -71,6 +71,8 @@ function GameBoot.Start()
 		-- Registers a teardown step into MatchCleanup's registry (same rule
 		-- as RewardCleanupHook/RewardResultHook above).
 		require(ServerScriptService.GameService.Player.KitLifecycleHook),
+		-- Same rule again: registers "MonsterTeardown" into MatchCleanup.
+		require(ServerScriptService.GameService.Monster.EncounterDirector),
 		require(ServerScriptService.GameService.Match.ReturnToLobbyService),
 		require(ServerScriptService.GameService.Match.MatchClock),
 		-- Loads characters for the roster once WaitingForPlayers begins.
