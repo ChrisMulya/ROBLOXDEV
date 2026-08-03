@@ -43,12 +43,12 @@ Work over the past 4 days, grouped by system. Only what still exists today.
   its first contributor.
 - `MatchResultSync` finally has a client listener on both places (`MatchReceipt` + controller).
 
-**Game-place mirror tooling (this session).**
-- `Tools/GenerateGameMirror.ps1` walks the disk tree and emits a complete installer
-  (`Tools/mirror-chunks/chunk-01..10.luau`) plus a matching checker (`check.luau`).
-  No hand-maintained manifest exists anymore, so "installer out of date" is unreachable.
-- Fixed a real correctness bug in the mirror hash: FNV-1a's `hash * 16777619` exceeds 2⁵³ in
-  Luau doubles and silently drops low bits. Now split as `bit32.lshift(hash,24) + hash*403`.
+**Game-place mirror tooling (superseded, deleted).** A prior session built
+`Tools/GenerateGameMirror.ps1` + `Tools/mirror-chunks/chunk-01..10.luau` + `check.luau` to
+generate-and-paste the Game place's content. The repo reorg into `Lobby/`/`Map0_Test/` (both
+live-syncing) made this whole workflow unnecessary; it and `Tools/InstallGameMirror.luau`/
+`Tools/CheckGameMirror.luau` are deleted. Kept only as a historical note — the FNV-1a
+overflow fix it made no longer matters since there's no mirror hash to compute.
 
 ---
 
@@ -71,8 +71,11 @@ Stable seams that future work depends on.
   `RewardService` (the only sink) → `RewardLedger` → `RewardStore_v1`.
 - **Remotes only, codes not messages.** Zero RemoteFunctions. Server replies on a separate
   `*Result`/`*Feedback` remote with a code string; a shared `*ResultCodes` module maps it.
-- **Two-place sync is manual.** Only the Lobby live-syncs from disk. The Game place is
-  reproduced by generating and pasting mirror chunks.
+- **Two-place sync is now automatic.** `Lobby/` and `Map0_Test/` are separate folders, each
+  live-syncing to its own Studio place, the same mechanism the Lobby alone used to have. The
+  old generate-and-paste mirror-chunk workflow is deleted. Drift check is a plain recursive
+  hash diff between the two trees (they must stay byte-identical except for place-specific
+  content) — no `MirrorHash` attribute needed anymore.
 
 ---
 
@@ -113,15 +116,18 @@ Stable seams that future work depends on.
 
 | Item | Why it exists | Impact | Resolution |
 |---|---|---|---|
-| Duplicate `Bootstrap` on the Game place | The mirror generator creates `ServerScriptService.GameService.Bootstrap`; the older top-level `ServerScriptService.Bootstrap` is still present and enabled, with different source | Both run at server start → `GameBoot.Start()` executes twice. It has no re-entry guard, so `CharacterAutoLoads = false`, the non-reserved `PlayerAdded` connection, and `MatchArrival`'s first transition all fire twice | **Delete the top-level `Bootstrap` by hand in Explorer.** Instance deletion is a user action |
-| Both places not republished | Last publish predates all 8.1/8.5/8V work | Nothing built in the last 4 days is live; 8V cannot start | Publish both places |
-| Nothing committed since `ec0b7d8` | 8.1, 8.5, 8V and the mirror tooling are all uncommitted | No revert point ahead of Phase 12's DataStore semantics change | Commit before Phase 9 |
+| Both places not republished | Last publish predates all 8.1/8.5/8V work, and the repo reorg | Nothing built recently is live; 8V cannot start | Publish both places |
+
+Resolved since this table was last written: the duplicate `ServerScriptService.Bootstrap`
+on the Game place is deleted (confirmed gone on disk and in the live Studio datamodel), and
+`05d2e98`/`a3af174` mean the "nothing committed since `ec0b7d8`" row no longer applies.
 
 ## Superseded tooling
 
-- `Tools/InstallGameMirror.luau` and `Tools/CheckGameMirror.luau` are dead. Both carry the
-  overflow-lossy hash and a wrong `PlayerStats` path. **Delete them** so nobody reaches back.
-  Replaced by `Tools/GenerateGameMirror.ps1`.
+- `Tools/GenerateGameMirror.ps1`, `Tools/mirror-chunks/`, `Tools/InstallGameMirror.luau`,
+  and `Tools/CheckGameMirror.luau` are all **deleted**. The repo reorg into `Lobby/` +
+  `Map0_Test/` (both live-syncing) makes the whole generate/install/check mirror workflow
+  unnecessary — there is nothing left to mirror by hand.
 
 ## Deferred by decision
 
@@ -141,9 +147,12 @@ Stable seams that future work depends on.
 
 ## Structural risk
 
-- **Manual two-place sync is the largest standing risk.** No Rojo, no CI. The generator plus
-  the hash check makes drift detectable rather than silent, but it buys phases, not permanence.
-  A real multi-place sync should be budgeted around Phase 9–10, not discovered.
+- **Retired.** Manual two-place sync used to be the largest standing risk here; the
+  `Lobby/`+`Map0_Test/` reorg replaced it with real per-place live sync, no generator step
+  involved. Remaining check is a plain recursive hash diff between the two trees — still no
+  Rojo, no CI, so genuine drift (someone hand-edits one place's Studio instance without
+  touching disk) is still only detectable, not prevented. Not worth a dedicated phase unless
+  that actually happens.
 - **`MarkHandedOff` can strand XP** (Phase 10): if the save marks handed-off and
   `TeleportAsync` then fails, that player's session refuses all writes until rejoin.
   `Launch` returning false must trigger `ClearSession` + fresh setup — and note
@@ -155,9 +164,8 @@ Stable seams that future work depends on.
 
 - **Roadmap phase:** 8V — published-build verification.
 - **Milestone:** prove the teleport round trip end to end on a real client.
-- **Immediate prerequisites:**
-  1. Delete the duplicate top-level `ServerScriptService.Bootstrap` on the Game place.
-  2. Publish both places.
+- **Immediate prerequisite:** publish both places. (The duplicate `Bootstrap` blocker and the
+  repo commit are already cleared — see below.)
 - **Gate:** 8V is the last remaining unknown-unknown (roadmap R-1). Phases 9, 10, 11 and 12
   all sit behind it. **Do not start new gameplay features until 8V passes** — everything after
   it is Studio-verifiable, so 8V is the only step that can still surprise the design.
@@ -166,19 +174,21 @@ Stable seams that future work depends on.
 
 # Next Session Plan
 
-1. **Delete `ServerScriptService.Bootstrap`** (top-level) on the Game place. Keep
-   `ServerScriptService.GameService.Bootstrap`.
-2. **Publish both places.**
-3. **Run the 8V checklist** (MAINHANDOFF, Phase 8V): join the Lobby as Creator → `/launch` →
+**Done this session:** repo reorganized into `Lobby/`/`Map0_Test/` (both live-syncing);
+duplicate top-level `Bootstrap` deleted and confirmed gone from the live Game-place
+datamodel; superseded mirror tooling deleted; reorg committed (`a3af174`); `graphify update`
+run against the new paths (zero import cycles); this doc and MAINHANDOFF updated for the new
+layout.
+
+1. **Publish both places** with the current code.
+2. **Run the 8V checklist** (MAINHANDOFF, Phase 8V): join the Lobby as Creator → `/launch` →
    confirm teleport → character loads with no manual step → camera Tool equipped →
    photograph a target → match self-ends at 300s → server empties → back on the Lobby with
    XP intact.
-4. **Ride along with 8V:** the two Phase 6 spectate scenarios, if a second real player is
+3. **Ride along with 8V:** the two Phase 6 spectate scenarios, if a second real player is
    available. This is the only context where two real clients exist.
-5. **Commit** everything from 8.1 / 8.5 / 8V and the mirror tooling.
-6. **Delete** `Tools/InstallGameMirror.luau` and `Tools/CheckGameMirror.luau`.
-7. **Update MAINHANDOFF** with the 8V result and the new mirror workflow.
-8. Only then: **Phase 9 (encounter director)** — subscribe to `MatchManager.StateChanged`,
+4. **Update MAINHANDOFF** with the 8V result.
+5. Only then: **Phase 9 (encounter director)** — subscribe to `MatchManager.StateChanged`,
    read `MatchStates.MonstersSpawn`, call `MonsterService.Spawn`. One new file, one `GameBoot`
    line. Treat a diff that touches any other file as evidence the seam is wrong.
 
@@ -216,10 +226,11 @@ Stable seams that future work depends on.
   `Phase7_5MonsterTarget`, `Phase7_5ObjectiveTarget`, and the `Assets.Tool.Camera` tree.
   `CameraInventory` survives a missing `Assets` tree (returns `NoCameraAssets`), but every
   match then hands out an empty placeholder.
-- **Mirror workflow.** Regenerate, never hand-edit:
-  `powershell -ExecutionPolicy Bypass -File Tools/GenerateGameMirror.ps1`.
-  Paste `chunk-01` through `chunk-10` **in order** — later chunks parent children into folders
-  earlier chunks create. Then paste `check.luau` to confirm.
+- **Mirror workflow is gone.** `Lobby/` and `Map0_Test/` both live-sync from disk now — edit
+  the file, Studio picks it up, same as it always has for the Lobby. Drift check (should stay
+  byte-identical on every shared path, minus known divergences like
+  `ObjectiveVisualsController`'s packaging): recursive hash diff between the two folders,
+  no installer/checker scripts needed.
 - **Graphify workflow.** Cross-file questions only (`graphify query`/`path`/`explain`).
   Run `graphify update` once per completed unit of work. Never read
   `graphify-out/cache/` or `graphify-out/*/graph.json`.

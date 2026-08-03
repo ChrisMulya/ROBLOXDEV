@@ -3,6 +3,19 @@
 Agent-facing. Current phase only, no history. Git has the changelog.
 Module behavior lives in the code and `graphify-out/GRAPH_REPORT.md` — not here.
 
+**Repo layout changed.** The old single flat tree (`ReplicatedStorage/`,
+`ServerScriptService/`, `StarterPlayerScripts/` at repo root) is gone. The repo is now one
+folder per Roblox place — `Lobby/` and `Map0_Test/` — each **live-syncing to its own Studio
+session**, the same way only `Lobby/` (as `BaseGame`) used to. This retires the manual
+mirror-chunk generate-and-paste workflow entirely (`GenerateGameMirror.ps1`,
+`InstallGameMirror.luau`, `CheckGameMirror.luau` — all deleted); every "Game place has no
+local mirror" / "manually mirror this file" passage below describes a **past** state, from
+before this reorg, not the current one. The two trees are meant to stay byte-identical on
+every shared path (drift check: recursive hash diff, not a `MirrorHash` attribute). One
+known cosmetic divergence: `ObjectiveVisualsController` is `init.luau`-in-a-folder on
+`Lobby/` and a flat ModuleScript on `Map0_Test/` — contents are identical, only the instance
+shape differs.
+
 ## Phase
 
 Single-server vertical slice, feature-complete enough to play: move → buy camera →
@@ -674,10 +687,11 @@ stack overlapping launches. Wired into `LobbyBoot` right after `MatchLauncher` (
 caller).
 
 **Before testing:** both places were already published, but *before* today's Phase 8.1/8.5 work
-(and 8V's own trigger) — none of it is live until republished. Confirm the Lobby's Studio
-Edit-mode session has today's disk changes (`LobbyBoot.luau`, new `DebugLaunchTrigger.luau`) —
-normal disk-sync should carry these over the same way it has for every Lobby file all session,
-unlike the Game place which has needed the manual `InstallGameMirror` catch-up. Then publish
+(and 8V's own trigger) — none of it is live until republished. Confirm both places' Studio
+Edit-mode sessions have today's disk changes (`LobbyBoot.luau`, new `DebugLaunchTrigger.luau`,
+the duplicate-`Bootstrap` deletion) — normal disk-sync now carries these over for **both**
+`Lobby/` and `Map0_Test/` equally, since the reorg made the Game place live-sync the same way
+the Lobby always has (the old manual `InstallGameMirror` catch-up is gone). Then publish
 both places.
 
 **Verification checklist for the human tester** (nothing below has been run):
@@ -762,7 +776,7 @@ Non-derivable from code. These will burn a session if forgotten.
 **File suffix → Roblox class:** `Foo.luau` = ModuleScript · `Foo.local.luau` = LocalScript · `Foo.legacy.luau` = server `Script` (RunContext Legacy) · `init.luau` = folder-as-module.
 `.legacy.luau` files are **live and running**, not dead code.
 
-**Folder → service:** folder names at repo root map 1:1 to Roblox services. No Rojo project file; sync is via Studio MCP. `StarterPlayerScripts/` **does** have a local mirror (11 LocalScripts) — it did not historically.
+**Folder → service:** `<Place>/<Service>/` — `Lobby/` and `Map0_Test/` are the two places, each with its own `ReplicatedStorage`/`ServerScriptService`/`StarterPlayerScripts`/etc. mapping 1:1 to Roblox services underneath. No Rojo project file; both places live-sync via disk the same way (superseded the old repo-root-is-one-place layout and the manual Game-place mirror workflow — see the top-of-file note).
 
 | Attribute | On | Meaning |
 |---|---|---|
