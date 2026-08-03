@@ -10,14 +10,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Modules.Flash.FlashRenderers)
 require(ReplicatedStorage.Modules.Objective.ObjectiveVisualsController)
 
--- Mirrors the server-side role branch in Bootstrap.legacy.luau. Empty on
--- both sides today -- MatchStateClient/PlayerStateClient/DeathScreen/
--- SpectateHud (Game) and QueueHud (Lobby) land in later phases.
+-- Mirrors the server-side role branch in Bootstrap.legacy.luau.
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 
 if ServerRole.Is("LobbyServer") then
 	require(ReplicatedStorage.Modules.UI.MatchReceiptController)
-	-- Phase 10: QueueHud
+	require(ReplicatedStorage.Modules.Queue.QueueController)
 elseif ServerRole.Is("GameServer") then
 	require(ReplicatedStorage.Modules.UI.DeathScreenController)
 	require(ReplicatedStorage.Modules.Spectate.SpectateController)

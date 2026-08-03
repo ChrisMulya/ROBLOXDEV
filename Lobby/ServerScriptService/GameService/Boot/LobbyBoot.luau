@@ -4,11 +4,8 @@
 -- policy -> feature systems -> replicators. Publishers start before
 -- subscribers.
 --
--- QueueService/PartyService land in a later phase and get added here --
--- they do not self-wire at require time (see the Service.Start() convention
--- in the plan). Existing self-wiring legacy Scripts (PlayerCurrency,
--- BuyHandler, etc.) are untouched by this and keep running exactly as
--- before.
+-- Existing self-wiring legacy Scripts (PlayerCurrency, BuyHandler, etc.) are
+-- untouched by this and keep running exactly as before.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -29,12 +26,17 @@ function LobbyBoot.Start()
 		require(ServerScriptService.GameService.PlayerState.PlayerStateService),
 		require(ServerScriptService.GameService.PlayerState.PlayerStateReplicator),
 		require(ServerScriptService.GameService.Lobby.LobbyDeathPolicy),
+		-- LaunchGate before its registrants (RewardLaunchHook, QueueService's
+		-- own "Roster" precondition): registry before registrant.
+		require(ServerScriptService.GameService.Lobby.LaunchGate),
+		require(ServerScriptService.GameService.Reward.RewardLaunchHook),
 		require(ServerScriptService.GameService.Lobby.MatchLauncher),
-		-- TEMPORARY, Phase 8V only -- delete once Phase 10's QueueService
-		-- becomes the real caller of MatchLauncher.
-		require(ServerScriptService.GameService.Lobby.DebugLaunchTrigger),
 		require(ServerScriptService.GameService.Lobby.ArrivalService),
-		-- Phase 10: PartyService, QueueService
+		require(ServerScriptService.GameService.Lobby.PartyService),
+		-- QueueService last: it's the caller of MatchLauncher and the
+		-- registrant of LaunchGate's "Roster" precondition -- callee before
+		-- caller, registry before registrant.
+		require(ServerScriptService.GameService.Lobby.QueueService),
 	}
 
 	for _, service in ipairs(services) do

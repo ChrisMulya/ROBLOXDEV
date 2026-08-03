@@ -32,6 +32,9 @@ Remotes.ALL_NAMES = {
 	"SpectateResult",
 	"SpectateStateSync",
 	"MatchResultSync",
+	"QueueRequest",
+	"QueueResult",
+	"QueueStateSync",
 }
 
 function Remotes.Get(name: string): RemoteEvent

@@ -166,6 +166,34 @@ function RewardStore.ClearSession(player: Player)
 	sessions[player.UserId] = nil
 end
 
+-- Session-lock cheap gate (Phase 10 decision 1): a "HandedOff" session fails
+-- IsReady, so Save/StartAutosave/BindToClose all refuse writes for a player
+-- whose Lobby-side save was already forced through immediately before a
+-- teleport attempt -- narrows the outbound-leg race without a version
+-- counter. Caller (RewardLaunchHook) must have already confirmed Save
+-- succeeded; this function only flips the flag.
+function RewardStore.MarkHandedOff(player: Player)
+	local session = sessions[player.UserId]
+	if session then
+		session.state = "HandedOff"
+	end
+end
+
+-- Rollback for MarkHandedOff when the launch it was guarding never actually
+-- happens (LaunchGate.Check fails on a later precondition, or
+-- MatchLauncher.Launch itself fails) -- R-3's stranded-XP edge case.
+-- Deliberately does NOT re-run RewardLedger.SetupPlayer: MarkHandedOff never
+-- touched the leaderstat IntValue, so the live total is still correct and
+-- trustworthy. Re-adding a baseline on top of it would double-count (the
+-- exact hazard the roadmap flags) -- flipping the state back to "Ready" is
+-- the whole fix.
+function RewardStore.ClearHandoff(player: Player)
+	local session = sessions[player.UserId]
+	if session and session.state == "HandedOff" then
+		session.state = "Ready"
+	end
+end
+
 -- Periodic autosave so a server crash doesn't cost a whole session. The Ready
 -- gate inside Save applies here too, so Failed sessions stay unwritten.
 function RewardStore.StartAutosave(getValues: (Player) -> { [string]: number })

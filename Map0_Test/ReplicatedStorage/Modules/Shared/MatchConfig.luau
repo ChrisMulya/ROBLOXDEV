@@ -12,6 +12,7 @@ MatchConfig.Modes = {
 		CountdownSeconds = 5,
 		MatchDuration = 300, -- seconds Playing runs before MatchClock force-ends it (TimeExpired)
 		EndingHoldSeconds = 8, -- how long Ending stays up so the summary is readable
+		QueueGraceSeconds = 20, -- solo/partial-roster wait-for-company window before QueueService launches anyway
 	},
 }
 
