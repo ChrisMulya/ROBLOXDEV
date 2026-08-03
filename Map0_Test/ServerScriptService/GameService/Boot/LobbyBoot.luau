@@ -1,0 +1,45 @@
+-- Ordered service list for the Lobby place. This list IS the boot order --
+-- it is not inferred from require() order (Roblox doesn't guarantee that;
+-- see Bootstrap.legacy.luau). Convention: shared/data -> state managers ->
+-- policy -> feature systems -> replicators. Publishers start before
+-- subscribers.
+--
+-- QueueService/PartyService land in a later phase and get added here --
+-- they do not self-wire at require time (see the Service.Start() convention
+-- in the plan). Existing self-wiring legacy Scripts (PlayerCurrency,
+-- BuyHandler, etc.) are untouched by this and keep running exactly as
+-- before.
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+local PlayerStates = require(ReplicatedStorage.Modules.Shared.PlayerStates)
+
+local LobbyBoot = {}
+
+function LobbyBoot.Start()
+	ServerRole.AssertLobbyServer()
+
+	-- MatchStates is Game-Server-only (the Match layer never runs on the
+	-- Lobby), so only PlayerStates needs validating here. PlayerState is a
+	-- layer that exists on both places.
+	PlayerStates.Validate()
+
+	local services = {
+		require(ServerScriptService.GameService.PlayerState.PlayerStateService),
+		require(ServerScriptService.GameService.PlayerState.PlayerStateReplicator),
+		require(ServerScriptService.GameService.Lobby.LobbyDeathPolicy),
+		require(ServerScriptService.GameService.Lobby.MatchLauncher),
+		-- TEMPORARY, Phase 8V only -- delete once Phase 10's QueueService
+		-- becomes the real caller of MatchLauncher.
+		require(ServerScriptService.GameService.Lobby.DebugLaunchTrigger),
+		require(ServerScriptService.GameService.Lobby.ArrivalService),
+		-- Phase 10: PartyService, QueueService
+	}
+
+	for _, service in ipairs(services) do
+		service.Start()
+	end
+end
+
+return LobbyBoot
