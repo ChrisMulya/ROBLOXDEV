@@ -128,10 +128,14 @@ function RewardLedger.TeardownPlayer(player: Player)
 	RewardStore.ClearSession(player)
 end
 
-RewardStore.StartAutosave(RewardLedger.CurrentPersistentValues)
-
-game:BindToClose(function()
-	RewardStore.SaveAll(RewardLedger.CurrentPersistentValues)
-end)
+-- Phase 12 (debt #21): the module-scope StartAutosave/BindToClose that used
+-- to live here are deleted, not relocated into a Start(). ProfileStore
+-- (RewardStore's new backend) installs its own AUTO_SAVE_PERIOD loop and its
+-- own game:BindToClose -- both apply globally, to every active session
+-- across every ProfileStore instance, the moment the library is required.
+-- Duplicating either here would just be a second, redundant writer racing
+-- the library's own. This resolves debt #21 by elimination rather than by
+-- giving RewardLedger a Start() it would otherwise now have no other reason
+-- to need.
 
 return RewardLedger

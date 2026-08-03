@@ -204,7 +204,6 @@ local function evaluate()
 
 	local checkOk, checkCode = LaunchGate.Check(candidates)
 	if not checkOk then
-		LaunchGate.Rollback(candidates)
 		fireResult(candidateUnits, checkCode)
 		launching = false
 		return
@@ -213,8 +212,8 @@ local function evaluate()
 	local launchOk, launchCode = MatchLauncher.Launch(candidates, DEFAULT_MODE)
 	if launchOk then
 		dequeueUnits(candidateUnits)
+		LaunchGate.OnLaunched(candidates)
 	else
-		LaunchGate.Rollback(candidates)
 		fireResult(candidateUnits, "LaunchFailed")
 		warn("QueueService: MatchLauncher.Launch failed:", launchCode)
 	end
