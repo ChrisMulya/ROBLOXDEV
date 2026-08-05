@@ -58,6 +58,43 @@ somewhere.
   codes live in `Shared/QueueResultCodes.luau` (covers both pad rejections and
   `MatchLauncher`'s launch-failure reasons — one codes module, one remote).
 
+### Pickup System — hand-placed in v1, visuals are place-agnostic
+
+`GameService/Pickup/` (`PickupRegistry`, `PickupPrompt`, `PickupService`,
+`PickupHandlers/`, `PickupCleanupHook`) + `Player/CashWallet.luau` are wired
+into `GameBoot` only — a pickup placed on the Lobby has no prompt and grants
+nothing there.
+
+`PickupVisualsController` (client, idle spin + light pillar) is the
+exception: it's wired unconditionally into `ClientBootstrap` on **both**
+places, since it only watches the shared `IsPickup` attribute and has no
+dependency on the server-side registry or match state. Net effect: a pickup
+placed on the Lobby spins and glows exactly like one on the Game place, but
+is never interactable and never pays out there.
+
+- **Identity is two attributes**, same shape as `IsMonsterSpawn`/`MonsterId`:
+  `IsPickup` (discovery marker) and `PickupType` (row key into
+  `ReplicatedStorage/Modules/Pickup/PickupTypes.luau`). Both strings are owned
+  exclusively by `PickupTypes` — read `PickupTypes.MarkerAttribute`/
+  `.TypeAttribute`, never hardcode them.
+- **No spawner yet.** Pickups are hand-placed in Workspace and copied out of
+  `ReplicatedStorage.Assets.Pickup.<Type>` by a designer, must be **Anchored**
+  and have a `PrimaryPart` if a Model. A `PickupSpawner` (markers +
+  server-side cloning at match start, mirroring `Monster/EncounterDirector`)
+  is the intended next step and needs no change to the registry/service/
+  handlers to add.
+- **Race safety has no lock object** — `PickupService` claims an instance in
+  a `claimed[instance] = true` table with no yield between the validation
+  chain and the claim, relying on Luau's cooperative scheduling to serialize
+  two same-frame triggers. Any future handler that yields (a DataStore write,
+  an async call) **must** claim first, then yield — never the reverse.
+- **Cash is per-life, same as the existing starter-kit Cash.** A pickup's
+  cash is wiped by `EndGame` on death/match end exactly like the starter
+  stipend — this was a deliberate decision, not an oversight; revisit only if
+  playtesting says it feels punishing.
+- **No new remotes.** `ProximityPromptService.PromptTriggered` fires
+  server-side with the triggering player — the whole flow is server-only.
+
 ### Party system — server-only, inert by design
 
 `Lobby/PartyService.luau` exists (`GetLeader`/`IsLeader`/`GetParty`/`Join`/
@@ -182,6 +219,7 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 | Matchmaking (queue pads) | works | see Phase section above |
 | Party | server-only | see Phase section above — no client surface |
 | Loadout persistence | works | camera choice survives teleport and rejoin |
+| Pickup / Cash collection | works | Game place only; hand-placed pickups, no spawner yet — see Phase section above |
 
 ## Half-built / not wired
 
@@ -248,6 +286,8 @@ Non-derivable from code. These will burn a session if forgotten.
 | `QueuePadSize` | the pad's `Zone` Part | Queue pad capacity (1/2/4). Owned by `QueuePadService` |
 | `QueuePadLabel` | a Part inside the pad model | Marks which descendant carries the display `BillboardGui`/`TextLabel` |
 | `QueuePadCount` / `QueuePadCapacity` / `QueuePadEndsAt` | the pad's `Zone` Part | Server-written, read-only display state. `QueuePadEndsAt` is `0` when idle, else a `workspace:GetServerTimeNow()` deadline |
+| `IsPickup` / `PickupType` | Model or Part, Workspace | Pickup identity. Owned by `Pickup/PickupTypes.luau`; never hardcode elsewhere |
+| `PickupAmount` | same instance | Optional per-instance override of a Cash pickup's `Params.Amount` |
 
 **ScreenGui DisplayOrder registry** (full list + rationale lives in
 `UIBuilder.CreateScreenGui`'s comment — pick a gap, never an existing value):
@@ -264,5 +304,6 @@ Non-derivable from code. These will burn a session if forgotten.
 **Asset paths** (tree structure differs — don't assume parity):
 - `ReplicatedStorage.Assets.Tool.SupportItem`
 - `ReplicatedStorage.Assets.Tool.Camera.Camera1`
+- `ReplicatedStorage.Assets.Pickup.Cash` — Studio-authored, Anchored, `PrimaryPart` set if a Model
 
 **Security boundary:** `CameraSessionTracker`'s InCamera flag is client-reported — UX guard only, never a security check.

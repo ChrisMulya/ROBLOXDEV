@@ -9,6 +9,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 require(ReplicatedStorage.Modules.Flash.FlashRenderers)
 require(ReplicatedStorage.Modules.Objective.ObjectiveVisualsController)
+-- Pickup visuals (idle spin + light pillar) are purely cosmetic and place-
+-- agnostic -- boots on both places, regardless of match state. The
+-- ProximityPrompt and any actual grant stay Game-place + active-match gated
+-- server-side (PickupRegistry/PickupService/PickupHandlers), so a pickup
+-- placed on the Lobby spins and glows but is never interactable and never
+-- pays out.
+require(ReplicatedStorage.Modules.Pickup.PickupVisualsController)
 
 -- Mirrors the server-side role branch in Bootstrap.legacy.luau.
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)

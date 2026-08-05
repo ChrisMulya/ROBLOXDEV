@@ -77,6 +77,15 @@ function GameBoot.Start()
 		-- table), but this position keeps the list's dependency direction
 		-- consistent with every other publisher-before-subscriber entry.
 		require(ServerScriptService.GameService.Reward.RewardCleanupHook),
+		-- Pickup System: needs PlayerStateService (Alive check),
+		-- MatchManager + MatchParticipants (Cash handler's match-active/
+		-- roster gates), and MatchCleanup (PickupCleanupHook registers a
+		-- teardown step into it) -- all already required above. Registry
+		-- before service before hook, same registry-before-registrant
+		-- rule as RewardCleanupHook just above.
+		require(ServerScriptService.GameService.Pickup.PickupRegistry),
+		require(ServerScriptService.GameService.Pickup.PickupService),
+		require(ServerScriptService.GameService.Pickup.PickupCleanupHook),
 		-- Before RewardResultHook, which reads it: the per-match reward delta
 		-- accumulator must be subscribed to RewardService.Granted before any
 		-- reward can be granted.
