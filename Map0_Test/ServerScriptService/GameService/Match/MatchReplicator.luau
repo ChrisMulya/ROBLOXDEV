@@ -12,9 +12,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
+local MatchConfig = require(ReplicatedStorage.Modules.Shared.MatchConfig)
 local MatchManager = require(script.Parent.MatchManager)
 local MatchParticipants = require(script.Parent.MatchParticipants)
 local MatchResultBuilder = require(script.Parent.MatchResultBuilder)
+local MatchArrival = require(script.Parent.MatchArrival)
 
 local MatchReplicator = {}
 
@@ -41,19 +43,40 @@ function MatchReplicator.Start()
 
 	MatchManager.StateChanged:Connect(function(newState: string)
 		matchInfo:SetAttribute("MatchState", newState)
+	end)
 
-		if newState == "Ending" then
-			local result = MatchResultBuilder.Build()
-			local resultSync = Remotes.Get("MatchResultSync")
-			for _, userId in ipairs(MatchParticipants.All()) do
-				local player = Players:GetPlayerByUserId(userId)
-				if player then
-					resultSync:FireClient(player, {
-						resultCode = result.resultCode,
-						durationSeconds = result.durationSeconds,
-						perPlayer = result.perPlayer[userId] or {},
-					})
-				end
+	-- Fired by MatchResultBuilder itself once its Ending capture has actually
+	-- run -- NOT MatchManager.StateChanged -> "Ending" (a second subscriber
+	-- to that same event), which only worked if this one happened to run
+	-- after Builder's. See MatchResultBuilder.Captured's own comment.
+	MatchResultBuilder.Captured:Connect(function()
+		local result = MatchResultBuilder.Build()
+		local resultSync = Remotes.Get("MatchResultSync")
+		-- Same workspace:GetServerTimeNow()-deadline trick as
+		-- QueueService's pad countdown: a timestamp, not a remaining
+		-- duration, so the client's per-second tick is pure local
+		-- subtraction and can't drift. MatchClock's own Ending-hold timer
+		-- is the actual authority on when Cleanup fires -- this is only
+		-- what the receipt's button displays.
+		local returnsAt = workspace:GetServerTimeNow() + MatchConfig.Get(MatchArrival.GetModeId()).EndingHoldSeconds
+		for _, userId in ipairs(MatchParticipants.All()) do
+			local player = Players:GetPlayerByUserId(userId)
+			if player then
+				resultSync:FireClient(player, {
+					resultCode = result.resultCode,
+					durationSeconds = result.durationSeconds,
+					perPlayer = result.perPlayer[userId] or {},
+					-- Everyone's slices, for the scoreboard. Not private
+					-- data -- it's the same end-of-match summary every
+					-- participant sees, same as any match scoreboard.
+					roster = result.roster,
+					returnsAt = returnsAt,
+					-- Tells MatchReceipt which of its sections to show,
+					-- rather than inferring from payload shape (the old
+					-- "#roster > 1" / "perPlayer.Stats exists" rules guessed
+					-- wrong for solo runs). See UI/MatchReceipt.luau.
+					variant = "Match",
+				})
 			end
 		end
 	end)

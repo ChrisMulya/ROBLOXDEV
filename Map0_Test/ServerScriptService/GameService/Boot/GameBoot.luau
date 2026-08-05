@@ -55,6 +55,10 @@ function GameBoot.Start()
 		-- list -- placed early so IsInCamera is truthful as soon as the
 		-- server is up, same reasoning as PlayerStateService above.
 		require(ServerScriptService.GameService.Camera.CameraSessionTracker),
+		-- Server-owned Humanoid movement budget (WalkSpeed/JumpHeight). No
+		-- dependencies, but must be listening before MatchSpawner loads any
+		-- character -- placed with the other early always-on services.
+		require(ServerScriptService.GameService.Player.CharacterMovementService),
 		-- Phase 12.5 item 6: subscribes to ProfileStore's global diagnostic
 		-- signals. No dependencies, no dependents -- placed early so it's
 		-- listening before any Reward operation could fire them.
@@ -73,9 +77,16 @@ function GameBoot.Start()
 		-- table), but this position keeps the list's dependency direction
 		-- consistent with every other publisher-before-subscriber entry.
 		require(ServerScriptService.GameService.Reward.RewardCleanupHook),
+		-- Before RewardResultHook, which reads it: the per-match reward delta
+		-- accumulator must be subscribed to RewardService.Granted before any
+		-- reward can be granted.
+		require(ServerScriptService.GameService.Reward.MatchEarnings),
 		-- First MatchResultBuilder contributor -- registry before registrant,
 		-- same rule as RewardCleanupHook above.
 		require(ServerScriptService.GameService.Reward.RewardResultHook),
+		-- Second contributor ("Player" -> display name for the end-of-match
+		-- scoreboard). Same registry-before-registrant rule.
+		require(ServerScriptService.GameService.Match.MatchRosterHook),
 		-- Registers a teardown step into MatchCleanup's registry (same rule
 		-- as RewardCleanupHook/RewardResultHook above).
 		require(ServerScriptService.GameService.Player.KitLifecycleHook),
@@ -87,6 +98,11 @@ function GameBoot.Start()
 		require(ServerScriptService.GameService.Match.MatchSpawner),
 		require(ServerScriptService.GameService.Death.DeathService),
 		require(ServerScriptService.GameService.Spectate.SpectateService),
+		-- Third MatchResultBuilder contributor ("Stats" -> survival time +
+		-- capture counts). After DeathService: subscribes to
+		-- PlayerStateService.StateChanged for the Dead transition, and
+		-- DeathService is the only thing that ever fires it into Dead.
+		require(ServerScriptService.GameService.Match.MatchStats),
 		-- MatchArrival LAST: it fires the first real transition
 		-- (Loading -> WaitingForPlayers), so every StateChanged subscriber
 		-- above (MatchClock, MatchSpawner, MatchResultBuilder, etc.) must

@@ -11,7 +11,7 @@ MatchConfig.Modes = {
 		WaitTimeout = 60, -- seconds WaitingForPlayers waits before Cleanup at zero players
 		CountdownSeconds = 5,
 		MatchDuration = 300, -- seconds Playing runs before MatchClock force-ends it (TimeExpired)
-		EndingHoldSeconds = 8, -- how long Ending stays up so the summary is readable
+		EndingHoldSeconds = 60, -- how long Ending stays up so the summary is readable
 		PadCountdownSeconds = 10, -- lobby queue pad: countdown from the first player stepping on to launch
 	},
 }

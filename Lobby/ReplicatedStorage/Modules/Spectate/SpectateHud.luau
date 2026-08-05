@@ -4,6 +4,8 @@
 -- convention (raw Instance.new, lazy ensureBuilt(), UITheme colors, built
 -- through UIBuilder.CreateScreenGui).
 
+local StarterGui = game:GetService("StarterGui")
+
 local UIBuilder = require(script.Parent.Parent.UI.UIBuilder)
 local UITheme = require(script.Parent.Parent.UI.UITheme)
 
@@ -53,17 +55,30 @@ local function ensureBuilt()
 	indexLabel.Parent = holder
 end
 
+-- The backpack belongs to the character you no longer have. Its slots stay on
+-- screen through death and spectate otherwise, offering hotkeys for tools that
+-- aren't yours to hold. Server-side the tools are destroyed on death
+-- (KitLifecycleHook); this hides the strip itself, including its empty slots.
+-- CoreGui calls can throw while CoreGui is still initializing, hence the pcall.
+local function setBackpackVisible(visible: boolean)
+	pcall(function()
+		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, visible)
+	end)
+end
+
 function SpectateHud.Update(targetName: string?, index: number, total: number)
 	ensureBuilt()
 	nameLabel.Text = targetName and ("Spectating " .. targetName) or "Free Camera"
 	indexLabel.Text = total > 0 and (index .. " / " .. total) or ""
 	screenGui.Enabled = true
+	setBackpackVisible(false)
 end
 
 function SpectateHud.Hide()
 	if screenGui then
 		screenGui.Enabled = false
 	end
+	setBackpackVisible(true)
 end
 
 return SpectateHud

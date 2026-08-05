@@ -22,12 +22,24 @@ local function handleArrival(player: Player)
 		return
 	end
 
-	local perPlayer = (summary.perPlayer and summary.perPlayer[player.UserId]) or {}
+	-- roster survives the TeleportData JSON round-trip intact (integer
+	-- userId keys would not -- see summary.perPlayer's own note in
+	-- MatchResultBuilder). The Arrival variant renders only the roster
+	-- scoreboard, so perPlayer isn't needed here at all -- Match/MatchStats'
+	-- grade and personal-stats block is the in-match receipt's job, not the
+	-- arrival one's.
+	local roster = summary.roster or {}
+
 	local resultSync = Remotes.Get("MatchResultSync")
 	resultSync:FireClient(player, {
 		resultCode = summary.resultCode,
 		durationSeconds = summary.durationSeconds,
-		perPlayer = perPlayer,
+		roster = roster,
+		-- Tells MatchReceipt to show the scoreboard regardless of roster
+		-- size (a solo run still deserves to see its own Score/XP), and to
+		-- never show the grade/personal-stats block or the Return button --
+		-- there's nothing left to return FROM once you're already back.
+		variant = "Arrival",
 	})
 end
 

@@ -37,6 +37,17 @@ Remotes.ALL_NAMES = {
 	-- pad attributes rather than a per-player sync. QueueResult remains for the
 	-- one thing attributes can't carry -- a message aimed at one player.
 	"QueueResult",
+	-- Fired by the Match Ended receipt's Return To Lobby button (Game place
+	-- only) -- see Match/ReturnToLobbyService.luau. Listed on both places so
+	-- the two trees stay byte-identical and `diff -rq Lobby Map0_Test` stays a
+	-- clean check; the Lobby simply provisions it and never connects to it.
+	"ReturnToLobbyRequest",
+	-- Sprint is a request, not a command: the client fires SprintRequest(bool)
+	-- on Shift down/up and CharacterMovementService grants it only if the
+	-- stamina IT owns allows. StaminaSync(stamina) pushes that authoritative
+	-- value out on a timer -- the client renders it and never simulates it.
+	"SprintRequest",
+	"StaminaSync",
 }
 
 function Remotes.Get(name: string): RemoteEvent

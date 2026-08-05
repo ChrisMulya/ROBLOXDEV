@@ -1,14 +1,14 @@
 -- Modular death UI: a panel + a button registry table, so Continue/View
 -- Rewards/Retry/Report Player/Return to Lobby become rows a future phase
 -- registers, not edits to this panel. Nothing is registered yet -- this is
--- the shell (Phase 5). Phase 7 registers "View Rewards" once a result
--- payload exists, Phase 8 registers "Return to Lobby" once
--- ReturnToLobbyService exists, etc.
+-- still the shell, and the panel sizes itself to however many buttons exist
+-- so an empty registry doesn't leave a hole under the title.
 --
--- Follows the repo's existing UI convention: raw Instance.new with
--- build*() helpers, lazy ensureBuilt(), colors from UITheme, built through
--- UIBuilder.CreateScreenGui (ResetOnSpawn = false is already that
--- function's default, and mandatory here since the character is dead).
+-- Panel chrome (backdrop, rounded panel, close button) comes from UIBuilder,
+-- shared with MatchReceipt so the two modals look like one system.
+--
+-- ResetOnSpawn = false is UIBuilder.CreateScreenGui's default and is
+-- mandatory here, since the character is dead when this shows.
 
 local UIBuilder = require(script.Parent.UIBuilder)
 local UITheme = require(script.Parent.UITheme)
@@ -23,7 +23,12 @@ type ButtonDef = {
 	OnActivated: (context: any) -> (),
 }
 
+local BUTTON_HEIGHT = 36
+local BUTTON_PADDING = 8
+local HEADER_HEIGHT = 104
+
 local screenGui: ScreenGui? = nil
+local panel: Frame? = nil
 local buttonHolder: Frame? = nil
 
 local buttonRegistry: { ButtonDef } = {}
@@ -35,40 +40,65 @@ function DeathScreen.RegisterButton(button: ButtonDef)
 	end)
 end
 
-local function buildPanel(): Frame
-	local frame = Instance.new("Frame")
-	frame.Name = "DeathPanel"
-	frame.AnchorPoint = Vector2.new(0.5, 0.5)
-	frame.Position = UDim2.fromScale(0.5, 0.5)
-	frame.Size = UDim2.fromOffset(320, 200)
-	frame.BackgroundColor3 = UITheme.Colors.PanelBackground
-	frame.BorderSizePixel = 0
-	return frame
-end
+local function buildHeader(parent: Frame)
+	local pad = UITheme.Layout.PanelPadding
 
-local function buildMessageLabel(parent: Frame): TextLabel
-	local label = Instance.new("TextLabel")
-	label.Name = "Message"
-	label.Size = UDim2.new(1, -20, 0, 60)
-	label.Position = UDim2.fromOffset(10, 10)
-	label.BackgroundTransparency = 1
-	label.Font = UITheme.Fonts.Bold
-	label.TextColor3 = UITheme.Colors.Text
-	label.TextSize = 24
-	label.Text = "You died"
-	label.Parent = parent
-	return label
+	-- A thin accent rule above the title, rather than a coloured title bar:
+	-- it reads as "something bad happened" without shouting.
+	local accentRule = Instance.new("Frame")
+	accentRule.Name = "AccentRule"
+	accentRule.Size = UDim2.fromOffset(38, 3)
+	accentRule.Position = UDim2.fromOffset(pad, 26)
+	accentRule.BackgroundColor3 = UITheme.Colors.Danger
+	accentRule.BorderSizePixel = 0
+	accentRule.ZIndex = 2
+
+	local ruleCorner = Instance.new("UICorner")
+	ruleCorner.CornerRadius = UDim.new(1, 0)
+	ruleCorner.Parent = accentRule
+
+	accentRule.Parent = parent
+
+	local title = Instance.new("TextLabel")
+	title.Name = "Message"
+	title.Size = UDim2.new(1, -(pad * 2) - 34, 0, 34)
+	title.Position = UDim2.fromOffset(pad, 40)
+	title.BackgroundTransparency = 1
+	title.Font = UITheme.Fonts.Bold
+	title.TextColor3 = UITheme.Colors.Text
+	title.TextSize = 28
+	title.TextXAlignment = Enum.TextXAlignment.Left
+	title.ZIndex = 2
+	title.Text = "You died"
+	title.Parent = parent
+
+	local subtitle = Instance.new("TextLabel")
+	subtitle.Name = "Subtitle"
+	subtitle.Size = UDim2.new(1, -(pad * 2), 0, 16)
+	subtitle.Position = UDim2.fromOffset(pad, 74)
+	subtitle.BackgroundTransparency = 1
+	subtitle.Font = UITheme.Fonts.Regular
+	subtitle.TextColor3 = UITheme.Colors.TextMuted
+	subtitle.TextSize = 13
+	subtitle.TextXAlignment = Enum.TextXAlignment.Left
+	subtitle.ZIndex = 2
+	subtitle.Text = "Spectating shortly..."
+	subtitle.Parent = parent
 end
 
 local function buildButtonHolder(parent: Frame): Frame
+	local pad = UITheme.Layout.PanelPadding
+
 	local holder = Instance.new("Frame")
 	holder.Name = "Buttons"
-	holder.Size = UDim2.new(1, -20, 1, -80)
-	holder.Position = UDim2.fromOffset(10, 80)
+	holder.Size = UDim2.new(1, -(pad * 2), 1, -HEADER_HEIGHT)
+	holder.Position = UDim2.fromOffset(pad, HEADER_HEIGHT)
 	holder.BackgroundTransparency = 1
+	holder.ZIndex = 2
 
 	local layout = Instance.new("UIListLayout")
-	layout.Padding = UDim.new(0, 8)
+	layout.Padding = UDim.new(0, BUTTON_PADDING)
+	layout.SortOrder = Enum.SortOrder.LayoutOrder
 	layout.Parent = holder
 
 	holder.Parent = parent
@@ -80,11 +110,50 @@ local function ensureBuilt()
 		return
 	end
 
-	screenGui = UIBuilder.CreateScreenGui("DeathScreenGui", UIBuilder.GetPlayerGui())
-	local panel = buildPanel()
-	buildMessageLabel(panel)
+	-- DisplayOrder 40: below MatchReceiptGui (50) -- see UIBuilder.CreateScreenGui.
+	screenGui = UIBuilder.CreateScreenGui("DeathScreenGui", UIBuilder.GetPlayerGui(), 40)
+	UIBuilder.CreateBackdrop(screenGui)
+
+	panel = UIBuilder.CreatePanel(screenGui, UDim2.fromOffset(340, HEADER_HEIGHT + 24))
+	UIBuilder.CreateCloseButton(panel, function()
+		DeathScreen.Hide()
+	end)
+
+	buildHeader(panel)
 	buttonHolder = buildButtonHolder(panel)
-	panel.Parent = screenGui
+end
+
+local function buildButton(button: ButtonDef, context: any, order: number): TextButton
+	local instance = Instance.new("TextButton")
+	instance.Name = button.Id
+	instance.Size = UDim2.new(1, 0, 0, BUTTON_HEIGHT)
+	instance.BackgroundColor3 = UITheme.Colors.Accent
+	instance.BorderSizePixel = 0
+	instance.AutoButtonColor = false
+	instance.Font = UITheme.Fonts.Bold
+	-- Dark text on the bright accent -- white on this green is unreadable.
+	instance.TextColor3 = UITheme.Colors.PanelBackground
+	instance.TextSize = 16
+	instance.Text = button.Label
+	instance.LayoutOrder = order
+	instance.ZIndex = 3
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UITheme.Layout.RowCornerRadius
+	corner.Parent = instance
+
+	instance.MouseEnter:Connect(function()
+		instance.BackgroundTransparency = 0.15
+	end)
+	instance.MouseLeave:Connect(function()
+		instance.BackgroundTransparency = 0
+	end)
+
+	instance.Activated:Connect(function()
+		button.OnActivated(context)
+	end)
+
+	return instance
 end
 
 local function renderButtons(context: any)
@@ -94,23 +163,20 @@ local function renderButtons(context: any)
 		end
 	end
 
+	local shown = 0
 	for _, button in ipairs(buttonRegistry) do
 		if button.Enabled(context) then
-			local instance = Instance.new("TextButton")
-			instance.Name = button.Id
-			instance.Size = UDim2.new(1, 0, 0, 32)
-			instance.BackgroundColor3 = UITheme.Colors.Accent
-			instance.TextColor3 = UITheme.Colors.Text
-			instance.Font = UITheme.Fonts.Bold
-			instance.TextSize = 18
-			instance.Text = button.Label
-			instance.Parent = buttonHolder
-
-			instance.Activated:Connect(function()
-				button.OnActivated(context)
-			end)
+			shown += 1
+			buildButton(button, context, shown).Parent = buttonHolder
 		end
 	end
+
+	-- Grow the panel to fit however many buttons survived the Enabled filter,
+	-- so the shell with zero registered buttons is a compact card rather than
+	-- a mostly-empty box.
+	local buttonsHeight = shown > 0 and (shown * BUTTON_HEIGHT + (shown - 1) * BUTTON_PADDING) or 0
+	local bottomPadding = shown > 0 and UITheme.Layout.PanelPadding or 6
+	panel.Size = UDim2.fromOffset(340, HEADER_HEIGHT + buttonsHeight + bottomPadding)
 end
 
 function DeathScreen.Show(context: any)

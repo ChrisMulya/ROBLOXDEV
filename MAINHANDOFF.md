@@ -11,6 +11,11 @@ matchmaking). Both trees are kept **byte-identical on every shared path** —
 verify with `diff -rq Lobby Map0_Test` after any cross-cutting change; there
 is no Rojo project file and no automated drift check beyond that diff.
 
+There are **no standing exceptions** — `diff -rq Lobby Map0_Test` prints
+nothing, and any output is a bug. (`ReturnToLobbyRequest` is listed in both
+places' `Remotes.ALL_NAMES` even though only the Game place connects to it,
+precisely so the diff stays a clean machine check.)
+
 What exists and works end to end: move → buy camera → photograph
 monsters/objectives → earn XP/Score → queue on a lobby pad → teleport into a
 reserved match server → match runs to completion → return to Lobby with XP
@@ -69,6 +74,74 @@ Latent bug, harmless today: `PartyService`'s `PlayerRemoving` path does not
 fire `Changed`, unlike `Join`/`Leave`. No current subscriber, so nothing
 breaks — but the first thing that subscribes to `Changed` will see it.
 
+### Movement authority — server-owned (both places)
+
+`GameService/Player/CharacterMovementService.luau`, booted early in both
+`GameBoot` and `LobbyBoot`. It owns every Humanoid movement property and the
+stamina number.
+
+- **Why it must be server-side.** Live Roblox servers validate character
+  motion against the **server's** copy of `Humanoid.WalkSpeed`, and a
+  LocalScript's writes to Humanoid properties no longer replicate. The client
+  setting `WalkSpeed = 0` (so its `LinearVelocity` drive owns X/Z) left the
+  server believing the default 16: walking passed, sprinting was rejected and
+  rubber-banded. Studio does not run that validation — **this class of bug is
+  invisible in Studio and only appears on a published build.**
+- **WalkSpeed is a budget, set per sprint state**, at
+  `walk-or-sprint × BUDGET_HEADROOM` (1.15). The headroom absorbs slopes,
+  knockback and the client's accel-lerp overshoot; it is too small to spend as
+  a second sprint.
+- **The client still zeroes `WalkSpeed` locally** and re-zeroes it whenever the
+  server's value replicates down — otherwise the engine's own movement fights
+  the `LinearVelocity` drive.
+- **Sprint is a request.** Client fires `SprintRequest(bool)`; the server
+  grants only if its own stamina allows. Stamina replicates back on
+  `StaminaSync(stamina)` at 10 Hz, and is mirrored to `Player` attributes
+  `Stamina`/`Sprinting` purely so the value is inspectable from Studio.
+- **The client does not simulate stamina.** It renders the synced number. An
+  earlier split where both sides ran the drain/regen rule made the bar appear
+  frozen whenever the two disagreed — see the invariant below.
+- **Jump cooldown** (`PlayerStats.JumpCooldown`, 0.3s) runs from **landing**,
+  not takeoff — a jump's airtime exceeds the cooldown, so a takeoff-anchored
+  timer rate-limits nothing. Enforced on the client (where the character is
+  simulated, and so where the player feels it) and on the server.
+- **Shift lock is force-disabled** (`StarterPlayer.EnableMouseLockOption` plus
+  per-player `DevEnableMouseLock`): its switch binds Shift and swallowed the
+  sprint key.
+
+### Sprint input — one intent cell, many devices
+
+`ReplicatedStorage/Modules/Movement/SprintIntent.luau` is a client state cell
+(`Get`/`Set`/`Changed`, no Instances, no remotes). Every input device writes
+it; `Playermovementcontroller` is the **only** subscriber and the only place
+that applies the stamina gate, fires `SprintRequest`, and drives top speed and
+FOV. Adding a device means writing intent, not repeating that sequence.
+
+`StarterPlayerScripts/MobileSprintButton.local.luau` — touch sprint, **tap to
+arm**:
+
+- Tapping arms; it does not change speed. Armed **+ joystick moving** sprints.
+- **The button is a toggle** — tapping while armed cancels, so a player can
+  drop back to a walk mid-run without letting go of the joystick. Cancelling
+  also resets the release tracker, or a cancel mid-run would leave a stale
+  release pending that disarms the *next* tap.
+- Nothing in the button writes `SprintIntent` directly: the RenderStepped loop
+  is its single writer (`armed and stickActive`). Arming and cancelling only
+  move the `armed` flag, and the loop picks it up on the next frame.
+- **Sprint is refused entirely while in camera mode** (`CameraState.Get()`),
+  and opening the camera mid-sprint clears the intent. Client-side only, by
+  design — see Known broken/deferred.
+- Letting the joystick centre disarms — sprinting again needs a fresh tap.
+  Disarm triggers only on a genuine active→inactive release; disarming on a
+  merely-centred stick clears the arm one frame after the tap and makes the
+  button look dead.
+- Always visible during a touch session, at a **frozen** home position captured
+  once from the joystick's resting centre. `DynamicThumbstick` leaves
+  `ThumbstickStart` wherever the last touch landed, so re-reading it later
+  strands the button wherever a run happened to start.
+- A stretch/gesture trigger was built and removed — it fired during ordinary
+  movement often enough to be unpredictable.
+
 ## Architecture invariants
 
 Rules that outlive any single file. Violating one is a bug even if it works.
@@ -81,6 +154,7 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 - **Ownership is symmetric.** Whoever acquires a GUI/effect/connection releases it, by reference, via a `Trove` — never by name lookup.
 - **No reward amount ever crosses a remote.** `RewardService` is the only sink.
 - **Server reads attributes off the server-observed instance**, never client-declared identity.
+- **One simulator per value.** If the server owns a number, the client renders it — it must not run the same rule in parallel "for smoothness". Stamina was simulated on both sides against one shared rule; the moment the two disagreed the sync stomped the client every tick and the HUD looked frozen. Prediction is a deliberate exception, not a default, and needs a written reconciliation rule.
 - **Defaults are for display, never persistence.** If you can't distinguish "no data" from "couldn't read data", do not write.
 - **Identity by attribute, never by `.Name`.** `IsMonster`/`IsObjective`/`QueuePadSize`/etc. — a rename or a "Camera" collision must not change behavior.
 - No `--!strict`. No circular dependencies (graph currently reports **zero** import cycles — protect that).
@@ -89,7 +163,9 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 
 | System | Status | Notes |
 |---|---|---|
-| Movement / stamina / FOV / camera tilt | works | `LinearVelocity`, asymmetric smoothing |
+| Movement / FOV / camera tilt | works | client `LinearVelocity`, asymmetric smoothing; speed budget is server-set — see Movement authority |
+| Sprint / stamina / jump cooldown | works | server-authoritative (`CharacterMovementService`); client renders, never simulates |
+| Mobile sprint button | works | tap-to-arm, `MobileSprintButton.local.luau`; touch only |
 | HUD (stamina) | works | `StarterPlayerScripts`, **not** `StarterGui` — see G1 |
 | Inventory slots + shop | works | server-authoritative buy; empty slots tagged `IsEmpty` |
 | Currency UI | works | remote-driven |
@@ -99,6 +175,10 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 | Monsters | works | `Monster/EncounterDirector.luau` gives `MonsterService.Spawn` a real caller |
 | Objectives | works | registry/service/replicator + client visuals |
 | Flash | works | client `FlashSignal` → screen + world-light renderers; server `FlashEvents` has a publisher, still zero subscribers |
+| Touch-device detection | works | `Shared/TouchSession.IsActive()` — the single answer, called never cached; see G6 |
+| Mobile landscape lock | works | `ScreenOrientationController.local.luau` — `LandscapeSensor`, re-applied on change (see G19). No-op on desktop |
+| Spectate | works | `Custom` + `CameraSubject` with a re-assert guard — see G12; camera resolved per call, never cached |
+| Death → kit teardown | works | `KitLifecycleHook` calls `EndGame.ClearPlayerTools` on death (tools used to survive into spectate); `SpectateHud` hides the Backpack CoreGui while spectating |
 | Matchmaking (queue pads) | works | see Phase section above |
 | Party | server-only | see Phase section above — no client surface |
 | Loadout persistence | works | camera choice survives teleport and rejoin |
@@ -115,6 +195,7 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 | Issue | Impact | Why deferred |
 |---|---|---|
 | `origin` is client-supplied | Spoofable shot origin | `CaptureGuard.ValidateShot` 10-stud proximity check is a mitigation; server-derived origin is a larger change |
+| Camera-mode sprint block is client-side only | A modified client can still sprint while scoped | The only server-side signal is `CameraSessionTracker`'s client-reported InCamera flag, which must never back a server-authoritative check. It is a UX rule; the WalkSpeed budget still caps absolute speed |
 
 ## Tracked sunset conditions
 
@@ -131,13 +212,19 @@ Non-derivable from code. These will burn a session if forgotten.
 - **G3 — `execute_luau` runs in an isolated `require()` cache** from real Scripts/LocalScripts (plugin identity), on **both** Client and Server datamodels. A module's internal Lua state (tables, closures) populated by a real script is invisible to it — looks exactly like a hung async call, with no error. Verify via shared Instances (properties/attributes/leaderstats) only. *Tell: a real script's background op "never completes" with zero errors → suspect isolation before a hang.*
 - **G4 — Play datamodel clones from Edit at Play-start, and file sync is async.** Editing locally then immediately hitting Play can silently run the **old** code. Confirm the Edit datamodel has the new source before Play. *Tell: `script_grep` finds nothing for something you definitely just wrote.*
 - **G5 — `execute_luau` is misleadingly permissive.** It has plugin capability; real Scripts don't. `Instance:GetDebugId()` passes every `execute_luau` check and errors the instant a real player hits it. **Always do one end-to-end pass firing the real remote from a Client context** before calling a feature done.
-- **G6 — Studio "Play Solo" reports `TouchEnabled` *and* `KeyboardEnabled` true.** Any `TouchEnabled and not KeyboardEnabled` gate (`CameraTouchHud`) stays hidden there. Use **Test → Device** emulation to see touch-only UI.
+- **G6 — Studio reports `TouchEnabled` *and* `KeyboardEnabled` true — in Play Solo *and* under Test → Device emulation** (the developer's real keyboard keeps the latter true). A `TouchEnabled and not KeyboardEnabled` gate is therefore wrong: always wrong on a touchscreen laptop, and **nondeterministic under emulation** — measured, `KeyboardEnabled` can read false at module-load and true a moment later, so a gate cached at load flips between sessions with no code change. (That race is why `CameraTouchHud` appeared *sometimes*.) **Use `Shared/TouchSession.IsActive()`** — never hand-roll this again, and never cache its result, since a phone preset selected after Play never reaches a script that already decided. Both former offenders (`CameraTouchHud`, `MobileSprintButton`) now go through it.
 - **G7 — Studio API Services off** ⇒ every join lands in `RewardStore` state `Failed`: XP shows 0 and *nothing is written*. Real data stays intact. Not a bug.
 - **G8 — `ServerScriptService` modules are unreachable from clients.** Shared code must live in `ReplicatedStorage`.
 - **G9 — Roblox does not guarantee Script execution order.** `Bootstrap.legacy.luau` is a decoupling point, *not* an ordered bootstrap. Boot order for a place's services comes from the ordered list in its `Boot/*Boot.luau` `Start()` call, not require order.
 - **G10 — `ReserveServer`/`TeleportAsync` return HTTP 403 in Studio Play/Test, even against a published place.** `GetAsync`/`SetAsync` and other DataStore calls **do** work in Studio Play with API Services on (see G7) — don't conflate the two. Matchmaking's launch step (`MatchLauncher`) can only be verified end-to-end on a published two-place build, never in Studio.
 - **G11 — `Signal:Fire` (the shared `BindableEvent` wrapper) is deferred.** A synchronous read of an attribute or state immediately after the `Set`/`Fire` that changed it sees the *previous* value. Needs a `task.wait()` between the write and the read whenever testing from the command bar or a test script.
-- **G12 — `Camera.CameraSubject = nil` does not clear it**, and `CameraType` must be `Scriptable`, not `Custom` (`Custom` is Roblox's interactive default and its built-in scripts fight for `CameraSubject` every frame). A free-camera fallback needs a real anchored Part to point at, not `nil`.
+- **G12 — Spectating is `CameraType.Custom` + `CameraSubject`, NOT `Scriptable`.** (This entry previously said the opposite; that was wrong and it broke spectate.) `Scriptable` means "no engine camera logic at all" — the engine stops writing `CFrame` and **ignores `CameraSubject` entirely**, so the camera freezes where it stood while the HUD happily names a target. `Custom` is what follows a subject. Its one cost is that Roblox's camera scripts reassign `CameraSubject` to the local humanoid on respawn — re-assert it rather than giving up engine camera control. Also: `Camera.CameraSubject = nil` does not clear it (a free-camera fallback needs a real anchored Part), and **never cache `Workspace.CurrentCamera` at require time** — the engine replaces it on respawn/teleport and every write then lands on a camera nobody is rendering.
+- **G14 — Client writes to Humanoid properties do not replicate, and live servers validate motion against the server's copy of `WalkSpeed`.** Anything that moves a character faster than the server's `WalkSpeed` is rejected on a published build and rubber-bands. Studio does not run this validation at all, so **it looks perfect in Studio and fails live**. Movement budgets must be server-set — see Movement authority.
+- **G15 — `UIBuilder.CreateScreenGui` returns ScreenGuis with `Enabled = false`.** Every caller opts in. Forgetting it renders nothing regardless of `Visible`, with no error — it looks exactly like the script never ran.
+- **G16 — `TouchGui.TouchControlFrame.DynamicThumbstickFrame` is a ~420×322 region covering the whole bottom-left.** Any touch UI placed there must outrank `TouchGui` (`DisplayOrder` 0) or it renders under the stick — pick a value from the registry in `UIBuilder.CreateScreenGui`'s comment, and never reuse an existing one. `ThumbstickStart` is present and visible **even at rest** (this layout draws a resting ring), so it cannot be used as an "is the player touching the stick" signal — use move-vector magnitude. It also stays wherever the last touch landed, so it is not a reliable home position after the first drag.
+- **G17 — Stick *displacement* is only available from `ControlModule:GetMoveVector()`** (magnitude scales 0..1 with the push, capped at 1). `Humanoid.MoveDirection` is normalized — identical at a nudge and at full stretch — so it can answer "is the player moving" and nothing more.
+- **G19 — `PlayerGui.ScreenOrientation` written once at client start silently loses.** Measured: the write appears to succeed, then reads back as `Sensor` seconds later with no error and nothing observably reverting it — a StarterPlayerScripts LocalScript runs before the engine finishes seeding PlayerGui from StarterGui. A write made *later* in the same session holds and survives death/respawn, so it is a startup race, not a repeated overwrite. Re-apply via `GetPropertyChangedSignal("ScreenOrientation")`. Note also that setting `StarterGui.ScreenOrientation` does **not** update an existing PlayerGui — it is only the seed for a new one.
+- **G18 — MCP input automation lands in Studio-window coordinates, not the emulated viewport's.** Measured: a click sent at `x=66` arrived in-game at `x=19` (~47px X offset; Y matched). A synthetic tap that "does nothing" is usually missing the target, not being consumed — verify by logging `UserInputService.InputBegan` position before concluding anything about input ownership.
 - **G13 — `get_console_output` (Studio MCP) can return a stale buffer across a Play stop/restart.** Don't trust it as a liveness signal for a running script; re-read Instance-backed state (attributes, `leaderstats`) fresh instead.
 
 ## Reference tables
@@ -157,9 +244,22 @@ Non-derivable from code. These will burn a session if forgotten.
 | `KeepDuringCamera` | ScreenGui | Exempt from `CameraSession.hideOtherGuis`. Roblox's `TouchGui` is exempted by name separately — hiding it breaks camera look on touch |
 | `KitGiven` | Player | Server-only. Set **last**, after the grant succeeds |
 | `CurrentCamera` | Player | Server-set by `CameraInventory`. **Never write from client** |
+| `Stamina` / `Sprinting` | Player | Server-written by `CharacterMovementService`, for observability only. Nothing reads them — the HUD goes through `StaminaSync` |
 | `QueuePadSize` | the pad's `Zone` Part | Queue pad capacity (1/2/4). Owned by `QueuePadService` |
 | `QueuePadLabel` | a Part inside the pad model | Marks which descendant carries the display `BillboardGui`/`TextLabel` |
 | `QueuePadCount` / `QueuePadCapacity` / `QueuePadEndsAt` | the pad's `Zone` Part | Server-written, read-only display state. `QueuePadEndsAt` is `0` when idle, else a `workspace:GetServerTimeNow()` deadline |
+
+**ScreenGui DisplayOrder registry** (full list + rationale lives in
+`UIBuilder.CreateScreenGui`'s comment — pick a gap, never an existing value):
+
+| Order | ScreenGui |
+|---|---|
+| 0 | Roblox `TouchGui` (engine-owned), and most of this repo's GUIs |
+| 30 | `MobileSprintGui` — beats `TouchGui`, loses to both modals |
+| 40 | `DeathScreenGui` |
+| 50 | `MatchReceiptGui` |
+| 100 | `CameraTouchHud` |
+| 1000 | `ScreenFlashRenderer` |
 
 **Asset paths** (tree structure differs — don't assume parity):
 - `ReplicatedStorage.Assets.Tool.SupportItem`

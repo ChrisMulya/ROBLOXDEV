@@ -12,7 +12,7 @@
 -- MatchParticipants, MatchCleanup) -- must not live in Match/, since it also
 -- requires StartGame/EndGame, which Match-layer modules must never touch (R2).
 --
--- Absorbs PlayerStateHandler.legacy.luau's Humanoid.Died -> ResetKit
+-- Absorbs PlayerStateHandler.legacy.luau's Humanoid.Died -> kit teardown
 -- behavior for this place -- that Script is deleted (see MAINHANDOFF); the
 -- Lobby's equivalent now lives in LobbyDeathPolicy instead.
 
@@ -42,7 +42,12 @@ local function onCharacterAdded(player: Player, character: Model)
 	local humanoid = character:WaitForChild("Humanoid", 5)
 	if humanoid then
 		humanoid.Died:Connect(function()
-			StartGameService.ResetKit(player)
+			-- Destroys the tools from both Backpack and character AND clears
+			-- KitGiven. This used to only flip the attribute, which left the
+			-- dead player's tools sitting in their Backpack through the whole
+			-- spectate session. The respawn re-grant path
+			-- (onCharacterAdded -> GivePlayerStarterKit) is unchanged.
+			RemoveAllSlot.ClearPlayerTools(player)
 		end)
 	end
 end

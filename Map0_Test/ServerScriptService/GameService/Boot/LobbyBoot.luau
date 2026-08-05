@@ -29,6 +29,10 @@ function LobbyBoot.Start()
 		-- list -- placed early so IsInCamera is truthful as soon as the
 		-- server is up, same reasoning as PlayerStateService above.
 		require(ServerScriptService.GameService.Camera.CameraSessionTracker),
+		-- Server-owned Humanoid movement budget (WalkSpeed/JumpHeight). No
+		-- dependencies, but must be listening before any character loads --
+		-- placed with the other early always-on services.
+		require(ServerScriptService.GameService.Player.CharacterMovementService),
 		-- Phase 12.5 item 6: subscribes to ProfileStore's global diagnostic
 		-- signals. No dependencies, no dependents -- placed early so it's
 		-- listening before any Reward operation could fire them.

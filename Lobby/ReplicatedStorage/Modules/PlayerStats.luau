@@ -21,6 +21,7 @@ PlayerStats.Changed = changedEvent.Event
 PlayerStats.WalkSpeed   = 16     -- studs/sec, normal top speed
 PlayerStats.SprintSpeed = 25      -- studs/sec, top speed while sprinting
 PlayerStats.JumpHeight = 4        -- studs; Roblox's default is 7.2
+PlayerStats.JumpCooldown = 0.3    -- seconds on the ground before the next jump
 PlayerStats.AccelRate   = 18      -- higher = snappier ramp-up to top speed while input is held
 PlayerStats.DecelRate   = 5       -- lower = longer slide-to-stop after input is released
 PlayerStats.MaxAxisForce = 100000 -- LinearVelocity force cap on X/Z
@@ -38,6 +39,10 @@ PlayerStats.MaxStamina        = 100
 PlayerStats.StaminaDrainRate  = 15   -- per second while sprinting
 PlayerStats.StaminaRegenRate  = 10   -- per second while not sprinting
 PlayerStats.MinStaminaToSprint = 15   -- can't start sprinting below this
+-- Holding Shift while standing still neither drains nor regens, or you could
+-- park on the key and never recover. After this many seconds of no movement,
+-- regen starts anyway -- holding Shift shouldn't punish a player who stopped.
+PlayerStats.StaminaIdleRegenDelay = 3
 
 -- ===== Money =====
 PlayerStats.StartingCash = 100

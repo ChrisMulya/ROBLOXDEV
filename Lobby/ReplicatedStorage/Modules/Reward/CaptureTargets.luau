@@ -13,6 +13,7 @@ CaptureTargets.Types = {
 	Monster = {
 		Attribute = "IsMonster",
 		Priority = 100,
+		StatLabel = "Encounter Taken", -- end-of-match personal-stats row label (Match/MatchStats.luau)
 		Rules = {}, -- no gating: always awards, per design decision
 		RepeatPolicy = "Cooldown", -- flipped 8.5: a real player now holds a camera in a match (Phase 8.5)
 		Payout = {
@@ -24,6 +25,7 @@ CaptureTargets.Types = {
 	Objective = {
 		Attribute = "IsObjective",
 		Priority = 200, -- wins over Monster if an instance somehow carries both
+		StatLabel = "Objective Taken",
 		Rules = {
 			{ Rule = "RequireShotQuality", Value = "Strong", Code = "WrongShotQuality" },
 			{ Rule = "MaxMeters", Value = 15, Code = "TooFar" }, -- inclusive: exactly 15m awards
@@ -59,6 +61,15 @@ end)
 
 function CaptureTargets.Get(typeName: string)
 	return CaptureTargets.Types[typeName]
+end
+
+-- Every registered type name, Priority-ordered (same order orderedTypeNames
+-- is already built in). This is what makes adding a row (Artifact, ...)
+-- appear in the end-of-match personal stats with zero code changes -- the
+-- display layer iterates this instead of naming Monster/Objective itself.
+-- Precedent: Camera/CameraStats.luau's GetOrderedIds.
+function CaptureTargets.OrderedNames(): { string }
+	return table.clone(orderedTypeNames)
 end
 
 function CaptureTargets.AttributeFor(typeName: string): string?

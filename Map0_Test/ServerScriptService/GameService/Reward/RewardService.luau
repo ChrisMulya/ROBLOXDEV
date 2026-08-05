@@ -36,6 +36,15 @@ local RewardService = {}
 -- what an objective is. ObjectiveService subscribes to mark completion.
 RewardService.Awarded = Signal.new()
 
+-- (player: Player, amounts: { [string]: number }, meta) -- fired after every
+-- successful Grant, including direct Grant calls that never go through
+-- AwardFromCapture. That difference is the whole reason this exists
+-- alongside Awarded: a subscriber that needs to see EVERY reward amount
+-- (MatchEarnings, the per-match delta tracker) can't use Awarded, which only
+-- fires on the capture path. Grant is the sole caller of RewardLedger.Add in
+-- the repo, so this signal is complete by construction rather than by audit.
+RewardService.Granted = Signal.new()
+
 -- fn(player, subject, context) -> table? -- merged into the reward context
 -- before CaptureRules.Check runs. A provider that has nothing to add for this
 -- subject returns nil. Order is registration order; providers must be
@@ -93,6 +102,11 @@ function RewardService.Grant(player: Player, amounts: { [string]: number }, meta
 	if amounts.XP then
 		flagIfAnomalous(player, amounts.XP)
 	end
+
+	-- Fired only on the success path, after the amounts have actually landed
+	-- in the ledger -- a grant refused by the scoring gate above must never
+	-- accrue anywhere.
+	RewardService.Granted:Fire(player, amounts, meta)
 
 	return true
 end

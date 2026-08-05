@@ -22,7 +22,10 @@ PartyService.Changed = Signal.new() -- fires no payload; listeners re-read state
 local leaderOf: { [number]: number } = {} -- [memberUserId] = leaderUserId, only set for non-leaders
 local membersOf: { [number]: { number } } = {} -- [leaderUserId] = { memberUserId, ... }, excludes the leader themselves
 
-local function removeFromCurrentParty(player: Player)
+-- Returns whether party state actually changed, so callers can decide about
+-- firing Changed. Join/Leave fire it unconditionally (they have other work to
+-- announce); the PlayerRemoving path uses the return value.
+local function removeFromCurrentParty(player: Player): boolean
 	local currentLeaderId = leaderOf[player.UserId]
 	if currentLeaderId then
 		local members = membersOf[currentLeaderId]
@@ -38,7 +41,7 @@ local function removeFromCurrentParty(player: Player)
 			end
 		end
 		leaderOf[player.UserId] = nil
-		return
+		return true
 	end
 
 	-- player is themselves a leader with followers: dissolve, everyone goes solo.
@@ -48,7 +51,10 @@ local function removeFromCurrentParty(player: Player)
 			leaderOf[memberUserId] = nil
 		end
 		membersOf[player.UserId] = nil
+		return true
 	end
+
+	return false
 end
 
 function PartyService.GetLeader(player: Player): Player?
@@ -117,7 +123,13 @@ function PartyService.Leave(player: Player): (boolean, string)
 end
 
 local function onPlayerRemoving(player: Player)
-	removeFromCurrentParty(player)
+	-- Fires Changed like Join/Leave do. This path used to dissolve a party
+	-- silently: harmless while nothing subscribes, but the first subscriber
+	-- (the party client surface) would have inherited a listener that sees
+	-- joins and leaves and misses disconnects entirely.
+	if removeFromCurrentParty(player) then
+		PartyService.Changed:Fire()
+	end
 end
 
 local started = false

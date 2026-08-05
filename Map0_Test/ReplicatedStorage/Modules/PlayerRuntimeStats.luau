@@ -5,6 +5,12 @@
 -- (PlayerStats is required on both sides) with no guard stopping
 -- PlayerStats.Set("WalkSpeed", 0) either. Nothing server-side reads Stamina,
 -- so this only needs to exist on the client.
+--
+-- Stamina here is now a client-side *mirror* of server state, written only by
+-- PlayerMovementController's StaminaSync handler. CharacterMovementService
+-- owns the real value. Treat it as display state, never as an authority, and
+-- do not simulate it here -- a second implementation of the drain/regen rule
+-- is what made the bar appear frozen while the two sides disagreed.
 
 local PlayerRuntimeStats = {}
 

@@ -20,10 +20,6 @@ local function createEmptySlot(slotName)
 	return slot
 end
 
-function StartGameService.ResetKit(player)
-	player:SetAttribute("KitGiven", false)
-end
-
 -- Gives the player their actual camera (not an empty placeholder), based on
 -- the CurrentCamera attribute set server-side (e.g. by CameraShelfSwap on a
 -- previous visit to the shelf). Falls back to CameraInventory.DefaultCameraId

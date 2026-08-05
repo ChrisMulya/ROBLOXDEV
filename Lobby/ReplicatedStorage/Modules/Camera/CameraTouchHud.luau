@@ -8,11 +8,19 @@
 -- Instances are ever created.
 
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
+
+local TouchSession = require(script.Parent.Parent.Shared.TouchSession)
 
 local CameraTouchHud = {}
 
-local IS_TOUCH_DEVICE = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+-- Called, never cached. This was previously
+-- `TouchEnabled and not KeyboardEnabled` evaluated once at module load, which
+-- is false in Studio's device emulator and on any touchscreen laptop -- this
+-- HUD could not be seen in Studio at all. See TouchSession for the full
+-- reasoning.
+local function isTouchDevice(): boolean
+	return TouchSession.IsActive()
+end
 
 local BUTTON_SIZE = UDim2.new(0, 72, 0, 72)
 local BUTTON_BG_COLOR = Color3.fromRGB(40, 40, 40)
@@ -82,30 +90,54 @@ local function ensureBuilt(onOpenPressed: () -> (), onPhotoPressed: () -> ())
 	screenGui.Parent = playerGui
 end
 
+local storedOnOpenPressed: (() -> ())? = nil
+local storedOnPhotoPressed: (() -> ())? = nil
+
+-- Builds on demand rather than at Init. Init runs at client startup, but
+-- PlayerGui.TouchGui only appears once Roblox has built the touch controls a
+-- few seconds later -- deciding "not a touch device" at Init and returning
+-- would leave this HUD permanently unbuilt on a real phone.
+local function ensureReady(): boolean
+	if not isTouchDevice() then
+		return false
+	end
+	if screenGui then
+		return true
+	end
+	if not storedOnOpenPressed or not storedOnPhotoPressed then
+		return false
+	end
+	ensureBuilt(storedOnOpenPressed, storedOnPhotoPressed)
+	return screenGui ~= nil
+end
+
 -- Call once. onOpenPressed/onPhotoPressed take no arguments -- the driver
 -- closes over whatever tool/session state it needs.
 function CameraTouchHud.Init(onOpenPressed: () -> (), onPhotoPressed: () -> ())
-	if not IS_TOUCH_DEVICE then return end
-	ensureBuilt(onOpenPressed, onPhotoPressed)
+	storedOnOpenPressed = onOpenPressed
+	storedOnPhotoPressed = onPhotoPressed
+	-- Fine if this is too early to succeed; Show/SetInCamera retry.
+	ensureReady()
 end
 
 -- Shows the Open button. Call when a camera tool becomes equipped.
 function CameraTouchHud.Show()
-	if not IS_TOUCH_DEVICE or not screenGui then return end
+	if not ensureReady() then return end
 	screenGui.Enabled = true
 end
 
 -- Hides the whole HUD (Open + Photo). Call when the camera tool is
 -- unequipped -- there is nothing left to toggle or shoot with.
+-- Deliberately does not build: there is nothing to hide if it never existed.
 function CameraTouchHud.Hide()
-	if not IS_TOUCH_DEVICE or not screenGui then return end
+	if not screenGui then return end
 	screenGui.Enabled = false
 end
 
 -- Toggles the Photo button and restyles Open ("Camera" <-> "Close") to read
 -- as a scope toggle.
 function CameraTouchHud.SetInCamera(active: boolean)
-	if not IS_TOUCH_DEVICE or not screenGui then return end
+	if not ensureReady() then return end
 	photoButton.Visible = active
 	openButton.Text = active and "Close" or "Camera"
 end

@@ -15,6 +15,8 @@ local TeleportService = game:GetService("TeleportService")
 
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 local PlaceIds = require(ReplicatedStorage.Modules.Shared.PlaceIds)
+local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
+local Cooldown = require(ReplicatedStorage.Modules.Shared.Cooldown)
 
 local MatchManager = require(script.Parent.MatchManager)
 local MatchResultBuilder = require(script.Parent.MatchResultBuilder)
@@ -27,17 +29,32 @@ local WATCHDOG_SECONDS = 30
 local RETRY_DELAYS_SECONDS = { 2, 5, 10 }
 
 -- TeleportAsync's data table is shared across the whole batch (there's no
--- per-player slot in a single call), so the full perPlayer table rides
--- along and ArrivalService picks out each player's own slice server-side --
--- no information leaks to the wrong client, and this avoids one TeleportAsync
--- call per player.
+-- per-player slot in a single call), so the whole summary rides along and
+-- ArrivalService fans it out server-side -- one call instead of one per
+-- returning player.
+--
+-- The summary is deliberately not private: `roster` carries every
+-- participant's name/score/XP so the arrival receipt can show the same
+-- end-of-match scoreboard the in-match screen showed. Anything genuinely
+-- per-player-secret must NOT be added to a contributor slice, because every
+-- participant receives all of them.
 local function buildTeleportData()
 	return { summary = MatchResultBuilder.Build() }
 end
 
+-- [userId] = true while a return teleport for that player is outstanding
+-- (queued via TeleportAsync, including its retry chain). Prevents the manual
+-- ReturnToLobbyRequest handler from double-firing a teleport for a player
+-- who already clicked once, or from racing ReturnAll() at Finished.
+local returningPlayers: { [number]: boolean } = {}
+
 local function attemptReturn(players: { Player })
 	if #players == 0 then
 		return
+	end
+
+	for _, player in ipairs(players) do
+		returningPlayers[player.UserId] = true
 	end
 
 	local teleportOptions = Instance.new("TeleportOptions")
@@ -78,6 +95,30 @@ local function handleInitFailed(player: Player, _teleportResult, message: string
 	end)
 end
 
+-- States in which an early manual return is meaningful: too early
+-- (WaitingForPlayers/Countdown/Playing) means there's no result to show yet
+-- and nothing to return FROM; ReturnAll() already owns Finished, this just
+-- lets an individual player jump the automatic 60s Ending hold.
+local ALLOWED_RETURN_STATES = { Ending = true, Cleanup = true, Finished = true }
+
+-- Rate-limited per player so a spammed click (or a resent client event)
+-- can't queue duplicate TeleportAsync calls before returningPlayers catches
+-- up -- the flag above is the real guard, this is just cheap backpressure.
+local requestCooldown = Cooldown.new(3)
+
+local function handleReturnRequest(player: Player)
+	if not ALLOWED_RETURN_STATES[MatchManager.Get()] then
+		return
+	end
+	if returningPlayers[player.UserId] then
+		return
+	end
+	if not requestCooldown:Check(player.UserId) then
+		return
+	end
+	attemptReturn({ player })
+end
+
 function ReturnToLobbyService.ReturnAll()
 	attemptReturn(Players:GetPlayers())
 
@@ -103,6 +144,7 @@ function ReturnToLobbyService.Start()
 	ServerRole.AssertGameServer()
 
 	TeleportService.TeleportInitFailed:Connect(handleInitFailed)
+	Remotes.Get("ReturnToLobbyRequest").OnServerEvent:Connect(handleReturnRequest)
 
 	MatchManager.StateChanged:Connect(function(newState: string)
 		if newState == "Finished" then

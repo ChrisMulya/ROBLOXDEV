@@ -1,10 +1,10 @@
 -- Death handling only. Owns no UI, no camera, no teleport.
 --
 -- Not the only Humanoid.Died listener on this place -- KitLifecycleHook
--- binds its own, independently, to reset KitGiven (-> StartGameService.
--- ResetKit). The two coexist without conflict: this module owns
+-- binds its own, independently, to tear the kit down (-> EndGame.
+-- ClearPlayerTools). The two coexist without conflict: this module owns
 -- PlayerStateService transitions and spectate/respawn policy; KitLifecycle
--- Hook only touches the KitGiven attribute. LobbyDeathPolicy binds
+-- Hook only touches the player's tools and the KitGiven attribute. LobbyDeathPolicy binds
 -- Humanoid.Died separately again on the Lobby and doesn't use this module.
 
 local Players = game:GetService("Players")

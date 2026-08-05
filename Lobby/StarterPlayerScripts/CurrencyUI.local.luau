@@ -11,9 +11,9 @@ local HideCurrencyUI = Remotes.Get("HideCurrencyUI")
 local playerGui = UIBuilder.GetPlayerGui()
 
 -- Built once and reused across Show/Hide cycles instead of rebuilt per Show --
--- ShowCurrencyUI can fire more than once per session (re-kitting after
--- StartGameService.ResetKit), and rebuilding used to stack a second CashGui
--- plus a second cash.Changed connection every time, leaking both forever.
+-- ShowCurrencyUI can fire more than once per session (re-kitting after a death
+-- clears the kit), and rebuilding used to stack a second CashGui plus a second
+-- cash.Changed connection every time, leaking both forever.
 local screenGui: ScreenGui? = nil
 local label: TextLabel? = nil
 local cashConnection: RBXScriptConnection? = nil
