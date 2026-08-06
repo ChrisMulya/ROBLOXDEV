@@ -8,6 +8,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local MatchPhases = require(script.Parent.MatchPhases)
 local UIBuilder = require(ReplicatedStorage.Modules.UI.UIBuilder)
 local UITheme = require(ReplicatedStorage.Modules.UI.UITheme)
 
@@ -24,6 +25,7 @@ local screenGui: ScreenGui? = nil
 local fill: Frame? = nil
 local hourLabel: TextLabel? = nil
 local lastHourText: string? = nil
+local lastFillColor: Color3? = nil
 
 local function ensureBuilt()
 	if screenGui then
@@ -87,10 +89,18 @@ end
 --
 -- The hour text is written only when the string actually changes (~14 writes
 -- a match), the same dirty-check ObjectiveVisualsController uses.
-function MatchTimeHud.Update(progress: number, hourText: string)
+function MatchTimeHud.Update(progress: number, hourText: string, hour: number)
 	ensureBuilt()
 
 	fill.Size = UDim2.new(math.clamp(progress, 0, 1), 0, 1, 0)
+
+	-- Same dirty-check as the hour text: the colour changes twice a match.
+	-- MatchPhases owns the bands; this file only paints what it is handed.
+	local color = MatchPhases.BarColorFromHour(hour)
+	if color ~= lastFillColor then
+		lastFillColor = color
+		fill.BackgroundColor3 = color
+	end
 
 	if hourText ~= lastHourText then
 		lastHourText = hourText
@@ -105,6 +115,7 @@ function MatchTimeHud.Hide()
 		screenGui.Enabled = false
 	end
 	lastHourText = nil
+	lastFillColor = nil
 end
 
 return MatchTimeHud

@@ -24,6 +24,39 @@ MatchPhases.Phases = {
 	Dawn = { StartHour = 28, MonsterStage = 2, MonstersAggressive = true, ExtractionOpen = true },
 }
 
+-- Match-time bar fill colours, as their own ordered band list. Hours are
+-- unwrapped on the same scale as Phases.StartHour: the match starts at 16 and
+-- counts up, so 27 is 3am.
+--
+-- These bands deliberately do NOT reuse the phase boundaries. Green and purple
+-- happen to land on Dusk and Night, but red starts at 27 (3am) while Dawn
+-- starts at 28 (4am) -- the bar is a mood cue and was specified in its own
+-- hours. Keeping the two lists side by side in this file is the point: whoever
+-- moves a phase boundary sees the colour band that no longer matches it.
+MatchPhases.BarColorOrder = { "Evening", "Night", "Dawn" }
+
+MatchPhases.BarColors = {
+	Evening = { StartHour = 16, Color = Color3.fromRGB(76, 209, 111) },
+	Night = { StartHour = 19, Color = Color3.fromRGB(150, 96, 224) },
+	Dawn = { StartHour = 27, Color = Color3.fromRGB(224, 74, 74) },
+}
+
+-- Same "last band whose StartHour <= hour" scan FromHour uses. Hours below the
+-- first band (only reachable if a schedule starts before 4pm) take the first
+-- colour rather than falling through to nil.
+function MatchPhases.BarColorFromHour(hour: number): Color3
+	local result = MatchPhases.BarColors[MatchPhases.BarColorOrder[1]]
+	for _, bandName in ipairs(MatchPhases.BarColorOrder) do
+		local band = MatchPhases.BarColors[bandName]
+		if band.StartHour <= hour then
+			result = band
+		else
+			break
+		end
+	end
+	return result.Color
+end
+
 -- Pure lookup: the last phase in Order whose StartHour <= hour.
 function MatchPhases.FromHour(hour: number): string
 	local result = MatchPhases.Order[1]
@@ -80,6 +113,38 @@ function MatchPhases.Validate()
 			end
 		end
 		assert(found, ("MatchPhases.Validate: '%s' is in Phases but not in Order"):format(phaseName))
+	end
+
+	-- Bar colours get the same ascending-order check, plus one tie to the phase
+	-- table: the first colour band must start when the first phase does, so a
+	-- schedule that no longer starts at 4pm fails here instead of drawing the
+	-- first minutes of the match with no band covering them.
+	local previousBandStart = -math.huge
+	for _, bandName in ipairs(MatchPhases.BarColorOrder) do
+		local band = MatchPhases.BarColors[bandName]
+		assert(band ~= nil, ("MatchPhases.Validate: '%s' is in BarColorOrder but not in BarColors"):format(bandName))
+		assert(
+			band.StartHour > previousBandStart,
+			("MatchPhases.Validate: bar colour '%s' StartHour must exceed the previous band's"):format(bandName)
+		)
+		previousBandStart = band.StartHour
+	end
+
+	assert(
+		MatchPhases.BarColors[MatchPhases.BarColorOrder[1]].StartHour
+			== MatchPhases.Phases[MatchPhases.Order[1]].StartHour,
+		"MatchPhases.Validate: the first bar colour band must start at the first phase's StartHour"
+	)
+
+	for bandName in pairs(MatchPhases.BarColors) do
+		local found = false
+		for _, orderedName in ipairs(MatchPhases.BarColorOrder) do
+			if orderedName == bandName then
+				found = true
+				break
+			end
+		end
+		assert(found, ("MatchPhases.Validate: '%s' is in BarColors but not in BarColorOrder"):format(bandName))
 	end
 end
 

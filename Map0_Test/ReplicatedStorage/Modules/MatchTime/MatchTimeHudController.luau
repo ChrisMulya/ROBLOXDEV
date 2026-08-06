@@ -42,12 +42,13 @@ local function tick()
 	-- rendering a zeroed bar.
 	local progress = MatchTimeClient.GetProgress()
 	local hourText = MatchTimeClient.GetHourText()
-	if not progress or not hourText then
+	local hour = MatchTimeClient.GetHour()
+	if not progress or not hourText or not hour then
 		MatchTimeHud.Hide()
 		return
 	end
 
-	MatchTimeHud.Update(progress, hourText)
+	MatchTimeHud.Update(progress, hourText, hour)
 end
 
 RunService.Heartbeat:Connect(function(delta)
