@@ -20,13 +20,19 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 local MatchStates = require(ReplicatedStorage.Modules.Shared.MatchStates)
+local MatchPhases = require(ReplicatedStorage.Modules.MatchTime.MatchPhases)
 local MatchManager = require(script.Parent.Parent.Match.MatchManager)
 local MatchCleanup = require(script.Parent.Parent.Match.MatchCleanup)
+local MatchTimeService = require(script.Parent.Parent.MatchTime.MatchTimeService)
 local MonsterService = require(script.Parent.MonsterService)
 
 local EncounterDirector = {}
 
-local spawnedModels: { Model } = {}
+-- { model, baseStage }. baseStage is the spawn point's authored Stage, kept
+-- separately because model:GetAttribute("Stage") holds the EFFECTIVE stage
+-- and is rewritten on every re-stage -- reading it back would ratchet the
+-- authored floor upwards and make the escalation irreversible.
+local spawnedModels: { { model: Model, baseStage: number } } = {}
 
 local function findSpawnPoints(): { Instance }
 	local points = {}
@@ -45,6 +51,20 @@ local function cframeOf(instance: Instance): CFrame
 	return (instance :: BasePart).CFrame
 end
 
+-- The spawn point's authored Stage is a FLOOR, not an override: a point
+-- hand-placed at Stage 2 is always at least 2, and the match phase can only
+-- ever escalate it. max() rather than a straight assignment keeps the ramp
+-- monotonic (difficulty never drops when a phase with a lower stage follows)
+-- and makes "no match time" degrade to exactly today's behaviour -- outside
+-- a match GetPhase() is nil and the authored stage stands alone.
+local function effectiveStage(baseStage: number): number
+	local phase = MatchTimeService.GetPhase()
+	if not phase then
+		return baseStage
+	end
+	return math.max(baseStage, MatchPhases.GetMonsterStage(phase) or 1)
+end
+
 local function spawnEncounter()
 	local points = findSpawnPoints()
 	if #points == 0 then
@@ -54,17 +74,27 @@ local function spawnEncounter()
 
 	for _, point in ipairs(points) do
 		local monsterId = point:GetAttribute("MonsterId") or "GreyCube"
-		local stage = point:GetAttribute("Stage")
-		local model = MonsterService.Spawn(monsterId, cframeOf(point), stage)
+		local baseStage = point:GetAttribute("Stage") or 1
+		local model = MonsterService.Spawn(monsterId, cframeOf(point), effectiveStage(baseStage))
 		if model then
-			table.insert(spawnedModels, model)
+			table.insert(spawnedModels, { model = model, baseStage = baseStage })
 		end
 	end
 end
 
+-- Re-stats every live monster when the match phase changes. This is what
+-- makes MonsterStats' stage-override merge actually reachable during a
+-- match: before this, Stage was read once at spawn and the monsters that
+-- existed at 4 PM were the same monsters at 5 AM.
+local function restageEncounter()
+	for _, entry in ipairs(spawnedModels) do
+		MonsterService.Restage(entry.model, effectiveStage(entry.baseStage))
+	end
+end
+
 local function despawnEncounter()
-	for _, model in ipairs(spawnedModels) do
-		MonsterService.Despawn(model)
+	for _, entry in ipairs(spawnedModels) do
+		MonsterService.Despawn(entry.model)
 	end
 	table.clear(spawnedModels)
 end
@@ -84,6 +114,11 @@ function EncounterDirector.Start()
 			spawnEncounter()
 		end
 	end)
+
+	-- MatchTimeService is started earlier in GameBoot's list, so this
+	-- subscription is in place before the clock can fire its first phase
+	-- change (publisher before subscriber).
+	MatchTimeService.PhaseChanged:Connect(restageEncounter)
 
 	MatchCleanup.RegisterTeardownStep("MonsterTeardown", despawnEncounter)
 end

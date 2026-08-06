@@ -34,9 +34,46 @@ local currentFOV = PlayerStats.BaseFOV
 local currentTilt = 0
 local activeHumanoid: Humanoid? = nil
 
+-- Bumped on every setupCharacter entry, captured locally, re-checked after the
+-- yields. Same generation-guard shape QueueService uses for its pad countdown.
+-- Module state below (activeHumanoid, isSprinting, currentVelocity, ...) is
+-- singular, so without this a setup that started for an older character and
+-- finished late would overwrite the live one -- leaving movement driving a
+-- humanoid that no longer exists.
+local setupGeneration = 0
+
 local function setupCharacter(character: Model)
-	local humanoid = character:WaitForChild("Humanoid") :: Humanoid
-	local rootPart = character:WaitForChild("HumanoidRootPart") :: BasePart
+	-- Bounded waits with a bail, the same shape DeathService.bindCharacter
+	-- uses. Unbounded WaitForChild here yielded forever whenever the character
+	-- was destroyed mid-load -- which sunrise elimination made routine: the
+	-- player is killed, deliberately never respawned (MatchStates
+	-- .RespawnsOnDeath is false from Playing onward), and then teleported out,
+	-- destroying the character while this was still waiting on it. The symptom
+	-- was a pair of "Infinite yield possible on HumanoidRootPart" warnings and
+	-- a leaked coroutine per match.
+	setupGeneration += 1
+	local myGeneration = setupGeneration
+
+	local humanoid = character:WaitForChild("Humanoid", 5) :: Humanoid?
+	local rootPart = character:WaitForChild("HumanoidRootPart", 5) :: BasePart?
+	if not humanoid or not rootPart or not character.Parent then
+		return
+	end
+
+	-- A newer character started setting up while we were yielding above. That
+	-- one owns the module state now; finishing here would hand movement back
+	-- to the character the player just stopped being.
+	if myGeneration ~= setupGeneration then
+		return
+	end
+
+	-- Idempotent: this script calls setupCharacter directly for an existing
+	-- character AND connects CharacterAdded, so the same model can arrive
+	-- twice. Building a second Attachment/LinearVelocity on one root part
+	-- would leave two LinearVelocities fighting over the same axes.
+	if rootPart:FindFirstChild("MovementAttachment") then
+		return
+	end
 
 	-- Let our LinearVelocity own X/Z entirely; don't fight the engine's own
 	-- WalkSpeed-driven movement. Vertical motion (gravity, jumping) stays
@@ -129,7 +166,14 @@ local function setupCharacter(character: Model)
 	connection = RunService.Heartbeat:Connect(function(dt)
 		if not character.Parent or humanoid.Health <= 0 then
 			connection:Disconnect()
-			activeHumanoid = nil
+			-- Only surrender the shared state if we still own it. On a
+			-- respawn the new character claims activeHumanoid before the old
+			-- one's model is destroyed, so an unconditional clear here would
+			-- null out the humanoid that just took over and leave the player
+			-- unable to move.
+			if myGeneration == setupGeneration then
+				activeHumanoid = nil
+			end
 			return
 		end
 

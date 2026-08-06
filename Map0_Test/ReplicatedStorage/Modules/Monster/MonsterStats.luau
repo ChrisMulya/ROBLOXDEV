@@ -7,7 +7,9 @@ local MonsterStats = {}
 MonsterStats.Stats = {
 	GreyCube = {
 		[1] = {
-			WalkSpeed        = 12,     -- studs/sec
+			-- Above the player's WalkSpeed (16), below SprintSpeed (25): you
+			-- cannot walk away from a GreyCube, you have to spend stamina.
+			WalkSpeed        = 18,     -- studs/sec
 			DetectRadius     = 60,     -- studs -- max distance it will target a player from
 			LoseInterestDist = 90,     -- studs -- reserved for future Wandering/Checking states
 			PursuitDuration  = 20,     -- secs -- how long it keeps hunting after losing the player
@@ -19,6 +21,21 @@ MonsterStats.Stats = {
 			-- happens. Keeps the state machine from being 100% predictable once
 			-- more states exist. At 1.0 it's a no-op.
 			TransitionChance = { Chase = 1.0 },
+		},
+
+		-- Sparse override, merged on top of stage 1. Reached from DeepNight
+		-- (midnight) onward via MatchPhases.MonsterStage -> EncounterDirector
+		-- .restageEncounter, so the same monster that was survivable at dusk
+		-- hunts harder after midnight without respawning.
+		--
+		-- 23 leaves only 2 studs/sec of margin under SprintSpeed (25), so
+		-- after midnight escaping costs stamina faster than it regenerates
+		-- (drain 15/s vs regen 10/s) -- outrunning one is no longer free,
+		-- it's a budget. DetectRadius/PursuitDuration widen the net to match.
+		[2] = {
+			WalkSpeed = 23,
+			DetectRadius = 75,
+			PursuitDuration = 30,
 		},
 	},
 }

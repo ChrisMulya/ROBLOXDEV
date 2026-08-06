@@ -12,11 +12,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
-local MatchConfig = require(ReplicatedStorage.Modules.Shared.MatchConfig)
 local MatchManager = require(script.Parent.MatchManager)
 local MatchParticipants = require(script.Parent.MatchParticipants)
 local MatchResultBuilder = require(script.Parent.MatchResultBuilder)
-local MatchArrival = require(script.Parent.MatchArrival)
+local MatchClock = require(script.Parent.MatchClock)
 
 local MatchReplicator = {}
 
@@ -52,13 +51,17 @@ function MatchReplicator.Start()
 	MatchResultBuilder.Captured:Connect(function()
 		local result = MatchResultBuilder.Build()
 		local resultSync = Remotes.Get("MatchResultSync")
-		-- Same workspace:GetServerTimeNow()-deadline trick as
-		-- QueueService's pad countdown: a timestamp, not a remaining
-		-- duration, so the client's per-second tick is pure local
-		-- subtraction and can't drift. MatchClock's own Ending-hold timer
-		-- is the actual authority on when Cleanup fires -- this is only
-		-- what the receipt's button displays.
-		local returnsAt = workspace:GetServerTimeNow() + MatchConfig.Get(MatchArrival.GetModeId()).EndingHoldSeconds
+		-- Same workspace:GetServerTimeNow()-deadline trick as QueueService's
+		-- pad countdown: a timestamp, not a remaining duration, so the
+		-- client's per-second tick is pure local subtraction and can't drift.
+		--
+		-- Read from MatchClock rather than recomputed from EndingHoldSeconds
+		-- here: MatchClock is the authority on when Cleanup actually fires,
+		-- and computing the same deadline twice let the receipt's countdown
+		-- disagree with the real transition. No fallback needed -- the getter
+		-- anchors the deadline on first request, so it is correct regardless
+		-- of which module asks first.
+		local returnsAt = MatchClock.GetEndingDeadline()
 		for _, userId in ipairs(MatchParticipants.All()) do
 			local player = Players:GetPlayerByUserId(userId)
 			if player then

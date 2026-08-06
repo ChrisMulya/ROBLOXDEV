@@ -11,6 +11,8 @@ local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 local PlaceIds = require(ReplicatedStorage.Modules.Shared.PlaceIds)
 local MatchStates = require(ReplicatedStorage.Modules.Shared.MatchStates)
 local PlayerStates = require(ReplicatedStorage.Modules.Shared.PlayerStates)
+local MatchSchedule = require(ReplicatedStorage.Modules.MatchTime.MatchSchedule)
+local MatchPhases = require(ReplicatedStorage.Modules.MatchTime.MatchPhases)
 
 local GameBoot = {}
 
@@ -47,6 +49,11 @@ function GameBoot.Start()
 	-- later -- this is the closest thing to a test suite either table gets.
 	MatchStates.Validate()
 	PlayerStates.Validate()
+	-- Same reasoning: a malformed schedule (a gap between segments, a last
+	-- segment that doesn't land on EndHour) becomes a loud boot failure
+	-- rather than a clock that silently runs to the wrong time.
+	MatchSchedule.Validate()
+	MatchPhases.Validate()
 
 	local services = {
 		require(ServerScriptService.GameService.PlayerState.PlayerStateService),
@@ -72,6 +79,19 @@ function GameBoot.Start()
 		require(ServerScriptService.GameService.Match.MatchResultBuilder),
 		require(ServerScriptService.GameService.Match.MatchReplicator),
 		require(ServerScriptService.GameService.Match.MatchCleanup),
+		-- Match Time System. After MatchCleanup because MatchTimeLighting
+		-- registers a teardown step into it (registry before registrant),
+		-- and after MatchManager because MatchTimeService subscribes to
+		-- StateChanged (publisher before subscriber). Within the block:
+		-- registry, then the publisher, then its three subscribers.
+		require(ServerScriptService.GameService.MatchTime.MatchTimeEvents),
+		require(ServerScriptService.GameService.MatchTime.MatchTimeService),
+		require(ServerScriptService.GameService.MatchTime.MatchTimeReplicator),
+		require(ServerScriptService.GameService.MatchTime.MatchTimeLighting),
+		-- Ends the match at 6 AM, replacing MatchClock's deleted runPlaying.
+		-- MatchEndCondition above races it harmlessly -- RequestEnd is
+		-- idempotent, so whoever fires first wins and the other no-ops.
+		require(ServerScriptService.GameService.MatchTime.SunriseEndHook),
 		-- After MatchCleanup: registers a save step into its registry.
 		-- Order-tolerant at boot (RegisterSaveStep just appends to a
 		-- table), but this position keeps the list's dependency direction

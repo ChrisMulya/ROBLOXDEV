@@ -18,13 +18,54 @@ precisely so the diff stays a clean machine check.)
 
 What exists and works end to end: move → buy camera → photograph
 monsters/objectives → earn XP/Score → queue on a lobby pad → teleport into a
-reserved match server → match runs to completion → return to Lobby with XP
-persisted. Loadout (camera choice) survives both a teleport and a plain
-rejoin. Reward persistence is on ProfileStore with a real per-session lock.
+reserved match server → match runs a 4 PM → 6 AM night on a configurable
+schedule → sunrise kills whoever is left and ends the match → return to Lobby
+with XP persisted. Loadout (camera choice) survives both a teleport and a
+plain rejoin. Reward persistence is on ProfileStore with a real per-session
+lock. Verified live on the published two-place build.
 
 **Known-broken and half-built items are their own sections below** — this
 paragraph is the only narrative allowed in this file. For how any of this was
 built, or what it used to be, see `git log`.
+
+### Match time — the single authority on match length (Game place only)
+
+A match is a night: 4 PM → 6 AM, on a segment schedule where each stretch of
+hours has its own real-time cost (`MatchTime/MatchSchedule.luau`). `Default` is
+60 s/hour to 7 PM then 75 s/hour, totalling **1005 s**. `Debug` (3 s/hour, 42 s
+total) exists for Studio runs — never point a real mode at it.
+
+**Hours run on a continuous scale past 24**: 6 AM is `30`, midnight is `24`.
+Every comparison and subtraction in the system is plain arithmetic on that
+scale. The only legal `% 24` are `MatchTimeMath.FormatHour` (display) and
+`MatchTimeLighting` (`ClockTime` is a 0-24 engine property). A wrap anywhere
+else reintroduces midnight-crossing bugs.
+
+`MatchConfig.MatchDuration` and `MatchClock.runPlaying` **do not exist** — how
+long `Playing` lasts is the schedule's total and nothing else. `MatchClock`
+still owns the `WaitingForPlayers`/`Countdown`/`EndingHold` timers; those bound
+states *outside* the match and are not a second match clock.
+
+The clock is **match-scoped**: it anchors on `Playing` and is fully torn down on
+any exit from it — Heartbeat disconnected (not left idle), anchors cleared,
+`MatchTimeEvents.Reset()`. `GetHour`/`GetPhase`/`GetProgress` return **nil**
+outside `Playing`; that nil is the contract, so every consumer must handle "no
+match time right now" rather than defaulting to a number. Nothing exists on the
+Lobby: the server modules are `GameBoot`-only and the HUD controller is required
+only in `ClientBootstrap`'s `GameServer` branch.
+
+Sunrise ends the match: `RequestEnd("Sunrise")` **first** (so `MatchEndCondition`
+can't win the race and stamp `AllPlayersDown`), then `Health = 0` on every
+survivor, with no yield between the two. Those deaths land while the state is
+already `Ending`, where `MatchStates.RespawnsOnDeath` is false — that flag is the
+only thing stopping `DeathService` respawning everyone under the result receipt.
+
+Phases (`MatchPhases`) are **derived from the hour, never stored or
+transitioned** — that is what keeps them from becoming a state machine parallel
+to `MatchStates`. A monster's effective stage is
+`max(spawnPoint.Stage, phase.MonsterStage)`: the authored stage is a floor, so
+the ramp is monotonic and collapses to today's behaviour when there is no match
+time.
 
 ### Queue pads (lobby matchmaking entry point)
 
@@ -191,6 +232,7 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 - **Ownership is symmetric.** Whoever acquires a GUI/effect/connection releases it, by reference, via a `Trove` — never by name lookup.
 - **No reward amount ever crosses a remote.** `RewardService` is the only sink.
 - **Server reads attributes off the server-observed instance**, never client-declared identity.
+- **Countdowns cross the wire as a deadline, never a remaining duration.** A `workspace:GetServerTimeNow()` timestamp the client subtracts locally, so its tick cannot drift and costs nothing per second. Used by `QueuePadEndsAt`, `MatchResultSync.returnsAt`, and the `MatchTime*` anchors. Corollary: **one owner computes the deadline, everyone else reads it** — `MatchClock.GetEndingDeadline()` anchors on first request precisely so the receipt's countdown and the real `Cleanup` transition can't disagree.
 - **One simulator per value.** If the server owns a number, the client renders it — it must not run the same rule in parallel "for smoothness". Stamina was simulated on both sides against one shared rule; the moment the two disagreed the sync stomped the client every tick and the HUD looked frozen. Prediction is a deliberate exception, not a default, and needs a written reconciliation rule.
 - **Defaults are for display, never persistence.** If you can't distinguish "no data" from "couldn't read data", do not write.
 - **Identity by attribute, never by `.Name`.** `IsMonster`/`IsObjective`/`QueuePadSize`/etc. — a rename or a "Camera" collision must not change behavior.
@@ -209,7 +251,9 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 | Camera framework | works | client session/viewfinder/touch HUD + shelf; one `Trove` per session |
 | Photo capture → reward | works | 5×5 spread raycast → `CaptureTargets.Resolve` → `RewardService` |
 | XP persistence | works | ProfileStore (`RewardStore_v2`), real session lock. `RewardStore_v1` is a legacy read path only — see Tracked sunset conditions |
-| Monsters | works | `Monster/EncounterDirector.luau` gives `MonsterService.Spawn` a real caller |
+| Match time / sunrise ending | works | Game place only; `MatchTime/` server + shared. Single authority on match length — see Match time above |
+| Match time HUD | works | top-centre bar + hour label, `DisplayOrder` 20, `KeepDuringCamera`. Client renders from replicated anchors; never simulates |
+| Monsters | works | `Monster/EncounterDirector.luau` gives `MonsterService.Spawn` a real caller; live agents re-stat on phase change via `MonsterService.Restage` |
 | Objectives | works | registry/service/replicator + client visuals |
 | Flash | works | client `FlashSignal` → screen + world-light renderers; server `FlashEvents` has a publisher, still zero subscribers |
 | Touch-device detection | works | `Shared/TouchSession.IsActive()` — the single answer, called never cached; see G6 |
@@ -219,11 +263,14 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 | Matchmaking (queue pads) | works | see Phase section above |
 | Party | server-only | see Phase section above — no client surface |
 | Loadout persistence | works | camera choice survives teleport and rejoin |
-| Pickup / Cash collection | works | Game place only; hand-placed pickups, no spawner yet — see Phase section above |
+| Pickup / Cash collection | works | Prompt + grant are Game place only; visuals are place-agnostic; hand-placed pickups, no spawner yet — see Phase section above |
 
 ## Half-built / not wired
 
 - **`RewardModifiers`** — registry exists, zero entries. The Combo/Streak/Event seam, unproven.
+- **`MatchTimeEvents`** — registry + monotonic-cursor dispatcher exist and are exercised by the clock, but ship with **zero registered entries**. The seam for timed spawn waves / extraction windows.
+- **`MatchPhases` flags beyond `MonsterStage`** — `MonstersAggressive` and `ExtractionOpen` are declared and read by nothing yet.
+- **`GreyCube` Stage 2 numbers** — real and reachable from `DeepNight`, but tuned by eye, not by playtest.
 - **`FlashEvents`** (server) — has a publisher (`CameraShotHandler.legacy.luau`), zero subscribers. Reserved for monster perception.
 - **`SoundIds.luau`** — TODO stub.
 - **Party client surface** — see Phase section above.
@@ -263,6 +310,8 @@ Non-derivable from code. These will burn a session if forgotten.
 - **G17 — Stick *displacement* is only available from `ControlModule:GetMoveVector()`** (magnitude scales 0..1 with the push, capped at 1). `Humanoid.MoveDirection` is normalized — identical at a nudge and at full stretch — so it can answer "is the player moving" and nothing more.
 - **G19 — `PlayerGui.ScreenOrientation` written once at client start silently loses.** Measured: the write appears to succeed, then reads back as `Sensor` seconds later with no error and nothing observably reverting it — a StarterPlayerScripts LocalScript runs before the engine finishes seeding PlayerGui from StarterGui. A write made *later* in the same session holds and survives death/respawn, so it is a startup race, not a repeated overwrite. Re-apply via `GetPropertyChangedSignal("ScreenOrientation")`. Note also that setting `StarterGui.ScreenOrientation` does **not** update an existing PlayerGui — it is only the seed for a new one.
 - **G18 — MCP input automation lands in Studio-window coordinates, not the emulated viewport's.** Measured: a click sent at `x=66` arrived in-game at `x=19` (~47px X offset; Y matched). A synthetic tap that "does nothing" is usually missing the target, not being consumed — verify by logging `UserInputService.InputBegan` position before concluding anything about input ownership.
+- **G20 — Roblox does not guarantee the order of multiple handlers connected to one event.** G9 is about Script execution; this is about `Connect` order on a single signal, and it is *not* registration order you can rely on. Measured: a listener connected *after* `MatchClock`'s read `GetEndingDeadline()` in the same `StateChanged` batch and got `nil`. **Never let one handler depend on another handler of the same event having already run.** Fixes that do work: compute-on-first-request (what `MatchClock.GetEndingDeadline` does), or publish a distinct signal the consumer subscribes to instead (`MatchTimeService.Started`/`Stopped` exist for exactly this). A value fired deferred *from inside* a handler does resolve in a later batch, so that ordering is safe.
+- **G21 — `guardNonReservedServer()` stops the whole Game-place boot in Studio** (`game.PrivateServerId == ""`), so `GameBoot`'s ordered service list never runs and no match ever starts. To exercise the real boot list in Studio, temporarily comment the `if guardNonReservedServer() then return end` block and point `MatchConfig.Modes.Default.ScheduleId` at `"Debug"` — **then revert both**; grep for leftover markers before committing. Without that bypass the only way to test is to start services by hand, which does not prove boot order.
 - **G13 — `get_console_output` (Studio MCP) can return a stale buffer across a Play stop/restart.** Don't trust it as a liveness signal for a running script; re-read Instance-backed state (attributes, `leaderstats`) fresh instead.
 
 ## Reference tables
@@ -286,6 +335,10 @@ Non-derivable from code. These will burn a session if forgotten.
 | `QueuePadSize` | the pad's `Zone` Part | Queue pad capacity (1/2/4). Owned by `QueuePadService` |
 | `QueuePadLabel` | a Part inside the pad model | Marks which descendant carries the display `BillboardGui`/`TextLabel` |
 | `QueuePadCount` / `QueuePadCapacity` / `QueuePadEndsAt` | the pad's `Zone` Part | Server-written, read-only display state. `QueuePadEndsAt` is `0` when idle, else a `workspace:GetServerTimeNow()` deadline |
+| `MatchState` | `ReplicatedStorage.MatchInfo` Folder | Current `MatchStates` name. Written by `MatchReplicator` |
+| `MatchScheduleId`, `MatchTimeStartedAt`, `MatchTimeEndsAt`, `MatchTimeAnchorAt`, `MatchTimeAnchorHour` | same `MatchInfo` Folder | Match clock anchors, written by `MatchTimeReplicator`. **All nil outside `Playing`** — absent must read as "no match time", never hour 0. `AnchorAt`/`AnchorHour` equal `StartedAt`/`StartHour` unless a schedule is swapped mid-match |
+| `IsMonsterSpawn` | Part or Model, Workspace | Hand-placed monster spawn point. Optional `MonsterId` (default `GreyCube`) and `Stage` (default 1) |
+| `MonsterId` / `Stage` | spawned monster Model | `Stage` here is the **effective** stage and is rewritten on every re-stage — the authored floor lives on the spawn point, not on this |
 | `IsPickup` / `PickupType` | Model or Part, Workspace | Pickup identity. Owned by `Pickup/PickupTypes.luau`; never hardcode elsewhere |
 | `PickupAmount` | same instance | Optional per-instance override of a Cash pickup's `Params.Amount` |
 
@@ -295,6 +348,7 @@ Non-derivable from code. These will burn a session if forgotten.
 | Order | ScreenGui |
 |---|---|
 | 0 | Roblox `TouchGui` (engine-owned), and most of this repo's GUIs |
+| 20 | `MatchTimeGui` — top-centre match clock; loses to the sprint button and both modals |
 | 30 | `MobileSprintGui` — beats `TouchGui`, loses to both modals |
 | 40 | `DeathScreenGui` |
 | 50 | `MatchReceiptGui` |

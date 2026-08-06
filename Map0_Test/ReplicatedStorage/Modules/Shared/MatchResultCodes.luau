@@ -7,7 +7,11 @@ local MatchResultCodes = {}
 MatchResultCodes.Messages = {
 	AllPlayersDown = "Everyone was defeated.",
 	ObjectiveComplete = "Objective complete!",
-	TimeExpired = "Time's up.",
+	-- Replaces TimeExpired, which MatchClock.runPlaying used to emit before
+	-- the Match Time System owned match length. The clock reaching 6 AM is
+	-- now the only way a match ends on time, and it kills whoever is left --
+	-- so the string is about the sunrise, not about a timer running out.
+	Sunrise = "The sun came up.",
 	Aborted = "Match ended early.",
 	HostShutdown = "Server shutting down.",
 }

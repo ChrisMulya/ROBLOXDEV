@@ -29,6 +29,8 @@ end
 --
 --     0    Roblox TouchGui (engine-owned; thumbstick + jump button)
 --     0    most ScreenGuis -- no overlap, no opinion
+--    20    MatchTimeGui      -- top-centre match clock; must lose to the
+--                               sprint button and both modals
 --    30    MobileSprintGui   -- must beat TouchGui (the thumbstick region
 --                               covers it) but lose to both modals below
 --    40    DeathScreenGui

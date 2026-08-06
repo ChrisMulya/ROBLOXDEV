@@ -25,7 +25,10 @@ local function ensureBuilt()
 	local holder = Instance.new("Frame")
 	holder.Name = "SpectateHolder"
 	holder.AnchorPoint = Vector2.new(0.5, 0)
-	holder.Position = UDim2.new(0.5, 0, 0, 20)
+	-- Sits below the match time bar (MatchTimeHud: y = 12, height 34), which
+	-- claimed top-centre when the Match Time System landed. Spectators need
+	-- the clock most of anyone, so the bar wins the higher slot.
+	holder.Position = UDim2.new(0.5, 0, 0, 56)
 	holder.Size = UDim2.fromOffset(260, 60)
 	holder.BackgroundColor3 = UITheme.Colors.PanelBackground
 	holder.BackgroundTransparency = 0.2

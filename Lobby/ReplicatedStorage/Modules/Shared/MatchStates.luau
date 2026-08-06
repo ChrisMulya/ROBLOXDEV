@@ -20,12 +20,31 @@ local CORE_FLAGS = {
 	"MonstersSpawn",
 	"Terminal",
 	"KitGranted",
+	"ShowsMatchTime",
+	"RespawnsOnDeath",
 }
 
 -- KitGranted: whether a participant may hold their starter kit right now.
 -- Added 8.5 -- the seam that lets KitLifecycleHook decide "may I grant/keep
 -- a kit" as a data lookup instead of a condition someone has to remember at
 -- every call site.
+--
+-- ShowsMatchTime: whether the match time HUD is on screen. True for Playing
+-- only -- the match clock is match-scoped, and MatchTimeService clears its
+-- anchors the moment Playing ends, so there is no time left to draw. The
+-- "bar completely filled at 6 AM" requirement is still met: progress is
+-- clamped to 1, so the last frame drawn before the transition is a full bar.
+-- An earlier draft had this true for Ending too; that was a flag claiming a
+-- capability the replicated data could not back, since the attributes are
+-- already nil by then.
+--
+-- RespawnsOnDeath: whether DeathService respawns a dying player instead of
+-- moving them into Dead/Spectating. True only for the pre-match states,
+-- where a death must not strand someone waiting on a match that never
+-- started. Critically FALSE for Ending: sunrise elimination kills every
+-- survivor while the match is already Ending, and the old
+-- `not IsGameplayActive` test would have respawned all of them into the map
+-- underneath the result receipt.
 MatchStates.All = {
 	Loading = {
 		GameplayActive = false,
@@ -35,6 +54,8 @@ MatchStates.All = {
 		MonstersSpawn = false,
 		Terminal = false,
 		KitGranted = false,
+		ShowsMatchTime = false,
+		RespawnsOnDeath = true,
 	},
 	WaitingForPlayers = {
 		GameplayActive = false,
@@ -44,6 +65,8 @@ MatchStates.All = {
 		MonstersSpawn = false,
 		Terminal = false,
 		KitGranted = true,
+		ShowsMatchTime = false,
+		RespawnsOnDeath = true,
 	},
 	Countdown = {
 		GameplayActive = false,
@@ -53,6 +76,8 @@ MatchStates.All = {
 		MonstersSpawn = false,
 		Terminal = false,
 		KitGranted = true,
+		ShowsMatchTime = false,
+		RespawnsOnDeath = true,
 	},
 	Playing = {
 		GameplayActive = true,
@@ -62,6 +87,8 @@ MatchStates.All = {
 		MonstersSpawn = true,
 		Terminal = false,
 		KitGranted = true,
+		ShowsMatchTime = true,
+		RespawnsOnDeath = false,
 	},
 	Ending = {
 		GameplayActive = false,
@@ -71,6 +98,8 @@ MatchStates.All = {
 		MonstersSpawn = false,
 		Terminal = false,
 		KitGranted = false,
+		ShowsMatchTime = false,
+		RespawnsOnDeath = false,
 	},
 	Cleanup = {
 		GameplayActive = false,
@@ -80,6 +109,8 @@ MatchStates.All = {
 		MonstersSpawn = false,
 		Terminal = false,
 		KitGranted = false,
+		ShowsMatchTime = false,
+		RespawnsOnDeath = false,
 	},
 	Finished = {
 		GameplayActive = false,
@@ -89,6 +120,8 @@ MatchStates.All = {
 		MonstersSpawn = false,
 		Terminal = true,
 		KitGranted = false,
+		ShowsMatchTime = false,
+		RespawnsOnDeath = false,
 	},
 }
 
@@ -139,6 +172,16 @@ end
 function MatchStates.IsKitGranted(state: string): boolean
 	local def = MatchStates.All[state]
 	return def ~= nil and def.KitGranted
+end
+
+function MatchStates.ShowsMatchTime(state: string): boolean
+	local def = MatchStates.All[state]
+	return def ~= nil and def.ShowsMatchTime
+end
+
+function MatchStates.RespawnsOnDeath(state: string): boolean
+	local def = MatchStates.All[state]
+	return def ~= nil and def.RespawnsOnDeath
 end
 
 function MatchStates.CanTransition(from: string, to: string): boolean

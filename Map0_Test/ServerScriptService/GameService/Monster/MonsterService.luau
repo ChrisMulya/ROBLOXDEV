@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 local MatchStates = require(ReplicatedStorage.Modules.Shared.MatchStates)
+local MonsterStats = require(ReplicatedStorage.Modules.Monster.MonsterStats)
 local MonsterAgent = require(script.Parent.MonsterAgent)
 local MonsterDamage = require(script.Parent.MonsterDamage)
 
@@ -110,6 +111,40 @@ function MonsterService.Spawn(monsterId: string, cframe: CFrame, stage: number?)
 	end)
 
 	return model
+end
+
+-- Re-stats a LIVE agent in place. Until this existed, Stage was read once at
+-- spawn and never again, so MonsterStats' stage-override merge -- the most
+-- match-time-shaped seam in the repo -- had no way to actually drive
+-- difficulty during a match.
+--
+-- Swaps the resolved stats table wholesale rather than mutating fields:
+-- Chase/MonsterDamage read agent.stats.* fresh on each use, so a reference
+-- swap is atomic from their point of view and cannot leave a half-applied
+-- stat set mid-tick.
+--
+-- Deliberately does NOT reset state, target, or position -- a monster that
+-- gets faster at midnight should keep chasing whoever it was chasing, not
+-- forget them.
+function MonsterService.Restage(model: Model, stage: number): boolean
+	local agent = liveAgents[model]
+	if not agent then
+		return false
+	end
+
+	if agent.stage == stage then
+		return false
+	end
+
+	local stats = MonsterStats.Get(agent.monsterId, stage)
+	if not stats then
+		return false
+	end
+
+	agent.stage = stage
+	agent.stats = stats
+	model:SetAttribute("Stage", stage)
+	return true
 end
 
 function MonsterService.Despawn(model: Model)

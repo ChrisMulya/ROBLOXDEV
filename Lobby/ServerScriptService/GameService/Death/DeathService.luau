@@ -27,12 +27,18 @@ function DeathService.SetPolicy(modeId: string)
 end
 
 local function onHumanoidDied(player: Player, humanoid: Humanoid)
-	-- A death outside Playing (Loading/WaitingForPlayers/Countdown/Ending/
-	-- Cleanup) must not strand a player waiting on a match that never
-	-- properly started -- respawn immediately instead of entering
-	-- Dead/Spectating, mirroring the Lobby's own Dead -> (new character) ->
-	-- Alive sequence rather than skipping Dead entirely.
-	if not MatchStates.IsGameplayActive(MatchManager.Get()) then
+	-- A death in a pre-match state (Loading/WaitingForPlayers/Countdown) must
+	-- not strand a player waiting on a match that never properly started --
+	-- respawn immediately instead of entering Dead/Spectating, mirroring the
+	-- Lobby's own Dead -> (new character) -> Alive sequence rather than
+	-- skipping Dead entirely.
+	--
+	-- Reads the RespawnsOnDeath flag rather than inverting IsGameplayActive:
+	-- those two agreed until sunrise elimination landed, which kills every
+	-- survivor while the match is already in Ending. Ending is not gameplay-
+	-- active but must NOT respawn, or the eliminated players come straight
+	-- back on their feet underneath the result receipt.
+	if MatchStates.RespawnsOnDeath(MatchManager.Get()) then
 		PlayerStateService.Set(player, "Dead", "DeathOutsideGameplay")
 		player:LoadCharacter()
 		return

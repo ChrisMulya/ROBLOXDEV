@@ -28,4 +28,10 @@ elseif ServerRole.Is("GameServer") then
 	require(ReplicatedStorage.Modules.UI.DeathScreenController)
 	require(ReplicatedStorage.Modules.Spectate.SpectateController)
 	require(ReplicatedStorage.Modules.UI.MatchReceiptController)
+	-- Game place only: the match clock exists for the duration of a match and
+	-- nowhere else, so the Lobby never builds this HUD. (It would fail safe
+	-- anyway -- the Lobby has no MatchInfo folder, so the controller would
+	-- find no anchors and stay hidden -- but not requiring it is the actual
+	-- guarantee.)
+	require(ReplicatedStorage.Modules.MatchTime.MatchTimeHudController)
 end

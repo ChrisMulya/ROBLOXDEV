@@ -72,33 +72,51 @@ local function runCountdown()
 	end
 end
 
+-- Absolute server timestamp when the Ending hold expires, or nil outside
+-- Ending. This module is the authority on when Cleanup actually fires, and
+-- MatchReplicator puts the same instant on the receipt's return button --
+-- two independent computations of one deadline is exactly the drift the
+-- Match Time System removed from match length.
+local endingDeadline: number? = nil
+
+-- Computed on FIRST REQUEST, not only inside runEndingHold. Roblox does not
+-- order multiple handlers connected to one event, so "MatchClock's
+-- StateChanged handler runs before the reader's" is not a guarantee this
+-- module is entitled to make. Whoever asks first anchors the deadline;
+-- runEndingHold then times the hold to that same instant. Order-independent
+-- by construction, so no caller needs a fallback.
+function MatchClock.GetEndingDeadline(): number?
+	if not MatchManager.Is("Ending") then
+		return nil
+	end
+	if not endingDeadline then
+		endingDeadline = workspace:GetServerTimeNow() + config().EndingHoldSeconds
+	end
+	return endingDeadline
+end
+
 local function runEndingHold()
-	local cfg = config()
-	task.delay(cfg.EndingHoldSeconds, function()
+	local deadline = MatchClock.GetEndingDeadline()
+	if not deadline then
+		return
+	end
+
+	-- Timed to the shared deadline rather than to a fresh EndingHoldSeconds
+	-- from now: if the replicator anchored it a moment earlier, the receipt's
+	-- countdown and the real transition still land together.
+	task.delay(math.max(0, deadline - workspace:GetServerTimeNow()), function()
 		if MatchManager.Is("Ending") then
 			MatchManager.RequestTransition("Cleanup", "EndingHoldElapsed")
 		end
 	end)
 end
 
--- Without this, a match with no time limit can never end on its own --
--- MatchEndCondition only fires when every participant stops counting as
--- active, which never happens if nobody dies. RequestEnd is idempotent, so
--- this racing MatchEndCondition (whoever fires first wins) is harmless.
-local function runPlaying()
-	local cfg = config()
-	local waited = 0
-
-	while MatchManager.Is("Playing") do
-		if waited >= cfg.MatchDuration then
-			MatchManager.RequestEnd("TimeExpired")
-			return
-		end
-
-		task.wait(1)
-		waited += 1
-	end
-end
+-- There is deliberately no runPlaying here. Ending the match on time is
+-- MatchTimeService's job: it reaches EndHour (6 AM), fires Completed, and
+-- SunriseEndHook calls RequestEnd("Sunrise"). A second countdown here would
+-- be a duplicate authority on match length -- the exact thing the Match Time
+-- System was built to remove. MatchEndCondition still covers "everyone died
+-- early", and RequestEnd remains idempotent so the two cannot conflict.
 
 local started = false
 
@@ -111,12 +129,17 @@ function MatchClock.Start()
 	ServerRole.AssertGameServer()
 
 	MatchManager.StateChanged:Connect(function(newState: string)
+		-- Ending is unreachable twice in one match (Ending -> Cleanup only),
+		-- but clearing here means a stale deadline can never outlive the
+		-- state it belongs to, whatever transitions are added later.
+		if newState ~= "Ending" then
+			endingDeadline = nil
+		end
+
 		if newState == "WaitingForPlayers" then
 			task.spawn(runWaitingForPlayers)
 		elseif newState == "Countdown" then
 			task.spawn(runCountdown)
-		elseif newState == "Playing" then
-			task.spawn(runPlaying)
 		elseif newState == "Ending" then
 			runEndingHold()
 		end
