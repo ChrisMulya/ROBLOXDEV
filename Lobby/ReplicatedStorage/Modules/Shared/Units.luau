@@ -1,4 +1,4 @@
--- Stud<->meter conversion. Roblox distances (raycasts, WalkSpeed, MonsterStats
+-- Stud<->meter conversion. Roblox distances (raycasts, WalkSpeed, monster
 -- radii, etc.) stay in studs everywhere internally -- this only exists for the
 -- boundary where a stud distance becomes something a player reads.
 

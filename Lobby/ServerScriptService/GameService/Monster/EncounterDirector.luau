@@ -9,7 +9,8 @@
 -- documents for itself.
 --
 -- Spawn points are Workspace content, not code: tag a BasePart or Model with
--- IsMonsterSpawn = true (optionally MonsterId, defaults "GreyCube", and
+-- IsMonsterSpawn = true (optionally MonsterId, defaulting to
+-- MonsterConstants.DefaultMonsterId, and
 -- Stage, defaults 1) the same way Phase 7.5's capture targets were hand-
 -- placed with IsMonster/IsObjective. No spawn points placed yet -- this
 -- module tolerates that (warns once, spawns nothing) rather than requiring
@@ -21,6 +22,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 local MatchStates = require(ReplicatedStorage.Modules.Shared.MatchStates)
 local MatchPhases = require(ReplicatedStorage.Modules.MatchTime.MatchPhases)
+local MonsterConstants = require(ReplicatedStorage.Modules.Monster.MonsterConstants)
 local MatchManager = require(script.Parent.Parent.Match.MatchManager)
 local MatchCleanup = require(script.Parent.Parent.Match.MatchCleanup)
 local MatchTimeService = require(script.Parent.Parent.MatchTime.MatchTimeService)
@@ -73,8 +75,8 @@ local function spawnEncounter()
 	end
 
 	for _, point in ipairs(points) do
-		local monsterId = point:GetAttribute("MonsterId") or "GreyCube"
-		local baseStage = point:GetAttribute("Stage") or 1
+		local monsterId = point:GetAttribute("MonsterId") or MonsterConstants.DefaultMonsterId
+		local baseStage = point:GetAttribute("Stage") or MonsterConstants.DefaultStage
 		local model = MonsterService.Spawn(monsterId, cframeOf(point), effectiveStage(baseStage))
 		if model then
 			table.insert(spawnedModels, { model = model, baseStage = baseStage })

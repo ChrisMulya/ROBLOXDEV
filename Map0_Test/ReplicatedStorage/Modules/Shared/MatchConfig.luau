@@ -1,5 +1,5 @@
 -- Per-mode match tunables. Keyed by mode id, same shape as CameraStats/
--- MonsterStats: adding a mode is one more table entry, no script changes.
+-- Monster/Configs: adding a mode is one more table entry, no script changes.
 -- Mode ids correspond to PlaceIds.GameModes keys.
 
 local MatchConfig = {}

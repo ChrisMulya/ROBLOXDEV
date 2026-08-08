@@ -18,7 +18,13 @@ local changedEvent = Instance.new("BindableEvent")
 PlayerStats.Changed = changedEvent.Event
 
 -- ===== Movement =====
-PlayerStats.WalkSpeed   = 16     -- studs/sec, normal top speed
+-- 10, not Roblox's default 16. Walking is deliberately slower than every
+-- monster's WalkSpeed (Monster1 is 18), so walking away from something that
+-- has seen you is not an option -- sprinting is. That makes stamina the real
+-- escape resource rather than a convenience, and it is what makes the
+-- footstep stimulus a meaningful trade: see Stimulus/FootstepEmitter, which
+-- only emits above 20 studs/sec, so a walking player is silent.
+PlayerStats.WalkSpeed   = 10
 PlayerStats.SprintSpeed = 25      -- studs/sec, top speed while sprinting
 PlayerStats.JumpHeight = 4        -- studs; Roblox's default is 7.2
 PlayerStats.JumpCooldown = 0.3    -- seconds on the ground before the next jump

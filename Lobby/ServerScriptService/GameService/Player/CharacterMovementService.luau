@@ -77,6 +77,15 @@ local function syncPlayer(player: Player, entry: Entry)
 	player:SetAttribute("Sprinting", entry.sprinting)
 end
 
+-- Server-granted sprint, not the client's request: onSprintRequest only sets
+-- this after the stamina gate. FootstepEmitter reads it so a sprint is always
+-- audible even in the moments its measured speed is still ramping up to the
+-- noise threshold.
+function CharacterMovementService.IsSprinting(player: Player): boolean
+	local entry = entries[player]
+	return entry ~= nil and entry.sprinting
+end
+
 -- Jump rate limit. The character is client-simulated, so the cooldown that the
 -- player actually feels is enforced in PlayerMovementController; disabling the
 -- state here is the server-side half, and it is also what makes the cooldown

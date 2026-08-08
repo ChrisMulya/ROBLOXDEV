@@ -52,7 +52,7 @@ local function onHumanoidDied(player: Player, humanoid: Humanoid)
 	local rootPart = humanoid.RootPart
 	DeathService.Died:Fire({
 		player = player,
-		killerUserId = nil, -- no attacker attribution exists yet -- MonsterDamage doesn't report a killer today
+		killerUserId = nil, -- no attacker attribution exists yet -- Monster/Components/Combat doesn't report a killer today
 		position = rootPart and rootPart.Position or nil,
 		timestamp = os.time(),
 	})

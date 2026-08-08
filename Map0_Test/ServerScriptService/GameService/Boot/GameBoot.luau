@@ -5,6 +5,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
 
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
@@ -23,6 +24,23 @@ local GameBoot = {}
 -- Returns true if this server is non-reserved (caller should stop booting).
 local function guardNonReservedServer(): boolean
 	if game.PrivateServerId ~= "" then
+		return false
+	end
+
+	-- TEMP:DEV-BYPASS -- delete this whole block before shipping.
+	-- Studio Play-test never has a PrivateServerId, so the guard below fires
+	-- every time and GameBoot returns before starting a single service --
+	-- which also makes the monster framework untestable locally.
+	--
+	-- Gated on IsStudio so it CANNOT affect a live server even if it ships by
+	-- accident: a real non-reserved Game Server still gets guarded. Everything
+	-- downstream already tolerates Studio -- MatchArrival seeds
+	-- MatchParticipants from the local player when there's no teleport data,
+	-- and MatchClock then takes RosterComplete -> Countdown -> Playing.
+	--
+	-- Find every piece of this with: grep -rn "TEMP:DEV-BYPASS"
+	if RunService:IsStudio() then
+		warn("[GameBoot] TEMP:DEV-BYPASS active -- booting a non-reserved server because this is Studio.")
 		return false
 	end
 
@@ -66,6 +84,18 @@ function GameBoot.Start()
 		-- dependencies, but must be listening before MatchSpawner loads any
 		-- character -- placed with the other early always-on services.
 		require(ServerScriptService.GameService.Player.CharacterMovementService),
+		-- Blueprint D5. After CharacterMovementService: reads
+		-- IsSprinting(player) every Heartbeat, so the accessor must exist
+		-- before this can query it (no ordering issue in practice --
+		-- IsSprinting just reads a table -- but publisher-before-consumer
+		-- is the convention this whole list follows). Before MonsterFramework,
+		-- whose HearingSensor is D3's only current subscriber.
+		require(ServerScriptService.GameService.Stimulus.FootstepEmitter),
+		-- Blueprint D6. The sole subscriber FlashEvents has ever had. No
+		-- ordering dependency on CameraShotHandler.legacy -- that file
+		-- self-wires as a Script and requiring FlashEvents from either side
+		-- resolves to the same cached Signal instance either way.
+		require(ServerScriptService.GameService.Stimulus.FlashStimulusAdapter),
 		-- Phase 12.5 item 6: subscribes to ProfileStore's global diagnostic
 		-- signals. No dependencies, no dependents -- placed early so it's
 		-- listening before any Reward operation could fire them.
@@ -119,8 +149,13 @@ function GameBoot.Start()
 		-- Registers a teardown step into MatchCleanup's registry (same rule
 		-- as RewardCleanupHook/RewardResultHook above).
 		require(ServerScriptService.GameService.Player.KitLifecycleHook),
-		-- Same rule again: registers "MonsterTeardown" into MatchCleanup.
-		require(ServerScriptService.GameService.Monster.EncounterDirector),
+		-- Monster Framework. One entry: it starts MonsterRegistry ->
+		-- MonsterScheduler -> EncounterDirector itself, in dependency order,
+		-- so the boot list doesn't have to track its internals. Same rule
+		-- again for its position here -- EncounterDirector registers
+		-- "MonsterTeardown" into MatchCleanup and subscribes to MatchManager
+		-- and MatchTimeService, all required above.
+		require(ServerScriptService.GameService.Monster.MonsterFramework),
 		require(ServerScriptService.GameService.Match.ReturnToLobbyService),
 		require(ServerScriptService.GameService.Match.MatchClock),
 		-- Loads characters for the roster once WaitingForPlayers begins.

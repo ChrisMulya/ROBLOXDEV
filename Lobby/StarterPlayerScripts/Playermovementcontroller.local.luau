@@ -274,6 +274,7 @@ UserInputService.InputEnded:Connect(function(input, _gameProcessed)
 	end
 end)
 
+
 -- Authoritative stamina from CharacterMovementService. The sole writer of the
 -- Stamina runtime stat -- the HUD renders this and nothing else. It
 -- deliberately carries no sprint flag: a sync already in flight when Shift is

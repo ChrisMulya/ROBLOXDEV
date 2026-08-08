@@ -1,7 +1,8 @@
 -- Per-key cooldown tracker (typically keyed by player.UserId).
 -- Replaces the lastXTime[UserId] + PlayerRemoving-cleanup pattern that was
 -- hand-written three separate times (CameraShotHandler, CameraShelfHandler,
--- and planned for MonsterDamage).
+-- and planned for the monster damage path -- now Monster/Components/Combat,
+-- which tracks its own per-instance table rather than using this).
 
 local Players = game:GetService("Players")
 
