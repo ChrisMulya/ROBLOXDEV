@@ -50,28 +50,43 @@ return {
 			-- leaves a 5 stud/sec sprint margin -- more breathing room than 22
 			-- did, at the cost of an escape being less of a knife-edge.
 			WalkSpeed       = 20,
-			-- 80, not the 60 inherited from GreyCube. That 60 was tuned when
-			-- vision had no cone and no line-of-sight -- 60 studs in every
-			-- direction, through walls. A 120 degree cone plus LOS cuts the
-			-- effective detection volume to roughly a third, so keeping 60
-			-- silently made the monster far blinder than it was ever meant to
-			-- be. This restores the intended threat range while keeping the
-			-- rules (cone, occlusion) that make it fair.
-			DetectRadius    = 80,
+			-- Doubled from 80 on request. History: 80 replaced the 60 inherited
+			-- from GreyCube, which was tuned when vision had no cone and no
+			-- line-of-sight (60 studs in every direction, through walls); a
+			-- cone plus LOS cuts the effective detection VOLUME to roughly a
+			-- third, so 60 had silently made the monster far blinder than
+			-- intended.
+			--
+			-- At 160 with a 150 degree cone the monster sees most of a mall
+			-- corridor end to end. LOS is what keeps this fair -- the counter
+			-- play is geometry, not distance, so open sightlines are now
+			-- genuinely dangerous and cover is genuinely worth using. Watch for
+			-- the monster committing from across an atrium; if that reads as
+			-- unfair, this is the number to walk back, not the cone.
+			DetectRadius    = 160,
 			PursuitDuration = 20,
 			AttackReach     = 5,
 			AttackCooldown  = 1,
+			-- Chance to stand still for a few seconds on reaching a
+			-- PatrolPoint. Lives in Stats rather than Navigation.Patrol so the
+			-- Evolution tier below can multiply it to zero -- see
+			-- States/Patrol's pauseChanceFor for why that asymmetry exists.
+			PatrolPauseChance = 0.15,
 			-- Above the max chase envelope, computed from the HIGHEST *effective*
 			-- speed, which since Limits.WalkSpeed.Max was removed is the
 			-- EVOLVED stage-2 speed, not the raw stage-2 stat:
 			--   DetectRadius + (WalkSpeed * EvolutionMultiplier) * PursuitDuration
-			--   stage 2 evolved: 100 + (24 * 1.3) * 30 = 100 + 31.2 * 30 = 1036
+			--   stage 2 evolved: 200 + (24 * 1.3) * 30 = 200 + 31.2 * 30 = 1136
 			-- Recompute whenever DetectRadius, WalkSpeed, PursuitDuration OR any
 			-- Evolution tier's WalkSpeed multiplier changes -- this has already
 			-- been wrong three times, twice before evolution even existed to
 			-- complicate it. Below the envelope the monster leashes
 			-- mid-legitimate-chase, which reads as it randomly giving up rather
 			-- than as the recovery path it is.
+			--
+			-- 1200 still clears 1136, so doubling DetectRadius did not require
+			-- moving this -- but the margin is down from 164 to 64 studs.
+			-- Another DetectRadius bump will need this raised with it.
 			LeashDistance   = 1200,
 		},
 		[2] = {
@@ -82,7 +97,8 @@ return {
 			WalkSpeed       = 24,
 			-- Must stay above stage 1 or the difficulty ramp inverts at
 			-- midnight, which is the opposite of what a stage bump is for.
-			DetectRadius    = 100,
+			-- Doubled alongside stage 1 to preserve that ordering.
+			DetectRadius    = 200,
 			PursuitDuration = 30,
 		},
 	},
@@ -103,7 +119,14 @@ return {
 		-- different lever (teleport, minions) precisely because raw speed was
 		-- capped under SprintSpeed on purpose.
 		WalkSpeed    = { Min = 4 },
-		DetectRadius = { Max = 140 },
+		-- Raised from 140 with the DetectRadius doubling. 140 would have
+		-- CLAMPED both new values (160 and 200) straight back down, silently
+		-- undoing the change and leaving stage 2 no sharper than stage 1 --
+		-- the same trap Limits.WalkSpeed.Max sprang on the evolution tier.
+		-- Kept as a ceiling rather than removed: unlike WalkSpeed, nothing
+		-- wants DetectRadius unbounded, and 220 leaves headroom for a future
+		-- perception multiplier without letting one make the monster omniscient.
+		DetectRadius = { Max = 220 },
 	},
 
 	Brain = {
@@ -134,9 +157,14 @@ return {
 	Perception = {
 		-- A real cone, unlike GreyCube's 360: this rig has a face, so "it
 		-- didn't see me, I was behind it" is a readable rule the player can
-		-- actually play against. 120 is generous enough that flanking takes
-		-- intent rather than luck.
-		Sensors = { Vision = { FOV = 120, RequiresLOS = true } },
+		-- actually play against.
+		--
+		-- FULL width, not a half-angle -- VisionSensor halves it for the cone
+		-- test. 150 leaves a 210 degree blind arc behind the monster, so
+		-- flanking still works but is a much tighter window than the 240 degree
+		-- blind arc 120 gave; getting behind it now takes real commitment
+		-- rather than a casual sidestep.
+		Sensors = { Vision = { FOV = 150, RequiresLOS = true } },
 	},
 
 	Navigation = {
@@ -160,15 +188,21 @@ return {
 	-- Tuned so the monster still commits at close to the range it did before
 	-- aggression existed, rather than sitting at 0.15 forever and looking
 	-- broken. The numbers are coupled -- changing one without re-deriving the
-	-- others is how this ends up feeling dead:
+	-- others is how this ends up feeling dead.
+	--
+	-- Every stud figure below is a FRACTION OF DetectRadius, not an absolute.
+	-- The derivation was done at DetectRadius 80; the stud numbers quoted are
+	-- the current 160. The proportions are what the tuning actually fixes, so
+	-- they survived the doubling untouched -- but the absolute distances did
+	-- not, which is the whole reason a 160-stud radius plays so differently:
 	--
 	--   Ease, not InverseSquare. InverseSquare needs closeness 0.91 to clear a
-	--   0.5 threshold -- roughly 7 studs on an 80-stud DetectRadius, so the
+	--   0.5 threshold -- roughly 14 studs of a 160-stud DetectRadius, so the
 	--   monster would ignore you across a room. Ease climbs fast instead:
 	--   half range already reads 0.75.
 	--
 	--   Threshold 0.15 with Proximity weight 0.7 puts the commit point at
-	--   about 70 of the 80 studs it can see. MatchTime adds up to 0.3 on top
+	--   about 87% of what it can see. MatchTime adds up to 0.3 on top
 	--   as the night wears on, which walks that out to the full radius --
 	--   the ramp is the point.
 	--
@@ -179,13 +213,13 @@ return {
 	--   of a match, which put the top band out of reach and the commit point
 	--   ~10 studs short.
 	--
-	--   Proximity 0.85 so the ceiling is reachable without MatchTime: at 10
+	--   Proximity 0.85 so the ceiling is reachable without MatchTime: at 20
 	--   studs the target is 0.85 * Ease(0.875) = 0.84, comfortably into High
 	--   (0.67). At weight 0.7 the peak was 0.689 -- over the band by 0.02 and
 	--   only asymptotically, so High could not be observed before the monster
 	--   reached AttackReach.
 	--
-	--   Threshold 0.12 puts the crossing at ~74 studs of the 80 it can see.
+	--   Threshold 0.12 puts the crossing at ~148 studs of the 160 it can see.
 	--   Rise is fast enough that the lag costs only a few studs rather than
 	--   the ~10 that a symmetric rate cost.
 	--
@@ -212,9 +246,24 @@ return {
 	-- clamped -- see the Limits.WalkSpeed note above for what that means
 	-- (faster than the player's SprintSpeed) and LeashDistance for the
 	-- envelope this now has to stay above.
+	--
+	-- PatrolPauseChance = 0 multiplies the 0.15 loitering chance to exactly
+	-- zero, so from 3 AM the monster never stops at a PatrolPoint again -- it
+	-- just keeps moving, permanently. Multiplying by zero rather than setting
+	-- an absolute is what keeps this inside the Stats-only evolution pipeline
+	-- that actually ships (plans/EvolutionPlan.md); a `Set`-shaped operation
+	-- is declared in the blueprint's pipeline but has no implementation.
+	--
+	-- Note this is one-way: nothing un-multiplies a zero, so a later tier
+	-- could never restore loitering. That is correct for an escalation ladder
+	-- and worth knowing before writing a tier that tries.
 	Evolution = {
 		Tiers = {
-			Witching = { AtHour = 27, Stats = { WalkSpeed = 1.3 }, Stacks = false },
+			Witching = {
+				AtHour = 27,
+				Stats  = { WalkSpeed = 1.3, PatrolPauseChance = 0 },
+				Stacks = false,
+			},
 		},
 	},
 

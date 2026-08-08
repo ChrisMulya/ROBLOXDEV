@@ -66,6 +66,24 @@ local function patrolCfg(instance)
 	return (instance.config.Navigation and instance.config.Navigation.Patrol) or {}
 end
 
+-- The pause CHANCE reads from Stats, unlike every other patrol knob, which
+-- lives under Navigation.Patrol. That asymmetry is deliberate: Stats is the
+-- only table evolution can mutate, and an evolved monster is meant to stop
+-- loitering. A tier declaring `PatrolPauseChance = 0` multiplies this to zero
+-- through the existing Stats pipeline, so "never idles after 3 AM" needs no
+-- new evolution machinery -- which matters, because the non-Stats half of the
+-- tier schema is unimplemented (see plans/EvolutionPlan.md).
+--
+-- The durations stay under Navigation.Patrol: nothing wants to evolve them,
+-- and putting a value in Stats that no tier ever touches would imply otherwise.
+local function pauseChanceFor(instance, cfg): number
+	local stat = instance.config.Stats.PatrolPauseChance
+	if type(stat) == "number" then
+		return stat
+	end
+	return cfg.PointPauseChance or MonsterConstants.DefaultPatrolPointPauseChance
+end
+
 ----------------------------------------------------------------------------
 -- Legacy authored-route path (config.Navigation.PatrolRoute). Unchanged from
 -- pre-Phase-F Patrol -- kept verbatim so an existing config that declares a
@@ -502,7 +520,7 @@ local function updateRoute(instance, navigation, memory, dt: number)
 		-- decision rather than a stutter. Breaking the chain here is the
 		-- entire point of the feature -- everywhere else in this state the
 		-- chain exists specifically to stop the monster going idle.
-		local pauseChance = cfg.PointPauseChance or MonsterConstants.DefaultPatrolPointPauseChance
+		local pauseChance = pauseChanceFor(instance, cfg)
 		if pauseChance > 0 and math.random() < pauseChance then
 			local minSeconds = cfg.PointPauseMin or MonsterConstants.DefaultPatrolPointPauseMin
 			local maxSeconds = cfg.PointPauseMax or MonsterConstants.DefaultPatrolPointPauseMax

@@ -88,7 +88,7 @@ MonsterConstants.DefaultPatrolLegTimeout         = 30
 -- that occasionally stops to look around reads as something deciding where to
 -- go next. Also gives a hiding player a window where the monster is stationary
 -- and audible-adjacent rather than always closing distance.
-MonsterConstants.DefaultPatrolPointPauseChance   = 0.25
+MonsterConstants.DefaultPatrolPointPauseChance   = 0.15
 MonsterConstants.DefaultPatrolPointPauseMin      = 3
 MonsterConstants.DefaultPatrolPointPauseMax      = 5
 MonsterConstants.DefaultPatrolSearchChance       = 0.3
