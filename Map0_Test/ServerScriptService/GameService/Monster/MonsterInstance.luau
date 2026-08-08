@@ -241,9 +241,30 @@ function MonsterInstance:SetStage(stage: number): boolean
 	self.stage = stage
 	self.config = config
 
+	-- Re-multiply any already-applied evolution tiers onto the new stage's
+	-- Stats before anything reads config.Stats again -- otherwise a stage
+	-- change after evolution would silently discard the evolution's
+	-- multipliers. See Components/Evolution:Reapply.
+	local evolution = self.components.Evolution
+	if evolution then
+		evolution:Reapply()
+	end
+
 	self.model:SetAttribute(MonsterConstants.Attributes.Stage, stage)
 	self.bus:Fire("StageChanged", { Stage = stage })
 	return true
+end
+
+-- No-op, returning false, on any monster lacking CanEvolve -- the component
+-- would not exist. Delegates entirely to Components/Evolution; this method
+-- exists so callers (MonsterEvolution, the command bar) don't need to know
+-- components are involved at all, same shape as SetStage.
+function MonsterInstance:Evolve(tierName: string): boolean
+	local evolution = self.components.Evolution
+	if not evolution then
+		return false
+	end
+	return evolution:Apply(tierName)
 end
 
 -- Does NOT destroy the model. MonsterService.Despawn owns that, and the

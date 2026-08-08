@@ -35,16 +35,16 @@ return {
 		[1] = {
 			-- The PURSUIT speed, not a single speed for every state. Wander and
 			-- Patrol run at half this and Check at three quarters, via each
-			-- state's SpeedScale -- so a monster moving at full 22 is a monster
+			-- state's SpeedScale -- so a monster moving at full 20 is a monster
 			-- that has seen you, and that difference is readable from across a
 			-- room. Override per state with States.<Name>.SpeedScale.
 			--
 			-- Sits between the player's WalkSpeed (10) and SprintSpeed (25),
 			-- which is the whole chase dynamic in one number: walking away from
-			-- this is impossible, sprinting away works but spends stamina. 22
-			-- leaves only a 3 stud/sec sprint margin, so escaping is a sustained
-			-- sprint rather than a jog.
-			WalkSpeed       = 22,
+			-- this is impossible, sprinting away works but spends stamina. 20
+			-- leaves a 5 stud/sec sprint margin -- more breathing room than 22
+			-- did, at the cost of an escape being less of a knife-edge.
+			WalkSpeed       = 20,
 			-- 80, not the 60 inherited from GreyCube. That 60 was tuned when
 			-- vision had no cone and no line-of-sight -- 60 studs in every
 			-- direction, through walls. A 120 degree cone plus LOS cuts the
@@ -56,27 +56,24 @@ return {
 			PursuitDuration = 20,
 			AttackReach     = 5,
 			AttackCooldown  = 1,
-			-- Above the max chase envelope, computed from the HIGHEST stage's
-			-- values since all three scale:
-			--   DetectRadius + WalkSpeed * PursuitDuration
-			--   stage 2: 100 + 24 * 30 = 820
-			-- Recompute whenever DetectRadius, WalkSpeed or PursuitDuration
-			-- change -- this has already been wrong twice. Below the envelope
-			-- the monster leashes mid-legitimate-chase, which reads as it
-			-- randomly giving up rather than as the recovery path it is.
-			LeashDistance   = 1000,
+			-- Above the max chase envelope, computed from the HIGHEST *effective*
+			-- speed, which since Limits.WalkSpeed.Max was removed is the
+			-- EVOLVED stage-2 speed, not the raw stage-2 stat:
+			--   DetectRadius + (WalkSpeed * EvolutionMultiplier) * PursuitDuration
+			--   stage 2 evolved: 100 + (24 * 1.3) * 30 = 100 + 31.2 * 30 = 1036
+			-- Recompute whenever DetectRadius, WalkSpeed, PursuitDuration OR any
+			-- Evolution tier's WalkSpeed multiplier changes -- this has already
+			-- been wrong three times, twice before evolution even existed to
+			-- complicate it. Below the envelope the monster leashes
+			-- mid-legitimate-chase, which reads as it randomly giving up rather
+			-- than as the recovery path it is.
+			LeashDistance   = 1200,
 		},
 		[2] = {
-			-- Must stay above stage 1 (22) or the difficulty ramp inverts at
-			-- midnight. 24 is Limits.WalkSpeed.Max, i.e. the ceiling that keeps
-			-- every monster under SprintSpeed 25 -- so a sprinting player can
-			-- still outrun it, by exactly 1 stud/sec, with no margin for error.
-			--
-			-- The progression is now effectively spent: stage 1 at 22 leaves
-			-- only 2 studs of headroom, and evolution's 1.3x multiplier clamps
-			-- straight to this same 24. Any further late-match escalation has
-			-- to come from a different lever (teleport, minions, a wider
-			-- DetectRadius), not from raw speed.
+			-- Must stay above stage 1 (20) or the difficulty ramp inverts at
+			-- midnight. 24 is now an UNCLAMPED stat, not a value pinned to a
+			-- removed ceiling -- see the WalkSpeed Limits note below for what
+			-- that means once evolution multiplies it.
 			WalkSpeed       = 24,
 			-- Must stay above stage 1 or the difficulty ramp inverts at
 			-- midnight, which is the opposite of what a stage bump is for.
@@ -86,8 +83,21 @@ return {
 	},
 
 	Limits = {
-		-- Under SprintSpeed 25 no matter how evolution stacks.
-		WalkSpeed    = { Min = 4, Max = 24 },
+		-- Max removed on request. WalkSpeed no longer has a ceiling -- Min = 4
+		-- remains so nothing (a future debuff, a mistuned modifier) can stat
+		-- the monster down to a crawl or zero.
+		--
+		-- CONSEQUENCE: at hour 27 (DeepNight, stage 2), the Witching tier's
+		-- 1.3x multiplier now actually applies instead of clamping back to 24
+		-- -- 24 * 1.3 = 31.2, which is FASTER than the player's SprintSpeed
+		-- (25). From that hour on, a player who has been seen can no longer
+		-- out-sprint this monster; going quiet and breaking the trail (see
+		-- Targeting:FollowTrail) becomes the only escape once it commits.
+		-- That may be exactly the late-match escalation you want -- it just
+		-- was not possible before this change, and previously required a
+		-- different lever (teleport, minions) precisely because raw speed was
+		-- capped under SprintSpeed on purpose.
+		WalkSpeed    = { Min = 4 },
 		DetectRadius = { Max = 140 },
 	},
 
@@ -187,9 +197,14 @@ return {
 	-- monster contacts the Torso and Touched on the root is unreliable.
 	Combat = { Mode = "Reach", Lethal = true },
 
+	-- Hour 27 (3 AM) -- the schedule's DeepNight phase (stage 2 since hour 24),
+	-- so this multiplies stage 2's WalkSpeed: 24 * 1.3 = 31.2. No longer
+	-- clamped -- see the Limits.WalkSpeed note above for what that means
+	-- (faster than the player's SprintSpeed) and LeashDistance for the
+	-- envelope this now has to stay above.
 	Evolution = {
 		Tiers = {
-			Witching = { Stats = { WalkSpeed = 1.3 }, Stacks = false },
+			Witching = { AtHour = 27, Stats = { WalkSpeed = 1.3 }, Stacks = false },
 		},
 	},
 

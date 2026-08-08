@@ -46,11 +46,18 @@ local function findSpawnPoints(): { Instance }
 	return points
 end
 
+-- The marker's TOP SURFACE, not its centre. A spawn marker is normally a flat
+-- part lying on the floor, so its CFrame sits half its thickness UNDER the
+-- floor -- spawning there put the rig partly inside the geometry, and a rig
+-- that starts interpenetrating resolves by being pushed through rather than
+-- out. MonsterService adds the rig's own clearance on top of this.
 local function cframeOf(instance: Instance): CFrame
 	if instance:IsA("Model") then
-		return instance:GetPivot()
+		local pivot, size = instance:GetPivot(), instance:GetExtentsSize()
+		return pivot + Vector3.new(0, size.Y / 2, 0)
 	end
-	return (instance :: BasePart).CFrame
+	local part = instance :: BasePart
+	return part.CFrame + Vector3.new(0, part.Size.Y / 2, 0)
 end
 
 -- The spawn point's authored Stage is a FLOOR, not an override: a point

@@ -16,6 +16,7 @@ local CaptureTargets = require(ReplicatedStorage.Modules.Reward.CaptureTargets)
 local MonsterFactory = require(script.Parent.MonsterFactory)
 local MonsterInstance = require(script.Parent.MonsterInstance)
 local MonsterRegistry = require(script.Parent.MonsterRegistry)
+local MonsterEvolution = require(script.Parent.MonsterEvolution)
 
 local MonsterService = {}
 
@@ -39,6 +40,20 @@ end
 -- Model = { Source = "Builder", Builder = "<name>" } in its config.
 -- MonsterFactory pivots, anchors and parents it.
 local MODEL_BUILDERS = {}
+
+-- Studs of air under the rig's feet at spawn. Enough to clear a marker that
+-- overlaps the floor slightly, small enough that the drop is not visible.
+local SPAWN_CLEARANCE = 2
+
+-- How far to raise a model so its lowest point clears the spawn CFrame by
+-- SPAWN_CLEARANCE. Measured off the bounding box rather than a hardcoded rig
+-- height so a taller monster added later needs no edit here.
+local function spawnLift(model: Model): number
+	local pivot = model:GetPivot()
+	local boxCFrame, boxSize = model:GetBoundingBox()
+	local bottom = boxCFrame.Position.Y - boxSize.Y / 2
+	return (pivot.Position.Y - bottom) + SPAWN_CLEARANCE
+end
 
 function MonsterService.Spawn(monsterId: string, cframe: CFrame, stage: number?): Model?
 	if not monstersCanSpawn() then
@@ -73,7 +88,15 @@ function MonsterService.Spawn(monsterId: string, cframe: CFrame, stage: number?)
 	-- Pivot BEFORE parenting. An unanchored rig parented first and positioned
 	-- second is simulated at the origin for a frame and can end up under the
 	-- floor or interpenetrating geometry.
-	model:PivotTo(cframe)
+	--
+	-- Lifted so the rig's LOWEST point starts SPAWN_CLEARANCE above the caller's
+	-- CFrame rather than its pivot sitting on it. The pivot is HumanoidRootPart,
+	-- roughly mid-torso, so pivoting straight onto a floor-level marker buried
+	-- the legs in the floor -- and a rig that spawns already interpenetrating is
+	-- as likely to be resolved downward through the geometry as upward out of
+	-- it, which is the "spawns beneath the world and noclips" case. Dropping a
+	-- short distance onto the floor has no such ambiguity.
+	model:PivotTo(cframe + Vector3.new(0, spawnLift(model), 0))
 	model.Parent = workspace
 
 	local instance = MonsterInstance.new(model, monsterId, stage)
@@ -81,6 +104,14 @@ function MonsterService.Spawn(monsterId: string, cframe: CFrame, stage: number?)
 		model:Destroy()
 		return nil
 	end
+
+	-- Blueprint §18: a monster spawned after an evolution hour has already
+	-- passed must get the tier immediately -- it will never hear the
+	-- MatchTimeEvents dispatch for an hour the clock is already past.
+	-- Idempotent against that dispatch reaching this same monster later (a
+	-- spawn racing the scheduled event in the same hour), so no ordering
+	-- requirement between this and MonsterRegistry.Add below.
+	MonsterEvolution.ApplyCurrentTiers(instance)
 
 	MonsterRegistry.Add(model, instance)
 

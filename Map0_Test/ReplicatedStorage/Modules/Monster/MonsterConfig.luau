@@ -198,6 +198,24 @@ function MonsterConfig.Validate()
 			end
 		end
 
+		-- AtHour drives MonsterEvolution's MatchTimeEvents registration and its
+		-- spawn-time catch-up scan (§18: a monster spawned after the hour must
+		-- get the tier applied at spawn, not rely on having heard the event).
+		-- A malformed one either mis-schedules the event or breaks the
+		-- catch-up scan's ordering -- loud boot failure beats a monster that
+		-- silently never evolves.
+		local evolution = definition.Evolution
+		if evolution and evolution.Tiers then
+			for tierName, tier in pairs(evolution.Tiers) do
+				assert(type(tier) == "table",
+					("MonsterConfig: '%s' Evolution.Tiers.%s must be a table"):format(id, tierName))
+				assert(type(tier.AtHour) == "number",
+					("MonsterConfig: '%s' Evolution.Tiers.%s.AtHour must be a number"):format(id, tierName))
+				assert(tier.Stats == nil or type(tier.Stats) == "table",
+					("MonsterConfig: '%s' Evolution.Tiers.%s.Stats must be a table"):format(id, tierName))
+			end
+		end
+
 		assert(type(definition.Stats) == "table",
 			("MonsterConfig: '%s' has no Stats table -- every monster declares its own"):format(id))
 		assert(MonsterConfig.Get(id, 1),

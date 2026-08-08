@@ -16,10 +16,10 @@ local modules = {
 	Aggression = require(script.Aggression),
 	Navigation = require(script.Navigation),
 	Combat     = require(script.Combat),
+	Evolution  = require(script.Evolution),
 }
 
 local planned = {
-	Evolution    = "step 10",
 	Presentation = "step 11",
 	Abilities    = "step 11",
 	Interaction  = "step 11",

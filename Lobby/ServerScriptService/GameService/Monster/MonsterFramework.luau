@@ -14,6 +14,7 @@ local MonsterConfig = require(ReplicatedStorage.Modules.Monster.MonsterConfig)
 local Components = require(script.Parent.Components)
 local MonsterRegistry = require(script.Parent.MonsterRegistry)
 local MonsterScheduler = require(script.Parent.MonsterScheduler)
+local MonsterEvolution = require(script.Parent.MonsterEvolution)
 local EncounterDirector = require(script.Parent.EncounterDirector)
 
 local MonsterFramework = {}
@@ -53,9 +54,12 @@ function MonsterFramework.Start()
 	reportPlannedComponents()
 
 	-- Registry before scheduler (the scheduler iterates it), both before the
-	-- director (it spawns into them).
+	-- director (it spawns into them). Evolution before the director too: its
+	-- MatchTimeEvents.Register calls must land before the director spawns
+	-- anything that ApplyCurrentTiers would need to catch up.
 	MonsterRegistry.Start()
 	MonsterScheduler.Start()
+	MonsterEvolution.Start()
 	EncounterDirector.Start()
 end
 
