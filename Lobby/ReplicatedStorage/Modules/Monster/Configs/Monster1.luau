@@ -29,6 +29,11 @@ return {
 		-- D7: pairs with Check -- a monster that finishes investigating a
 		-- stimulus releases into Wander rather than standing still.
 		"CanWander",
+		-- Phase F: the actual default now. Scores above Wander (0.35 vs 0.3),
+		-- so this monster patrols the map's IsPatrolPoint network and only
+		-- falls back to aimless Wander if the graph has nothing to offer it
+		-- (no points authored, or none reachable from wherever it is).
+		"CanPatrol",
 	},
 
 	Stats = {
@@ -114,6 +119,11 @@ return {
 		-- always outranks this regardless of weight.
 		Check  = { Weight = 1.0, TickRate = 0.1 },
 		Wander = { Weight = 1.0, TickRate = 0.5 },
+		-- Required for Patrol to ever be a Brain candidate at all -- CanPatrol
+		-- only grants the CAPABILITY; without a weight row here the state is
+		-- never added to Brain.candidates, same rule every state in this
+		-- table follows (see Attack's identical note below).
+		Patrol = { Weight = 1.0, TickRate = 0.5 },
 		-- D7: required for Attack to ever be a Brain candidate at all --
 		-- CanAttack only grants the CAPABILITY (and the Combat component);
 		-- without a weight row here the state is never added to

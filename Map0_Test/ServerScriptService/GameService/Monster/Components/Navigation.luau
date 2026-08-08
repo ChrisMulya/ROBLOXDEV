@@ -27,6 +27,10 @@ local MIN_ROAM_DISTANCE = 2
 -- far that a point over a stairwell resolves to the storey below.
 local GROUND_PROBE_UP = 6
 local GROUND_PROBE_DOWN = 24
+-- Height both ends of a line-of-sight test are lifted to. Patrol markers sit on
+-- the floor, and a floor-to-floor ray grazes the ground itself on any slope or
+-- step and reports a wall that isn't there. Chest height on this rig.
+local LOS_HEIGHT = 3
 
 function Navigation.new(instance, config)
 	local navConfig = config.Navigation or {}
@@ -130,6 +134,36 @@ function Navigation:ResolveReachable(point: Vector3): Vector3?
 	end
 
 	return ground.Position
+end
+
+-- Is there unobstructed space between two points? Full 360 degrees -- this is
+-- deliberately NOT a vision test and takes no facing into account. It answers
+-- "is that thing behind a wall", which is what Patrol needs to stop picking a
+-- destination on the far side of one.
+--
+-- Distinct from VisionSensor's LOS check, which is about whether the monster
+-- can SEE a target and is gated by a FOV cone. Sharing one function would
+-- eventually mean one of the two callers silently getting the other's cone.
+--
+-- `ignore` is the destination marker itself: an author who leaves CanCollide on
+-- an invisible marker would otherwise have that marker block the ray to itself.
+-- Hitting it means everything up to it was clear, so that reads as visible.
+function Navigation:HasLineOfSight(from: Vector3, to: Vector3, ignore: Instance?): boolean
+	local origin = from + Vector3.new(0, LOS_HEIGHT, 0)
+	local target = to + Vector3.new(0, LOS_HEIGHT, 0)
+	local delta = target - origin
+	if delta.Magnitude < 1e-3 then
+		return true
+	end
+
+	local hit = workspace:Raycast(origin, delta, self.roamParams)
+	if not hit then
+		return true
+	end
+	if ignore and (hit.Instance == ignore or hit.Instance:IsDescendantOf(ignore)) then
+		return true
+	end
+	return false
 end
 
 -- A random point within radius of origin that the monster can reach and stand

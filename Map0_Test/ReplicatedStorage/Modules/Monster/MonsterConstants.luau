@@ -18,6 +18,12 @@ MonsterConstants.Attributes = {
 	AIState         = "AIState",
 	AggressionLevel = "AggressionLevel",
 	IsMonsterSpawn  = "IsMonsterSpawn",
+	-- Phase F: hand-placed navigation network. Same convention as
+	-- IsMonsterSpawn -- an invisible BasePart carrying the attribute, plus an
+	-- optional MonsterId attribute to restrict a point to one monster type.
+	-- See PatrolGraph and States/Patrol.
+	IsPatrolPoint   = "IsPatrolPoint",
+	IsSearchPoint   = "IsSearchPoint",
 }
 
 -- Used when an IsMonsterSpawn point carries no MonsterId attribute.
@@ -67,6 +73,31 @@ MonsterConstants.DefaultSearchPause = 1.2
 MonsterConstants.DefaultWanderRadius = 20
 MonsterConstants.DefaultWanderPause  = 1.5
 MonsterConstants.DefaultHysteresis       = 1.1
+
+-- Phase F: Config.Navigation.Patrol overrides any of these per monster. See
+-- States/Patrol and plans/create-a-read-only-implementation-calm-ripple.md §20.
+MonsterConstants.DefaultPatrolLinkRadius         = 60
+MonsterConstants.DefaultPatrolForwardConeDegrees = 45
+MonsterConstants.DefaultPatrolReverseCutoff      = -0.5
+MonsterConstants.DefaultPatrolHistoryLength      = 2
+-- Longer than any single leg should plausibly take; exists only to recover
+-- from a path a closed door or a body-blocking player made impossible.
+MonsterConstants.DefaultPatrolLegTimeout         = 30
+-- Chance to stand still on reaching a PatrolPoint, and how long for. A monster
+-- that walks its route at a constant pace reads as a patrolling machine; one
+-- that occasionally stops to look around reads as something deciding where to
+-- go next. Also gives a hiding player a window where the monster is stationary
+-- and audible-adjacent rather than always closing distance.
+MonsterConstants.DefaultPatrolPointPauseChance   = 0.25
+MonsterConstants.DefaultPatrolPointPauseMin      = 3
+MonsterConstants.DefaultPatrolPointPauseMax      = 5
+MonsterConstants.DefaultPatrolSearchChance       = 0.3
+MonsterConstants.DefaultPatrolSearchPointRadius  = 40
+MonsterConstants.DefaultPatrolSearchScanInterval = 1
+MonsterConstants.DefaultPatrolSearchDurationMin  = 10
+MonsterConstants.DefaultPatrolSearchDurationMax  = 20
+MonsterConstants.DefaultPatrolSearchSweepRadius  = 12
+MonsterConstants.DefaultPatrolSearchPointCooldown = 90
 
 -- Bands the AggressionLevel attribute is quantised into, highest Min first.
 -- The raw scalar is never replicated: it would let a client read the exact

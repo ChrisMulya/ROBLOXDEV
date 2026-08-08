@@ -15,6 +15,7 @@ local Components = require(script.Parent.Components)
 local MonsterRegistry = require(script.Parent.MonsterRegistry)
 local MonsterScheduler = require(script.Parent.MonsterScheduler)
 local MonsterEvolution = require(script.Parent.MonsterEvolution)
+local PatrolGraph = require(script.Parent.PatrolGraph)
 local EncounterDirector = require(script.Parent.EncounterDirector)
 
 local MonsterFramework = {}
@@ -56,10 +57,14 @@ function MonsterFramework.Start()
 	-- Registry before scheduler (the scheduler iterates it), both before the
 	-- director (it spawns into them). Evolution before the director too: its
 	-- MatchTimeEvents.Register calls must land before the director spawns
-	-- anything that ApplyCurrentTiers would need to catch up.
+	-- anything that ApplyCurrentTiers would need to catch up. PatrolGraph
+	-- before the director for the same shape of reason: a monster that spawns
+	-- before the graph has scanned the map would find zero PatrolPoints and
+	-- fall through to Wander for its whole first Brain tick.
 	MonsterRegistry.Start()
 	MonsterScheduler.Start()
 	MonsterEvolution.Start()
+	PatrolGraph.Start()
 	EncounterDirector.Start()
 end
 
