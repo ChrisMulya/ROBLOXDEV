@@ -50,6 +50,30 @@ PlayerStats.MinStaminaToSprint = 15   -- can't start sprinting below this
 -- regen starts anyway -- holding Shift shouldn't punish a player who stopped.
 PlayerStats.StaminaIdleRegenDelay = 3
 
+-- ===== Flashlight =====
+-- BASE values -- the level-1 flashlight every player starts with. Read by
+-- Player/FlashlightService when it builds the beam.
+--
+-- Tuned against the match's own 6-7 PM lighting: at the original Angle 50 /
+-- Brightness 3 the beam was a wide, dim, warm pool indistinguishable from the
+-- sunset ambient -- it read as "the flashlight is broken" even though it was
+-- lit. A narrow cone in a near-white tint is what makes it read as a
+-- flashlight rather than as ambience.
+--
+-- A "Better Flashlight" upgrade must NOT be PlayerStats.Set on these. This
+-- table is required on both server and client, so a Set is one value shared by
+-- every player on the server -- upgrading one player would upgrade the whole
+-- lobby. See the header, and the Stamina/PlayerRuntimeStats split for the
+-- same lesson learned the hard way. A per-player upgrade needs per-player
+-- storage (a Player attribute, or the reward profile) with these as the
+-- fallback when the player has no upgrade.
+-- Range is capped by the engine at 120 -- Roblox silently clamps
+-- SpotLight.Range to that, so an upgrade tier above 120 buys nothing. Angle is
+-- likewise clamped to 180. Verified by setting 151 and reading back 120.
+PlayerStats.FlashlightRange      = 80  -- studs the beam reaches (engine max 120)
+PlayerStats.FlashlightBrightness = 4   -- SpotLight Brightness (no engine cap)
+PlayerStats.FlashlightAngle      = 32  -- degrees, full cone width (engine max 180)
+
 -- ===== Money =====
 PlayerStats.StartingCash = 100
 

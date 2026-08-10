@@ -17,17 +17,17 @@ local MatchSchedule = {}
 
 MatchSchedule.Schedules = {
 	Default = {
-		StartHour = 16, -- 4 PM
+		StartHour = 18, -- 6 PM
 		EndHour = 30, -- 6 AM the next day
 		Segments = {
-			{ UntilHour = 19, SecondsPerHour = 60 }, -- 4 PM -> 7 PM
+			{ UntilHour = 19, SecondsPerHour = 60 }, -- 6 PM -> 7 PM
 			{ UntilHour = 30, SecondsPerHour = 75 }, -- 7 PM -> 6 AM
 		},
 	},
 	-- Fast loop for Studio verification -- ~42s total instead of 840s.
 	-- Never used by a real mode row; require it by scheduleId explicitly.
 	Debug = {
-		StartHour = 16,
+		StartHour = 18,
 		EndHour = 30,
 		Segments = {
 			{ UntilHour = 30, SecondsPerHour = 3 },

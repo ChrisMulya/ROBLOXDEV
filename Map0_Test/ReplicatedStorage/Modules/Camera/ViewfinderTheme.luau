@@ -15,6 +15,17 @@ ViewfinderTheme.BracketMarginY = 0.22
 ViewfinderTheme.GhostMaxScale = 1.8   -- how much bigger the ghost ring grows at full blur
 ViewfinderTheme.GhostMinTransparency = 0.1 -- most visible the ghost ring ever gets (0 = fully opaque)
 
+-- Reticle ring, in priority order (see CameraViewfinder.applyReticleColor):
+--   Processing -- the whole exposure window (see CameraSession.Capture). The
+--                 "hold still" cue; covers exactly the span during which
+--                 moving forces the shot to Weak. Outranks Stable, so the
+--                 ring does not flicker green mid-capture.
+--   Stable     -- standing still, i.e. a shot taken now would qualify Strong.
+--   (base)     -- moving; a shot now is Weak.
+ViewfinderTheme.ReticleColor = Color3.fromRGB(255, 255, 255)
+ViewfinderTheme.ReticleStableColor = Color3.fromRGB(64, 255, 118)
+ViewfinderTheme.ReticleProcessingColor = Color3.fromRGB(255, 213, 0)
+
 ViewfinderTheme.LabelFont = Enum.Font.Code
 ViewfinderTheme.LabelTextSize = 16
 ViewfinderTheme.LabelColor = Color3.fromRGB(255, 255, 255)

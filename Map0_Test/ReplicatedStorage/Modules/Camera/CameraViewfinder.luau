@@ -18,6 +18,7 @@ local CameraViewfinder = {}
 local screenGui = nil
 local reticleGhostRing = nil
 local reticleGhostStroke = nil
+local reticleCircleStroke = nil
 local recLabel = nil
 local settingsLabel = nil
 local scanlinesContainer = nil
@@ -118,12 +119,13 @@ local function createReticle()
 	corner.Parent = circle
 
 	local stroke = Instance.new("UIStroke")
+	stroke.Name = "CircleStroke"
 	stroke.Thickness = 2
-	stroke.Color = Color3.new(1, 1, 1)
+	stroke.Color = ViewfinderTheme.ReticleColor
 	stroke.Transparency = 0.3
 	stroke.Parent = circle
 
-	return reticle, ghostRing, ghostStroke
+	return reticle, ghostRing, ghostStroke, stroke
 end
 
 local function createCornerLabel(name, corner)
@@ -231,10 +233,11 @@ local function ensureBuilt()
 	createBracket("BottomLeft").Parent = screenGui
 	createBracket("BottomRight").Parent = screenGui
 
-	local reticle, ghostRing, ghostStroke = createReticle()
+	local reticle, ghostRing, ghostStroke, circleStroke = createReticle()
 	reticle.Parent = screenGui
 	reticleGhostRing = ghostRing
 	reticleGhostStroke = ghostStroke
+	reticleCircleStroke = circleStroke
 
 	recLabel = createCornerLabel("RecLabel", "TopLeft")
 	recLabel.Parent = screenGui
@@ -310,6 +313,15 @@ function CameraViewfinder.Show(effectsSettings, viewfinderSettings)
 	applyScanlines(effectsSettings.Scanlines)
 	applyGrain(effectsSettings.Grain)
 
+	-- The reticle is built once and reused across sessions, so its colour
+	-- outlives the session that set it. Reset here rather than relying on the
+	-- previous session having cleared it -- a capture interrupted by an
+	-- unequip/death would otherwise leave every later session starting yellow.
+	-- Stability is seeded by CameraSession.Enter right after this and then
+	-- driven per-frame, so starting it false costs at most one frame of white.
+	CameraViewfinder.SetProcessing(false)
+	CameraViewfinder.SetStable(false)
+
 	screenGui.Enabled = true
 end
 
@@ -331,6 +343,43 @@ function CameraViewfinder.SetBlurAlpha(alpha: number)
 
 	local scale = 1 + (ViewfinderTheme.GhostMaxScale - 1) * alpha
 	reticleGhostRing.Size = UDim2.new(scale, 0, scale, 0)
+end
+
+-- Reticle colour is derived from two independent inputs rather than written
+-- directly by each caller: processing (CameraSession.Capture) and stability
+-- (CameraState.OnStableChanged, per-frame). Whoever fires last would
+-- otherwise win, and a stability change mid-capture would flicker the ring
+-- off yellow. Priority is fixed here, in one place.
+local reticleProcessing = false
+local reticleStable = false
+
+local function applyReticleColor()
+	if not reticleCircleStroke then return end
+
+	if reticleProcessing then
+		reticleCircleStroke.Color = ViewfinderTheme.ReticleProcessingColor
+	elseif reticleStable then
+		reticleCircleStroke.Color = ViewfinderTheme.ReticleStableColor
+	else
+		reticleCircleStroke.Color = ViewfinderTheme.ReticleColor
+	end
+end
+
+-- Held for the duration of a capture's exposure -- the "hold still" cue.
+-- Driven by CameraSession.Capture, which owns the window.
+--
+-- Idempotent and safe before the viewfinder is built (Show() creates it
+-- lazily), so callers never have to order themselves around that.
+function CameraViewfinder.SetProcessing(active: boolean)
+	reticleProcessing = active
+	applyReticleColor()
+end
+
+-- "A shot taken right now would be Strong." Driven per-frame off
+-- CameraState's stability, which CameraClient already computes.
+function CameraViewfinder.SetStable(isStable: boolean)
+	reticleStable = isStable
+	applyReticleColor()
 end
 
 return CameraViewfinder

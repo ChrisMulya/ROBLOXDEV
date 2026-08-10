@@ -145,7 +145,16 @@ local function updateAuthoredRoute(instance, navigation, route, dt: number)
 		return
 	end
 
-	if navigation:MoveTo(target, dt) then
+	local arrived, stuck = navigation:MoveTo(target, dt)
+	if stuck then
+		-- Same treatment as the graph route below: skip past it rather than
+		-- grinding, and let it be retried on the next lap once whatever
+		-- blocked it (a closed door, a player body-block) has cleared.
+		memory.authoredIndex += 1
+		return
+	end
+
+	if arrived then
 		memory.authoredIndex += 1
 		if memory.authoredIndex > #route then
 			memory.authoredIndex = 1
@@ -506,7 +515,16 @@ local function updateRoute(instance, navigation, memory, dt: number)
 			return
 		end
 
-		if not navigation:MoveTo(pos, dt) then
+		local arrived, stuck = navigation:MoveTo(pos, dt)
+		if stuck then
+			-- Same abandon path as LegTimeout above, just faster to trigger:
+			-- pressed against something rather than merely slow. History, not
+			-- the permanent unreachable-cache -- whatever blocked it may clear.
+			pushHistory(cfg, memory, memory.target)
+			memory.target = nil
+			return
+		end
+		if not arrived then
 			-- Still travelling: this tick's movement command is issued, done.
 			return
 		end
@@ -588,7 +606,15 @@ local function updateSearch(instance, navigation, memory, dt: number)
 		end
 	end
 
-	if navigation:MoveTo(memory.searchPoint, dt) then
+	local arrived, stuck = navigation:MoveTo(memory.searchPoint, dt)
+	if stuck then
+		-- Same nil-and-re-roll as an unreachable pick above -- this sweep
+		-- point turned out to be unwalkable in practice even though it passed
+		-- PickRoamPoint's isolated reachability check.
+		memory.searchPoint = nil
+		return
+	end
+	if arrived then
 		memory.searchPoint = nil
 		memory.searchPauseUntil = now + MonsterConstants.DefaultSearchPause
 	end
@@ -602,7 +628,15 @@ local function updateDivert(instance, navigation, memory, dt: number)
 		return
 	end
 
-	if navigation:MoveTo(memory.divertPosition, dt) then
+	local diverted, divertStuck = navigation:MoveTo(memory.divertPosition, dt)
+	if divertStuck then
+		-- Can't actually reach this SearchPoint -- resume the route rather
+		-- than grinding on it. No cooldown: it was never visited, so there
+		-- is nothing to cool down from, same as an unreachable roll.
+		resumeRoute(instance, navigation, memory, dt)
+		return
+	end
+	if diverted then
 		local cfg = patrolCfg(instance)
 		local minSeconds = cfg.SearchDurationMin or MonsterConstants.DefaultPatrolSearchDurationMin
 		local maxSeconds = cfg.SearchDurationMax or MonsterConstants.DefaultPatrolSearchDurationMax

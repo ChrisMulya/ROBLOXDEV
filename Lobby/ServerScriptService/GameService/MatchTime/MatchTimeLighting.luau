@@ -1,5 +1,5 @@
 -- The Match Time System's proving consumer: drives Lighting.ClockTime from
--- the match clock so the sky actually moves 4 PM -> 6 AM.
+-- the match clock so the sky actually moves 6 PM -> 6 AM.
 --
 -- Lighting is currently unowned -- nothing else in the repo touches
 -- ClockTime/TimeOfDay/Atmosphere -- so this is zero-conflict. It is also the

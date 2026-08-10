@@ -146,7 +146,21 @@ function Check.Update(instance, dt: number)
 	end
 
 	if memory.phase == "travel" then
-		if navigation:MoveTo(record.Position, dt) then
+		local arrived, stuck = navigation:MoveTo(record.Position, dt)
+		if stuck then
+			-- Can't physically reach the stimulus position -- searching
+			-- nearby wouldn't help, since PickRoamPoint validates points
+			-- around record.Position in isolation, not reachability from
+			-- wherever the monster is actually stuck. Give up on THIS
+			-- investigation the same way a completed one ends, so Wander or
+			-- Patrol picks a real destination from where the monster is now
+			-- rather than grinding on the same wall for the rest of Check's
+			-- eligibility window.
+			memory.investigatedAt = memory.activeAt
+			memory.phase = nil
+			return
+		end
+		if arrived then
 			memory.phase = "hold"
 			memory.holdUntil = now
 				+ (config.InvestigationHold or MonsterConstants.DefaultInvestigationHold)

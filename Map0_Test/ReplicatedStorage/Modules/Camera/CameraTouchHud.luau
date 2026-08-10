@@ -76,8 +76,10 @@ local function ensureBuilt(onOpenPressed: () -> (), onPhotoPressed: () -> ())
 	-- actually starts.
 	screenGui:SetAttribute("KeepDuringCamera", true)
 
-	-- Middle-right, above the default jump button.
-	openButton = buildCircleButton("OpenButton", "Camera", Vector2.new(1, 0.5), UDim2.new(1, -24, 0.5, 0))
+	-- Middle-right, above the default jump button. Offset 60px below screen
+	-- centre (not dead-centre) so MobileFlashlightButton's "LIGHT" button has
+	-- room to sit directly above it without the two touching.
+	openButton = buildCircleButton("OpenButton", "Camera", Vector2.new(1, 0.5), UDim2.new(1, -24, 0.5, 60))
 	openButton.Parent = screenGui
 	openButton.Activated:Connect(onOpenPressed)
 

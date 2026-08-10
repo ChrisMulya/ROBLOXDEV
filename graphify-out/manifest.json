@@ -10,14 +10,9 @@
     "semantic_hash": "d06087e0db8e86533f7a194db5bf086f"
   },
   "MAINHANDOFF.md": {
-    "mtime": 1786028182.7643309,
-    "ast_hash": "fc4c491c457371b000b71194a47235f8",
-    "semantic_hash": "fc4c491c457371b000b71194a47235f8"
-  },
-  "MONSTERS.md": {
-    "mtime": 1785157166.5743144,
-    "ast_hash": "6a3c27364a32aedc67d9199879cb8b60",
-    "semantic_hash": "6a3c27364a32aedc67d9199879cb8b60"
+    "mtime": 1786226310.041708,
+    "ast_hash": "bab4c8fcb57cf5f7880a15270d97b9de",
+    "semantic_hash": "bab4c8fcb57cf5f7880a15270d97b9de"
   },
   "PHOTO_SCORING.md": {
     "mtime": 1785239369.8972657,
@@ -114,11 +109,6 @@
     "ast_hash": "218902ce33052098119b58608d92e6ce",
     "semantic_hash": "218902ce33052098119b58608d92e6ce"
   },
-  "Lobby/ReplicatedStorage/Modules/Monster/MonsterStats.luau": {
-    "mtime": 1786025451.7703927,
-    "ast_hash": "d60399e30fb8e3231f5d03cc7ff0e9b0",
-    "semantic_hash": "d60399e30fb8e3231f5d03cc7ff0e9b0"
-  },
   "Lobby/ReplicatedStorage/Modules/Objective/ObjectiveStateClient.luau": {
     "mtime": 1785265817.5157125,
     "ast_hash": "12fa669592ca00cb9c4c3d97e04ca7ad",
@@ -145,9 +135,9 @@
     "semantic_hash": "3fcec8aaa313e7aa2f9d6df0f3da988c"
   },
   "Lobby/ReplicatedStorage/Modules/PlayerStats.luau": {
-    "mtime": 1785863986.797544,
-    "ast_hash": "9fedad161d5d42dc9e3114895ad6c283",
-    "semantic_hash": "9fedad161d5d42dc9e3114895ad6c283"
+    "mtime": 1786201426.6819942,
+    "ast_hash": "06055c40ce8285c0883a3a8cc6edaa69",
+    "semantic_hash": "06055c40ce8285c0883a3a8cc6edaa69"
   },
   "Lobby/ReplicatedStorage/Modules/Reward/CaptureRules.luau": {
     "mtime": 1785261618.1911,
@@ -205,14 +195,14 @@
     "semantic_hash": "5988ee203e74b5b1afdc91e65868a9fb"
   },
   "Lobby/ReplicatedStorage/Modules/Shared/Cooldown.luau": {
-    "mtime": 1785161243.7805085,
-    "ast_hash": "69b2b1bd876d09f7de54b9821ba6dfba",
-    "semantic_hash": "69b2b1bd876d09f7de54b9821ba6dfba"
+    "mtime": 1786180242.8963861,
+    "ast_hash": "7b31640a27511971508bc9e12781e0c4",
+    "semantic_hash": "7b31640a27511971508bc9e12781e0c4"
   },
   "Lobby/ReplicatedStorage/Modules/Shared/MatchConfig.luau": {
-    "mtime": 1786026065.2581904,
-    "ast_hash": "304c2a4bef7d13807c77828b1e398c59",
-    "semantic_hash": "304c2a4bef7d13807c77828b1e398c59"
+    "mtime": 1786184544.03573,
+    "ast_hash": "c744a7e8b0dcfee24341b00f8e47d9ac",
+    "semantic_hash": "c744a7e8b0dcfee24341b00f8e47d9ac"
   },
   "Lobby/ReplicatedStorage/Modules/Shared/MatchResultCodes.luau": {
     "mtime": 1786023452.820091,
@@ -240,7 +230,7 @@
     "semantic_hash": "5d2c52121f0765744357e3e29dc16cd0"
   },
   "Lobby/ReplicatedStorage/Modules/Shared/Remotes.luau": {
-    "mtime": 1785938000.637232,
+    "mtime": 1786201426.618144,
     "ast_hash": "9d3bf81acbcd81a2bdd0f8465136b36c",
     "semantic_hash": "9d3bf81acbcd81a2bdd0f8465136b36c"
   },
@@ -265,9 +255,9 @@
     "semantic_hash": "f8ec5cda636155c90518c418724cf35e"
   },
   "Lobby/ReplicatedStorage/Modules/Shared/Units.luau": {
-    "mtime": 1785175450.359693,
-    "ast_hash": "34168f13b66180218f2afaca97b1fcaf",
-    "semantic_hash": "34168f13b66180218f2afaca97b1fcaf"
+    "mtime": 1786184544.1151898,
+    "ast_hash": "61fb6d12176cc495340b92053256b9c0",
+    "semantic_hash": "61fb6d12176cc495340b92053256b9c0"
   },
   "Lobby/ReplicatedStorage/Modules/ShopPrices.luau": {
     "mtime": 1785151699.0241785,
@@ -335,9 +325,9 @@
     "semantic_hash": "65bf57ee30281fc232b0d38eba920fd3"
   },
   "Lobby/ServerScriptService/GameService/Boot/GameBoot.luau": {
-    "mtime": 1786026063.393372,
-    "ast_hash": "d4511994901c24a6ec8cb0694e7c9400",
-    "semantic_hash": "d4511994901c24a6ec8cb0694e7c9400"
+    "mtime": 1786201426.3551402,
+    "ast_hash": "3fd5786b21ffab68b4a8cb84f6dc5f12",
+    "semantic_hash": "3fd5786b21ffab68b4a8cb84f6dc5f12"
   },
   "Lobby/ServerScriptService/GameService/Boot/LobbyBoot.luau": {
     "mtime": 1785862723.812295,
@@ -385,9 +375,9 @@
     "semantic_hash": "48743ff0ce62f86f61c893c9c438b4e1"
   },
   "Lobby/ServerScriptService/GameService/Death/DeathService.luau": {
-    "mtime": 1786023254.069292,
-    "ast_hash": "6c6eab42d3e7ba038de3572c89d2ce17",
-    "semantic_hash": "6c6eab42d3e7ba038de3572c89d2ce17"
+    "mtime": 1786180242.971149,
+    "ast_hash": "d5af1cc2b160cd7d8e8567bb1b7ba34e",
+    "semantic_hash": "d5af1cc2b160cd7d8e8567bb1b7ba34e"
   },
   "Lobby/ServerScriptService/GameService/Flash/FlashEvents.luau": {
     "mtime": 1785261498.5541143,
@@ -459,40 +449,15 @@
     "ast_hash": "592f4f81f856070e6b2acd655859d1e2",
     "semantic_hash": "592f4f81f856070e6b2acd655859d1e2"
   },
-  "Lobby/ServerScriptService/GameService/Monster/Behaviors/GreyCube.luau": {
-    "mtime": 1785157521.6440651,
-    "ast_hash": "502ebee7ed24e48a1a3d2471abc1eeab",
-    "semantic_hash": "502ebee7ed24e48a1a3d2471abc1eeab"
-  },
-  "Lobby/ServerScriptService/GameService/Monster/MonsterAgent.luau": {
-    "mtime": 1785157944.7344992,
-    "ast_hash": "1ba934023cbad1fae86d1e2ce32cac1c",
-    "semantic_hash": "1ba934023cbad1fae86d1e2ce32cac1c"
-  },
-  "Lobby/ServerScriptService/GameService/Monster/MonsterDamage.luau": {
-    "mtime": 1785281239.681473,
-    "ast_hash": "79295eea6e42ecad3e66458e56a63a8a",
-    "semantic_hash": "79295eea6e42ecad3e66458e56a63a8a"
-  },
-  "Lobby/ServerScriptService/GameService/Monster/MonsterMovement.luau": {
-    "mtime": 1785157742.234416,
-    "ast_hash": "8036e86de9ce2eaf4dafdf294adf94e3",
-    "semantic_hash": "8036e86de9ce2eaf4dafdf294adf94e3"
-  },
-  "Lobby/ServerScriptService/GameService/Monster/MonsterSensing.luau": {
-    "mtime": 1785157497.3107922,
-    "ast_hash": "add831a1b22cea49fbe1b936915434a9",
-    "semantic_hash": "add831a1b22cea49fbe1b936915434a9"
-  },
   "Lobby/ServerScriptService/GameService/Monster/MonsterService.luau": {
-    "mtime": 1786024339.795156,
-    "ast_hash": "ecc2ff3503da32d355ab0e627a269c9f",
-    "semantic_hash": "ecc2ff3503da32d355ab0e627a269c9f"
+    "mtime": 1786211147.0404563,
+    "ast_hash": "7ebc651985c022cbe99f7596346f2b57",
+    "semantic_hash": "7ebc651985c022cbe99f7596346f2b57"
   },
   "Lobby/ServerScriptService/GameService/Monster/States/Chase.luau": {
-    "mtime": 1785157754.2268932,
-    "ast_hash": "46dc025695891313a94011467b001394",
-    "semantic_hash": "46dc025695891313a94011467b001394"
+    "mtime": 1786203885.6269863,
+    "ast_hash": "a949d96e4c8cfb7935de289904e0ef0a",
+    "semantic_hash": "a949d96e4c8cfb7935de289904e0ef0a"
   },
   "Lobby/ServerScriptService/GameService/Objective/ObjectiveRegistry.luau": {
     "mtime": 1785281233.4971192,
@@ -635,9 +600,9 @@
     "semantic_hash": "78ba84d8a06e84739fb7f9e7d83ef380"
   },
   "Lobby/StarterPlayerScripts/Playermovementcontroller.local.luau": {
-    "mtime": 1786027861.3548694,
-    "ast_hash": "ce2ade296832804f5829cb02694f5bc4",
-    "semantic_hash": "ce2ade296832804f5829cb02694f5bc4"
+    "mtime": 1786201426.2252083,
+    "ast_hash": "00fb4d57bb899541ac4d02430fc3e5bc",
+    "semantic_hash": "00fb4d57bb899541ac4d02430fc3e5bc"
   },
   "Lobby/StarterPlayerScripts/ShotFeedbackHandler.local.luau": {
     "mtime": 1785265801.360208,
@@ -729,11 +694,6 @@
     "ast_hash": "218902ce33052098119b58608d92e6ce",
     "semantic_hash": "218902ce33052098119b58608d92e6ce"
   },
-  "Map0_Test/ReplicatedStorage/Modules/Monster/MonsterStats.luau": {
-    "mtime": 1786025458.3192694,
-    "ast_hash": "d60399e30fb8e3231f5d03cc7ff0e9b0",
-    "semantic_hash": "d60399e30fb8e3231f5d03cc7ff0e9b0"
-  },
   "Map0_Test/ReplicatedStorage/Modules/Objective/ObjectiveStateClient.luau": {
     "mtime": 1785686141.9543614,
     "ast_hash": "12fa669592ca00cb9c4c3d97e04ca7ad",
@@ -765,9 +725,9 @@
     "semantic_hash": "3fcec8aaa313e7aa2f9d6df0f3da988c"
   },
   "Map0_Test/ReplicatedStorage/Modules/PlayerStats.luau": {
-    "mtime": 1785863948.3871508,
-    "ast_hash": "9fedad161d5d42dc9e3114895ad6c283",
-    "semantic_hash": "9fedad161d5d42dc9e3114895ad6c283"
+    "mtime": 1786201295.2303572,
+    "ast_hash": "06055c40ce8285c0883a3a8cc6edaa69",
+    "semantic_hash": "06055c40ce8285c0883a3a8cc6edaa69"
   },
   "Map0_Test/ReplicatedStorage/Modules/Reward/CaptureRules.luau": {
     "mtime": 1785686141.9322972,
@@ -825,14 +785,14 @@
     "semantic_hash": "5988ee203e74b5b1afdc91e65868a9fb"
   },
   "Map0_Test/ReplicatedStorage/Modules/Shared/Cooldown.luau": {
-    "mtime": 1785686141.894516,
-    "ast_hash": "69b2b1bd876d09f7de54b9821ba6dfba",
-    "semantic_hash": "69b2b1bd876d09f7de54b9821ba6dfba"
+    "mtime": 1786180231.846831,
+    "ast_hash": "7b31640a27511971508bc9e12781e0c4",
+    "semantic_hash": "7b31640a27511971508bc9e12781e0c4"
   },
   "Map0_Test/ReplicatedStorage/Modules/Shared/MatchConfig.luau": {
-    "mtime": 1786026074.478363,
-    "ast_hash": "304c2a4bef7d13807c77828b1e398c59",
-    "semantic_hash": "304c2a4bef7d13807c77828b1e398c59"
+    "mtime": 1786184527.669991,
+    "ast_hash": "c744a7e8b0dcfee24341b00f8e47d9ac",
+    "semantic_hash": "c744a7e8b0dcfee24341b00f8e47d9ac"
   },
   "Map0_Test/ReplicatedStorage/Modules/Shared/MatchResultCodes.luau": {
     "mtime": 1786023506.7268054,
@@ -860,7 +820,7 @@
     "semantic_hash": "5d2c52121f0765744357e3e29dc16cd0"
   },
   "Map0_Test/ReplicatedStorage/Modules/Shared/Remotes.luau": {
-    "mtime": 1785937938.092164,
+    "mtime": 1786201288.8016565,
     "ast_hash": "9d3bf81acbcd81a2bdd0f8465136b36c",
     "semantic_hash": "9d3bf81acbcd81a2bdd0f8465136b36c"
   },
@@ -885,9 +845,9 @@
     "semantic_hash": "f8ec5cda636155c90518c418724cf35e"
   },
   "Map0_Test/ReplicatedStorage/Modules/Shared/Units.luau": {
-    "mtime": 1785686141.8965409,
-    "ast_hash": "34168f13b66180218f2afaca97b1fcaf",
-    "semantic_hash": "34168f13b66180218f2afaca97b1fcaf"
+    "mtime": 1786184530.2397451,
+    "ast_hash": "61fb6d12176cc495340b92053256b9c0",
+    "semantic_hash": "61fb6d12176cc495340b92053256b9c0"
   },
   "Map0_Test/ReplicatedStorage/Modules/ShopPrices.luau": {
     "mtime": 1785686141.8622355,
@@ -955,9 +915,9 @@
     "semantic_hash": "65bf57ee30281fc232b0d38eba920fd3"
   },
   "Map0_Test/ServerScriptService/GameService/Boot/GameBoot.luau": {
-    "mtime": 1786026074.4274168,
-    "ast_hash": "d4511994901c24a6ec8cb0694e7c9400",
-    "semantic_hash": "d4511994901c24a6ec8cb0694e7c9400"
+    "mtime": 1786201360.129898,
+    "ast_hash": "3fd5786b21ffab68b4a8cb84f6dc5f12",
+    "semantic_hash": "3fd5786b21ffab68b4a8cb84f6dc5f12"
   },
   "Map0_Test/ServerScriptService/GameService/Boot/LobbyBoot.luau": {
     "mtime": 1785862714.972613,
@@ -1005,9 +965,9 @@
     "semantic_hash": "48743ff0ce62f86f61c893c9c438b4e1"
   },
   "Map0_Test/ServerScriptService/GameService/Death/DeathService.luau": {
-    "mtime": 1786023269.0683577,
-    "ast_hash": "6c6eab42d3e7ba038de3572c89d2ce17",
-    "semantic_hash": "6c6eab42d3e7ba038de3572c89d2ce17"
+    "mtime": 1786180233.449297,
+    "ast_hash": "d5af1cc2b160cd7d8e8567bb1b7ba34e",
+    "semantic_hash": "d5af1cc2b160cd7d8e8567bb1b7ba34e"
   },
   "Map0_Test/ServerScriptService/GameService/Flash/FlashEvents.luau": {
     "mtime": 1785686148.6498313,
@@ -1079,40 +1039,15 @@
     "ast_hash": "592f4f81f856070e6b2acd655859d1e2",
     "semantic_hash": "592f4f81f856070e6b2acd655859d1e2"
   },
-  "Map0_Test/ServerScriptService/GameService/Monster/Behaviors/GreyCube.luau": {
-    "mtime": 1785686148.6814244,
-    "ast_hash": "502ebee7ed24e48a1a3d2471abc1eeab",
-    "semantic_hash": "502ebee7ed24e48a1a3d2471abc1eeab"
-  },
-  "Map0_Test/ServerScriptService/GameService/Monster/MonsterAgent.luau": {
-    "mtime": 1785686148.6603577,
-    "ast_hash": "1ba934023cbad1fae86d1e2ce32cac1c",
-    "semantic_hash": "1ba934023cbad1fae86d1e2ce32cac1c"
-  },
-  "Map0_Test/ServerScriptService/GameService/Monster/MonsterDamage.luau": {
-    "mtime": 1785686148.6598504,
-    "ast_hash": "79295eea6e42ecad3e66458e56a63a8a",
-    "semantic_hash": "79295eea6e42ecad3e66458e56a63a8a"
-  },
-  "Map0_Test/ServerScriptService/GameService/Monster/MonsterMovement.luau": {
-    "mtime": 1785686148.6578522,
-    "ast_hash": "8036e86de9ce2eaf4dafdf294adf94e3",
-    "semantic_hash": "8036e86de9ce2eaf4dafdf294adf94e3"
-  },
-  "Map0_Test/ServerScriptService/GameService/Monster/MonsterSensing.luau": {
-    "mtime": 1785686148.6578522,
-    "ast_hash": "add831a1b22cea49fbe1b936915434a9",
-    "semantic_hash": "add831a1b22cea49fbe1b936915434a9"
-  },
   "Map0_Test/ServerScriptService/GameService/Monster/MonsterService.luau": {
-    "mtime": 1786024437.2279773,
-    "ast_hash": "ecc2ff3503da32d355ab0e627a269c9f",
-    "semantic_hash": "ecc2ff3503da32d355ab0e627a269c9f"
+    "mtime": 1786211138.355477,
+    "ast_hash": "7ebc651985c022cbe99f7596346f2b57",
+    "semantic_hash": "7ebc651985c022cbe99f7596346f2b57"
   },
   "Map0_Test/ServerScriptService/GameService/Monster/States/Chase.luau": {
-    "mtime": 1785686148.6623802,
-    "ast_hash": "46dc025695891313a94011467b001394",
-    "semantic_hash": "46dc025695891313a94011467b001394"
+    "mtime": 1786203868.6783311,
+    "ast_hash": "a949d96e4c8cfb7935de289904e0ef0a",
+    "semantic_hash": "a949d96e4c8cfb7935de289904e0ef0a"
   },
   "Map0_Test/ServerScriptService/GameService/Objective/ObjectiveRegistry.luau": {
     "mtime": 1785686148.6538517,
@@ -1255,9 +1190,9 @@
     "semantic_hash": "78ba84d8a06e84739fb7f9e7d83ef380"
   },
   "Map0_Test/StarterPlayerScripts/Playermovementcontroller.local.luau": {
-    "mtime": 1786027866.2709253,
-    "ast_hash": "ce2ade296832804f5829cb02694f5bc4",
-    "semantic_hash": "ce2ade296832804f5829cb02694f5bc4"
+    "mtime": 1786201253.9658003,
+    "ast_hash": "00fb4d57bb899541ac4d02430fc3e5bc",
+    "semantic_hash": "00fb4d57bb899541ac4d02430fc3e5bc"
   },
   "Map0_Test/StarterPlayerScripts/ShotFeedbackHandler.local.luau": {
     "mtime": 1785686169.8723154,
@@ -1305,9 +1240,9 @@
     "semantic_hash": "2f2fe9d02cae479221e4100e04383baf"
   },
   "Lobby/ServerScriptService/GameService/Monster/EncounterDirector.luau": {
-    "mtime": 1786024373.2326,
-    "ast_hash": "9cad0db5c53362946b8992c691a53c0f",
-    "semantic_hash": "9cad0db5c53362946b8992c691a53c0f"
+    "mtime": 1786211146.9825704,
+    "ast_hash": "2282660ba6faaa84993d4b7be9c4ed9e",
+    "semantic_hash": "2282660ba6faaa84993d4b7be9c4ed9e"
   },
   "Lobby/ServerScriptService/GameService/Reward/RewardLaunchHook.luau": {
     "mtime": 1785777799.981074,
@@ -1345,9 +1280,9 @@
     "semantic_hash": "2f2fe9d02cae479221e4100e04383baf"
   },
   "Map0_Test/ServerScriptService/GameService/Monster/EncounterDirector.luau": {
-    "mtime": 1786024437.2782319,
-    "ast_hash": "9cad0db5c53362946b8992c691a53c0f",
-    "semantic_hash": "9cad0db5c53362946b8992c691a53c0f"
+    "mtime": 1786211113.3526917,
+    "ast_hash": "2282660ba6faaa84993d4b7be9c4ed9e",
+    "semantic_hash": "2282660ba6faaa84993d4b7be9c4ed9e"
   },
   "Map0_Test/ServerScriptService/GameService/Reward/RewardLaunchHook.luau": {
     "mtime": 1785777196.1004765,
@@ -1460,9 +1395,9 @@
     "semantic_hash": "3c30fd487760c4ad0eabf07d3ce5c79e"
   },
   "Lobby/ServerScriptService/GameService/Player/CharacterMovementService.luau": {
-    "mtime": 1785864690.1973019,
-    "ast_hash": "5b77b4d60b0fbde6ade283abc6f7b17c",
-    "semantic_hash": "5b77b4d60b0fbde6ade283abc6f7b17c"
+    "mtime": 1786201426.2917306,
+    "ast_hash": "f5c9a7420ddb25c9340f05b58246a186",
+    "semantic_hash": "f5c9a7420ddb25c9340f05b58246a186"
   },
   "Lobby/StarterPlayerScripts/MobileSprintButton.local.luau": {
     "mtime": 1785939221.5063279,
@@ -1475,9 +1410,9 @@
     "semantic_hash": "3c30fd487760c4ad0eabf07d3ce5c79e"
   },
   "Map0_Test/ServerScriptService/GameService/Player/CharacterMovementService.luau": {
-    "mtime": 1785864680.6982474,
-    "ast_hash": "5b77b4d60b0fbde6ade283abc6f7b17c",
-    "semantic_hash": "5b77b4d60b0fbde6ade283abc6f7b17c"
+    "mtime": 1786201280.5294406,
+    "ast_hash": "f5c9a7420ddb25c9340f05b58246a186",
+    "semantic_hash": "f5c9a7420ddb25c9340f05b58246a186"
   },
   "Map0_Test/StarterPlayerScripts/MobileSprintButton.local.luau": {
     "mtime": 1785939211.570356,
@@ -1615,9 +1550,9 @@
     "semantic_hash": "c0fdd1bff7239d6077cdad8e58a3e04f"
   },
   "Lobby/ReplicatedStorage/Modules/MatchTime/MatchPhases.luau": {
-    "mtime": 1786022549.2806704,
-    "ast_hash": "fcb37ab9afaa16f0faf66f79294ac5ec",
-    "semantic_hash": "fcb37ab9afaa16f0faf66f79294ac5ec"
+    "mtime": 1786029837.539922,
+    "ast_hash": "c6af2655abca9032f8dee0a2424c303c",
+    "semantic_hash": "c6af2655abca9032f8dee0a2424c303c"
   },
   "Lobby/ReplicatedStorage/Modules/MatchTime/MatchSchedule.luau": {
     "mtime": 1786022518.7424908,
@@ -1630,14 +1565,14 @@
     "semantic_hash": "f35c8dce8f2c0fc8afc3839e48b441c0"
   },
   "Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeHud.luau": {
-    "mtime": 1786023571.3490274,
-    "ast_hash": "2be2fe89a6cc4a0969611ec3cfa5209d",
-    "semantic_hash": "2be2fe89a6cc4a0969611ec3cfa5209d"
+    "mtime": 1786029863.8273742,
+    "ast_hash": "2bd24812c9931b4463278fd2024e57a4",
+    "semantic_hash": "2bd24812c9931b4463278fd2024e57a4"
   },
   "Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeHudController.luau": {
-    "mtime": 1786024003.4434917,
-    "ast_hash": "0fe71b7de9fd78a8496a04db2e7609c4",
-    "semantic_hash": "0fe71b7de9fd78a8496a04db2e7609c4"
+    "mtime": 1786029617.0789611,
+    "ast_hash": "b5d135800a4dd3cfbca4d5640f21e83a",
+    "semantic_hash": "b5d135800a4dd3cfbca4d5640f21e83a"
   },
   "Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeMath.luau": {
     "mtime": 1786022535.4890065,
@@ -1670,9 +1605,9 @@
     "semantic_hash": "b4e2bf02d12bccb2a987b1e027715ba3"
   },
   "Map0_Test/ReplicatedStorage/Modules/MatchTime/MatchPhases.luau": {
-    "mtime": 1786023609.0323057,
-    "ast_hash": "fcb37ab9afaa16f0faf66f79294ac5ec",
-    "semantic_hash": "fcb37ab9afaa16f0faf66f79294ac5ec"
+    "mtime": 1786029965.2776225,
+    "ast_hash": "c6af2655abca9032f8dee0a2424c303c",
+    "semantic_hash": "c6af2655abca9032f8dee0a2424c303c"
   },
   "Map0_Test/ReplicatedStorage/Modules/MatchTime/MatchSchedule.luau": {
     "mtime": 1786023609.0365806,
@@ -1685,14 +1620,14 @@
     "semantic_hash": "f35c8dce8f2c0fc8afc3839e48b441c0"
   },
   "Map0_Test/ReplicatedStorage/Modules/MatchTime/MatchTimeHud.luau": {
-    "mtime": 1786023609.0457692,
-    "ast_hash": "2be2fe89a6cc4a0969611ec3cfa5209d",
-    "semantic_hash": "2be2fe89a6cc4a0969611ec3cfa5209d"
+    "mtime": 1786029965.332949,
+    "ast_hash": "2bd24812c9931b4463278fd2024e57a4",
+    "semantic_hash": "2bd24812c9931b4463278fd2024e57a4"
   },
   "Map0_Test/ReplicatedStorage/Modules/MatchTime/MatchTimeHudController.luau": {
-    "mtime": 1786024038.943194,
-    "ast_hash": "0fe71b7de9fd78a8496a04db2e7609c4",
-    "semantic_hash": "0fe71b7de9fd78a8496a04db2e7609c4"
+    "mtime": 1786029965.3873384,
+    "ast_hash": "b5d135800a4dd3cfbca4d5640f21e83a",
+    "semantic_hash": "b5d135800a4dd3cfbca4d5640f21e83a"
   },
   "Map0_Test/ReplicatedStorage/Modules/MatchTime/MatchTimeMath.luau": {
     "mtime": 1786023609.0535398,
@@ -1723,5 +1658,450 @@
     "mtime": 1786023506.457663,
     "ast_hash": "b4e2bf02d12bccb2a987b1e027715ba3",
     "semantic_hash": "b4e2bf02d12bccb2a987b1e027715ba3"
+  },
+  "Lobby/ReplicatedStorage/Modules/Monster/Configs/Monster1.luau": {
+    "mtime": 1786225500.1954658,
+    "ast_hash": "ab6d043af3585265ac9207787ae7c714",
+    "semantic_hash": "ab6d043af3585265ac9207787ae7c714"
+  },
+  "Lobby/ReplicatedStorage/Modules/Monster/Configs/init.luau": {
+    "mtime": 1786185278.8405511,
+    "ast_hash": "7f5032ecbd3814e33c478c46cf6770b5",
+    "semantic_hash": "7f5032ecbd3814e33c478c46cf6770b5"
+  },
+  "Lobby/ReplicatedStorage/Modules/Monster/MonsterCapabilities.luau": {
+    "mtime": 1786198518.8390625,
+    "ast_hash": "b1659303a353569d6bdc2474af89aea2",
+    "semantic_hash": "b1659303a353569d6bdc2474af89aea2"
+  },
+  "Lobby/ReplicatedStorage/Modules/Monster/MonsterConfig.luau": {
+    "mtime": 1786205809.196029,
+    "ast_hash": "79a6a7cdbd2bfdfe5ee03205a4fd4883",
+    "semantic_hash": "79a6a7cdbd2bfdfe5ee03205a4fd4883"
+  },
+  "Lobby/ReplicatedStorage/Modules/Monster/MonsterConstants.luau": {
+    "mtime": 1786225500.1288953,
+    "ast_hash": "294dd3b66817c1b5703646f1e33e6804",
+    "semantic_hash": "294dd3b66817c1b5703646f1e33e6804"
+  },
+  "Lobby/ReplicatedStorage/Modules/Stimulus/StimulusKinds.luau": {
+    "mtime": 1786203885.5096364,
+    "ast_hash": "f89cec2c7c02ce502958899ba17b963c",
+    "semantic_hash": "f89cec2c7c02ce502958899ba17b963c"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Aggression/AggressionCurves.luau": {
+    "mtime": 1786185278.9605615,
+    "ast_hash": "b679261bce8f1fd2f33320361b539914",
+    "semantic_hash": "b679261bce8f1fd2f33320361b539914"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Aggression/AggressionModifiers.luau": {
+    "mtime": 1786185278.9630954,
+    "ast_hash": "75c6bceaca07bc1449f87b53dfcae0b8",
+    "semantic_hash": "75c6bceaca07bc1449f87b53dfcae0b8"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Brain/Brain.luau": {
+    "mtime": 1786205125.3698876,
+    "ast_hash": "b5cc747beb5c1fedb87a5955227f3f50",
+    "semantic_hash": "b5cc747beb5c1fedb87a5955227f3f50"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Brain/StateMachine.luau": {
+    "mtime": 1786185278.9976084,
+    "ast_hash": "b79ae5a00d947b2daee387dc438a57d6",
+    "semantic_hash": "b79ae5a00d947b2daee387dc438a57d6"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Components/Aggression.luau": {
+    "mtime": 1786186839.824676,
+    "ast_hash": "1cecd17653328e29bd55b6fcba153a76",
+    "semantic_hash": "1cecd17653328e29bd55b6fcba153a76"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Components/Combat.luau": {
+    "mtime": 1786202573.5455256,
+    "ast_hash": "c6565acef64c15d650c7410b0d92f095",
+    "semantic_hash": "c6565acef64c15d650c7410b0d92f095"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Components/Evolution.luau": {
+    "mtime": 1786205808.7859945,
+    "ast_hash": "6732306374699d4dbc9e83d2f87ac23c",
+    "semantic_hash": "6732306374699d4dbc9e83d2f87ac23c"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Components/Navigation.luau": {
+    "mtime": 1786224284.1074917,
+    "ast_hash": "548259066f1c302ad9d63d4a2002da72",
+    "semantic_hash": "548259066f1c302ad9d63d4a2002da72"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Components/Perception.luau": {
+    "mtime": 1786203885.5685403,
+    "ast_hash": "11afc89096b2a1a78f16c4f33d3a063a",
+    "semantic_hash": "11afc89096b2a1a78f16c4f33d3a063a"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Components/Targeting.luau": {
+    "mtime": 1786205125.3047774,
+    "ast_hash": "46529ad62d7d75c13f525f7ed528b31f",
+    "semantic_hash": "46529ad62d7d75c13f525f7ed528b31f"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Components/init.luau": {
+    "mtime": 1786205808.850552,
+    "ast_hash": "ba3f906bc63eabcb78707601711b962e",
+    "semantic_hash": "ba3f906bc63eabcb78707601711b962e"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Locomotion/HumanoidPathLocomotion.luau": {
+    "mtime": 1786203211.28633,
+    "ast_hash": "79a8050568cccb391937b72c66fef51c",
+    "semantic_hash": "79a8050568cccb391937b72c66fef51c"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Locomotion/KinematicLocomotion.luau": {
+    "mtime": 1786202826.323449,
+    "ast_hash": "eb35a67bb4087186607ec107aff1e8d5",
+    "semantic_hash": "eb35a67bb4087186607ec107aff1e8d5"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Locomotion/init.luau": {
+    "mtime": 1786185278.9325085,
+    "ast_hash": "283caccbb5a588667b79752de4c11ffd",
+    "semantic_hash": "283caccbb5a588667b79752de4c11ffd"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/MonsterBus.luau": {
+    "mtime": 1786185279.0021346,
+    "ast_hash": "8d31468b38d2539141d117a7c222a144",
+    "semantic_hash": "8d31468b38d2539141d117a7c222a144"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/MonsterEvolution.luau": {
+    "mtime": 1786205808.9914415,
+    "ast_hash": "ca589b1c987740cdc9fbaea9c715f357",
+    "semantic_hash": "ca589b1c987740cdc9fbaea9c715f357"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/MonsterFactory.luau": {
+    "mtime": 1786185278.964095,
+    "ast_hash": "cff5cbb45394a1c915cf57a11d056e4d",
+    "semantic_hash": "cff5cbb45394a1c915cf57a11d056e4d"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/MonsterFramework.luau": {
+    "mtime": 1786223047.9693098,
+    "ast_hash": "02744b1a18829492515b95c46da66014",
+    "semantic_hash": "02744b1a18829492515b95c46da66014"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/MonsterInstance.luau": {
+    "mtime": 1786205808.9203713,
+    "ast_hash": "b2a72d8eb84b88610bc2f07cabc4af31",
+    "semantic_hash": "b2a72d8eb84b88610bc2f07cabc4af31"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/MonsterRegistry.luau": {
+    "mtime": 1786185278.9996116,
+    "ast_hash": "41117531ff2c25613ff7d632df401747",
+    "semantic_hash": "41117531ff2c25613ff7d632df401747"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/MonsterScheduler.luau": {
+    "mtime": 1786185278.9385123,
+    "ast_hash": "4967ab7b1409af4ea0d57c4e1321bc69",
+    "semantic_hash": "4967ab7b1409af4ea0d57c4e1321bc69"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/PatrolGraph.luau": {
+    "mtime": 1786223047.596804,
+    "ast_hash": "79dcd8a8ae80a5c5b001a678df337dea",
+    "semantic_hash": "79dcd8a8ae80a5c5b001a678df337dea"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Sensors/FlashSensor.luau": {
+    "mtime": 1786201426.553233,
+    "ast_hash": "41fdf234109885c43d8385d82228b31c",
+    "semantic_hash": "41fdf234109885c43d8385d82228b31c"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Sensors/HearingSensor.luau": {
+    "mtime": 1786201426.4889226,
+    "ast_hash": "f4562521e33af9ff81d3a03c1deae7a2",
+    "semantic_hash": "f4562521e33af9ff81d3a03c1deae7a2"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Sensors/ProximitySensor.luau": {
+    "mtime": 1786185278.9680922,
+    "ast_hash": "5e72208bb477c9a5540aacbeb39fb670",
+    "semantic_hash": "5e72208bb477c9a5540aacbeb39fb670"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Sensors/VisionSensor.luau": {
+    "mtime": 1786185278.9727054,
+    "ast_hash": "a9a1aa30f1f3f1810ea60bbf9b8ea72d",
+    "semantic_hash": "a9a1aa30f1f3f1810ea60bbf9b8ea72d"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/Sensors/init.luau": {
+    "mtime": 1786198518.779219,
+    "ast_hash": "1568f849fd8c5f046d5fcdc773622b1a",
+    "semantic_hash": "1568f849fd8c5f046d5fcdc773622b1a"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/States/Attack.luau": {
+    "mtime": 1786202573.488807,
+    "ast_hash": "c2f7d30891c11ae588a8cd296e63e5b8",
+    "semantic_hash": "c2f7d30891c11ae588a8cd296e63e5b8"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/States/Check.luau": {
+    "mtime": 1786204237.9174902,
+    "ast_hash": "5ec61a047844d0c8e38a6b1f3f87a0ed",
+    "semantic_hash": "5ec61a047844d0c8e38a6b1f3f87a0ed"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/States/Idle.luau": {
+    "mtime": 1786185278.9545653,
+    "ast_hash": "70e1811c7ca951ca5c20b8faa7f37572",
+    "semantic_hash": "70e1811c7ca951ca5c20b8faa7f37572"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/States/Lurk.luau": {
+    "mtime": 1786199032.8138373,
+    "ast_hash": "3cd32636bb7423d2d68fc83175483a6e",
+    "semantic_hash": "3cd32636bb7423d2d68fc83175483a6e"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/States/Patrol.luau": {
+    "mtime": 1786225500.2621517,
+    "ast_hash": "c38ed4c36071b8555828243e1c77b69c",
+    "semantic_hash": "c38ed4c36071b8555828243e1c77b69c"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/States/Reset.luau": {
+    "mtime": 1786204643.611327,
+    "ast_hash": "d1c7891c101453b2e068a18837d02d46",
+    "semantic_hash": "d1c7891c101453b2e068a18837d02d46"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/States/Wander.luau": {
+    "mtime": 1786204237.8590932,
+    "ast_hash": "98740855ae0be9b7d0de6206d3ebdee9",
+    "semantic_hash": "98740855ae0be9b7d0de6206d3ebdee9"
+  },
+  "Lobby/ServerScriptService/GameService/Monster/States/init.luau": {
+    "mtime": 1786199033.0035396,
+    "ast_hash": "4d366f0917652d6fa2d48e4f685af3b8",
+    "semantic_hash": "4d366f0917652d6fa2d48e4f685af3b8"
+  },
+  "Lobby/ServerScriptService/GameService/Stimulus/FlashStimulusAdapter.luau": {
+    "mtime": 1786198765.9986725,
+    "ast_hash": "9dffca188d8d1f2aa882049abab3c274",
+    "semantic_hash": "9dffca188d8d1f2aa882049abab3c274"
+  },
+  "Lobby/ServerScriptService/GameService/Stimulus/FootstepEmitter.luau": {
+    "mtime": 1786201426.422358,
+    "ast_hash": "2a0e90ca35edde28d06dc477a1449f9d",
+    "semantic_hash": "2a0e90ca35edde28d06dc477a1449f9d"
+  },
+  "Lobby/ServerScriptService/GameService/Stimulus/StimulusBus.luau": {
+    "mtime": 1786200898.961897,
+    "ast_hash": "15a577af19d26f866163e610ebd1cbf6",
+    "semantic_hash": "15a577af19d26f866163e610ebd1cbf6"
+  },
+  "Map0_Test/ReplicatedStorage/Modules/Monster/Configs/Monster1.luau": {
+    "mtime": 1786225492.1470716,
+    "ast_hash": "ab6d043af3585265ac9207787ae7c714",
+    "semantic_hash": "ab6d043af3585265ac9207787ae7c714"
+  },
+  "Map0_Test/ReplicatedStorage/Modules/Monster/Configs/init.luau": {
+    "mtime": 1786177680.266477,
+    "ast_hash": "7f5032ecbd3814e33c478c46cf6770b5",
+    "semantic_hash": "7f5032ecbd3814e33c478c46cf6770b5"
+  },
+  "Map0_Test/ReplicatedStorage/Modules/Monster/MonsterCapabilities.luau": {
+    "mtime": 1786198465.4803092,
+    "ast_hash": "b1659303a353569d6bdc2474af89aea2",
+    "semantic_hash": "b1659303a353569d6bdc2474af89aea2"
+  },
+  "Map0_Test/ReplicatedStorage/Modules/Monster/MonsterConfig.luau": {
+    "mtime": 1786205693.846477,
+    "ast_hash": "79a6a7cdbd2bfdfe5ee03205a4fd4883",
+    "semantic_hash": "79a6a7cdbd2bfdfe5ee03205a4fd4883"
+  },
+  "Map0_Test/ReplicatedStorage/Modules/Monster/MonsterConstants.luau": {
+    "mtime": 1786225385.5007257,
+    "ast_hash": "294dd3b66817c1b5703646f1e33e6804",
+    "semantic_hash": "294dd3b66817c1b5703646f1e33e6804"
+  },
+  "Map0_Test/ReplicatedStorage/Modules/Stimulus/StimulusKinds.luau": {
+    "mtime": 1786203831.6012137,
+    "ast_hash": "f89cec2c7c02ce502958899ba17b963c",
+    "semantic_hash": "f89cec2c7c02ce502958899ba17b963c"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Aggression/AggressionCurves.luau": {
+    "mtime": 1786185151.329718,
+    "ast_hash": "b679261bce8f1fd2f33320361b539914",
+    "semantic_hash": "b679261bce8f1fd2f33320361b539914"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Aggression/AggressionModifiers.luau": {
+    "mtime": 1786185170.3682256,
+    "ast_hash": "75c6bceaca07bc1449f87b53dfcae0b8",
+    "semantic_hash": "75c6bceaca07bc1449f87b53dfcae0b8"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Brain/Brain.luau": {
+    "mtime": 1786205078.0473373,
+    "ast_hash": "b5cc747beb5c1fedb87a5955227f3f50",
+    "semantic_hash": "b5cc747beb5c1fedb87a5955227f3f50"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Brain/StateMachine.luau": {
+    "mtime": 1786178991.7820542,
+    "ast_hash": "b79ae5a00d947b2daee387dc438a57d6",
+    "semantic_hash": "b79ae5a00d947b2daee387dc438a57d6"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Components/Aggression.luau": {
+    "mtime": 1786186816.8001254,
+    "ast_hash": "1cecd17653328e29bd55b6fcba153a76",
+    "semantic_hash": "1cecd17653328e29bd55b6fcba153a76"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Components/Combat.luau": {
+    "mtime": 1786202561.9717317,
+    "ast_hash": "c6565acef64c15d650c7410b0d92f095",
+    "semantic_hash": "c6565acef64c15d650c7410b0d92f095"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Components/Evolution.luau": {
+    "mtime": 1786205664.4572575,
+    "ast_hash": "6732306374699d4dbc9e83d2f87ac23c",
+    "semantic_hash": "6732306374699d4dbc9e83d2f87ac23c"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Components/Navigation.luau": {
+    "mtime": 1786224192.5515165,
+    "ast_hash": "548259066f1c302ad9d63d4a2002da72",
+    "semantic_hash": "548259066f1c302ad9d63d4a2002da72"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Components/Perception.luau": {
+    "mtime": 1786203849.301667,
+    "ast_hash": "11afc89096b2a1a78f16c4f33d3a063a",
+    "semantic_hash": "11afc89096b2a1a78f16c4f33d3a063a"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Components/Targeting.luau": {
+    "mtime": 1786205110.3879352,
+    "ast_hash": "46529ad62d7d75c13f525f7ed528b31f",
+    "semantic_hash": "46529ad62d7d75c13f525f7ed528b31f"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Components/init.luau": {
+    "mtime": 1786205670.77154,
+    "ast_hash": "ba3f906bc63eabcb78707601711b962e",
+    "semantic_hash": "ba3f906bc63eabcb78707601711b962e"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Locomotion/HumanoidPathLocomotion.luau": {
+    "mtime": 1786203201.9240098,
+    "ast_hash": "79a8050568cccb391937b72c66fef51c",
+    "semantic_hash": "79a8050568cccb391937b72c66fef51c"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Locomotion/KinematicLocomotion.luau": {
+    "mtime": 1786202780.5870948,
+    "ast_hash": "eb35a67bb4087186607ec107aff1e8d5",
+    "semantic_hash": "eb35a67bb4087186607ec107aff1e8d5"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Locomotion/init.luau": {
+    "mtime": 1786180619.6684542,
+    "ast_hash": "283caccbb5a588667b79752de4c11ffd",
+    "semantic_hash": "283caccbb5a588667b79752de4c11ffd"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/MonsterBus.luau": {
+    "mtime": 1786177699.9274764,
+    "ast_hash": "8d31468b38d2539141d117a7c222a144",
+    "semantic_hash": "8d31468b38d2539141d117a7c222a144"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/MonsterEvolution.luau": {
+    "mtime": 1786205714.4064205,
+    "ast_hash": "ca589b1c987740cdc9fbaea9c715f357",
+    "semantic_hash": "ca589b1c987740cdc9fbaea9c715f357"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/MonsterFactory.luau": {
+    "mtime": 1786184473.833494,
+    "ast_hash": "cff5cbb45394a1c915cf57a11d056e4d",
+    "semantic_hash": "cff5cbb45394a1c915cf57a11d056e4d"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/MonsterFramework.luau": {
+    "mtime": 1786223019.1230667,
+    "ast_hash": "02744b1a18829492515b95c46da66014",
+    "semantic_hash": "02744b1a18829492515b95c46da66014"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/MonsterInstance.luau": {
+    "mtime": 1786205681.532823,
+    "ast_hash": "b2a72d8eb84b88610bc2f07cabc4af31",
+    "semantic_hash": "b2a72d8eb84b88610bc2f07cabc4af31"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/MonsterRegistry.luau": {
+    "mtime": 1786180207.3303943,
+    "ast_hash": "41117531ff2c25613ff7d632df401747",
+    "semantic_hash": "41117531ff2c25613ff7d632df401747"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/MonsterScheduler.luau": {
+    "mtime": 1786177762.759055,
+    "ast_hash": "4967ab7b1409af4ea0d57c4e1321bc69",
+    "semantic_hash": "4967ab7b1409af4ea0d57c4e1321bc69"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/PatrolGraph.luau": {
+    "mtime": 1786222939.5421586,
+    "ast_hash": "79dcd8a8ae80a5c5b001a678df337dea",
+    "semantic_hash": "79dcd8a8ae80a5c5b001a678df337dea"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Sensors/FlashSensor.luau": {
+    "mtime": 1786201339.7525945,
+    "ast_hash": "41fdf234109885c43d8385d82228b31c",
+    "semantic_hash": "41fdf234109885c43d8385d82228b31c"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Sensors/HearingSensor.luau": {
+    "mtime": 1786201336.9612064,
+    "ast_hash": "f4562521e33af9ff81d3a03c1deae7a2",
+    "semantic_hash": "f4562521e33af9ff81d3a03c1deae7a2"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Sensors/ProximitySensor.luau": {
+    "mtime": 1786180187.375368,
+    "ast_hash": "5e72208bb477c9a5540aacbeb39fb670",
+    "semantic_hash": "5e72208bb477c9a5540aacbeb39fb670"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Sensors/VisionSensor.luau": {
+    "mtime": 1786184505.1339452,
+    "ast_hash": "a9a1aa30f1f3f1810ea60bbf9b8ea72d",
+    "semantic_hash": "a9a1aa30f1f3f1810ea60bbf9b8ea72d"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/Sensors/init.luau": {
+    "mtime": 1786198457.0311859,
+    "ast_hash": "1568f849fd8c5f046d5fcdc773622b1a",
+    "semantic_hash": "1568f849fd8c5f046d5fcdc773622b1a"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/States/Attack.luau": {
+    "mtime": 1786202565.0349047,
+    "ast_hash": "c2f7d30891c11ae588a8cd296e63e5b8",
+    "semantic_hash": "c2f7d30891c11ae588a8cd296e63e5b8"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/States/Check.luau": {
+    "mtime": 1786204215.4660306,
+    "ast_hash": "5ec61a047844d0c8e38a6b1f3f87a0ed",
+    "semantic_hash": "5ec61a047844d0c8e38a6b1f3f87a0ed"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/States/Idle.luau": {
+    "mtime": 1786179031.2048357,
+    "ast_hash": "70e1811c7ca951ca5c20b8faa7f37572",
+    "semantic_hash": "70e1811c7ca951ca5c20b8faa7f37572"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/States/Lurk.luau": {
+    "mtime": 1786198978.4721737,
+    "ast_hash": "3cd32636bb7423d2d68fc83175483a6e",
+    "semantic_hash": "3cd32636bb7423d2d68fc83175483a6e"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/States/Patrol.luau": {
+    "mtime": 1786225404.1362536,
+    "ast_hash": "c38ed4c36071b8555828243e1c77b69c",
+    "semantic_hash": "c38ed4c36071b8555828243e1c77b69c"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/States/Reset.luau": {
+    "mtime": 1786204610.534281,
+    "ast_hash": "d1c7891c101453b2e068a18837d02d46",
+    "semantic_hash": "d1c7891c101453b2e068a18837d02d46"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/States/Wander.luau": {
+    "mtime": 1786204205.7796786,
+    "ast_hash": "98740855ae0be9b7d0de6206d3ebdee9",
+    "semantic_hash": "98740855ae0be9b7d0de6206d3ebdee9"
+  },
+  "Map0_Test/ServerScriptService/GameService/Monster/States/init.luau": {
+    "mtime": 1786198993.869948,
+    "ast_hash": "4d366f0917652d6fa2d48e4f685af3b8",
+    "semantic_hash": "4d366f0917652d6fa2d48e4f685af3b8"
+  },
+  "Map0_Test/ServerScriptService/GameService/Stimulus/FlashStimulusAdapter.luau": {
+    "mtime": 1786198729.80432,
+    "ast_hash": "9dffca188d8d1f2aa882049abab3c274",
+    "semantic_hash": "9dffca188d8d1f2aa882049abab3c274"
+  },
+  "Map0_Test/ServerScriptService/GameService/Stimulus/FootstepEmitter.luau": {
+    "mtime": 1786201363.1832323,
+    "ast_hash": "2a0e90ca35edde28d06dc477a1449f9d",
+    "semantic_hash": "2a0e90ca35edde28d06dc477a1449f9d"
+  },
+  "Map0_Test/ServerScriptService/GameService/Stimulus/StimulusBus.luau": {
+    "mtime": 1786200894.2411673,
+    "ast_hash": "15a577af19d26f866163e610ebd1cbf6",
+    "semantic_hash": "15a577af19d26f866163e610ebd1cbf6"
+  },
+  "plans/EvolutionPlan.md": {
+    "mtime": 1786221881.6861439,
+    "ast_hash": "ed7c534b143d6f87056387844d7182ca",
+    "semantic_hash": "ed7c534b143d6f87056387844d7182ca"
   }
 }

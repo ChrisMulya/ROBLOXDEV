@@ -31,6 +31,19 @@ local GROUND_PROBE_DOWN = 24
 -- the floor, and a floor-to-floor ray grazes the ground itself on any slope or
 -- step and reports a wall that isn't there. Chest height on this rig.
 local LOS_HEIGHT = 3
+-- How long the body can go without covering STUCK_DISTANCE before MoveTo
+-- reports "stuck" -- pressed against a wall, snagged on a corner, or grinding
+-- on a straight-line fallback with no path. 3s is generous even for Wander's
+-- slowest state (Check at 0.75x): the smallest configured WalkSpeed still
+-- covers this distance in a fraction of a second when actually moving, so a
+-- miss here means the body genuinely isn't translating, not that it's slow.
+local STUCK_WINDOW = 3
+local STUCK_DISTANCE = 2
+-- A destination close enough to the one already being tracked counts as "the
+-- same journey" for stuck purposes. Without this, a caller re-issuing the
+-- literal same Vector3 every tick (as several states do) would look like a
+-- brand new journey every tick and the stuck window would never accumulate.
+local STUCK_SAME_TARGET_EPSILON = 0.5
 
 function Navigation.new(instance, config)
 	local navConfig = config.Navigation or {}
@@ -40,6 +53,7 @@ function Navigation.new(instance, config)
 		instance    = instance,
 		locomotion  = strategy.new(instance, navConfig),
 		wasArrived  = false,
+		stuckAnchor = nil,
 		agentRadius = (navConfig.AgentParams and navConfig.AgentParams.AgentRadius) or 0,
 	}, Navigation)
 
@@ -212,9 +226,48 @@ function Navigation:PickRoamPoint(origin: Vector3, radius: number): Vector3?
 	return self:ResolveReachable(origin + direction * usable)
 end
 
-function Navigation:MoveTo(targetPosition: Vector3, dt: number): boolean
+-- Body-displacement stuck check, not a wall-contact check: the question is
+-- "is this thing actually translating through space while it's trying to",
+-- which catches wall-hugging, corner-snagging and a straight-line fallback
+-- grinding on geometry all the same way, with no raycast of its own.
+--
+-- Keyed off the DESTINATION, not the caller: a caller re-issuing the same
+-- Vector3 every tick (most states do) must accumulate across those calls, but
+-- a caller switching to a genuinely different destination -- including one
+-- issued right after Stop() went idle for a while, e.g. a deliberate pause
+-- that never called MoveTo at all -- must not inherit a stale multi-second-old
+-- window and report stuck on its very first tick.
+function Navigation:_checkStuck(position: Vector3, targetPosition: Vector3): boolean
+	local now = os.clock()
+	local anchor = self.stuckAnchor
+
+	if not anchor or (anchor.target - targetPosition).Magnitude > STUCK_SAME_TARGET_EPSILON then
+		self.stuckAnchor = { position = position, at = now, target = targetPosition }
+		return false
+	end
+
+	if (position - anchor.position).Magnitude > STUCK_DISTANCE then
+		anchor.position = position
+		anchor.at = now
+		return false
+	end
+
+	return now - anchor.at >= STUCK_WINDOW
+end
+
+-- Second return is STUCK, not an error condition -- most callers ignore it
+-- (Lua drops unused returns) and get the pre-existing single-value behaviour.
+-- A caller that wants "give up and try something else" reads it explicitly.
+function Navigation:MoveTo(targetPosition: Vector3, dt: number): (boolean, boolean)
 	local arrived = self.locomotion:MoveTo(targetPosition, dt, self:GetSpeed())
-	self.instance.blackboard.NavStatus = arrived and "Arrived" or "Moving"
+
+	local stuck = false
+	if arrived then
+		self.stuckAnchor = nil
+	else
+		stuck = self:_checkStuck(self.instance.rootPart.Position, targetPosition)
+	end
+	self.instance.blackboard.NavStatus = if arrived then "Arrived" elseif stuck then "Stuck" else "Moving"
 
 	-- EDGE-triggered, not level-triggered. Locomotion reports "arrived" on
 	-- every tick it is already there, and Chase keeps calling MoveTo at the
@@ -231,7 +284,7 @@ function Navigation:MoveTo(targetPosition: Vector3, dt: number): boolean
 		end
 	end
 
-	return arrived
+	return arrived, stuck
 end
 
 function Navigation:Stop()
@@ -239,6 +292,11 @@ function Navigation:Stop()
 	self.instance.blackboard.NavStatus = "Idle"
 	-- Reset the edge so the next journey can report arrival again.
 	self.wasArrived = false
+	-- A caller that stops mid-journey is abandoning it on purpose (Patrol's
+	-- point-pause is the exception -- it never calls Stop at all, precisely so
+	-- MoveDirection stays zeroed without touching this). Whatever destination
+	-- comes next should get a fresh window, not the old one's remaining time.
+	self.stuckAnchor = nil
 end
 
 function Navigation:Destroy()

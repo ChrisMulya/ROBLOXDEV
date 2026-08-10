@@ -20,6 +20,10 @@ CameraStats.Stats = {
 		Movement = {
 			INCAMERA_WALK_SPEED_MULTIPLIER = 0.5, -- movement speed while InCamera (0.5 = 50% slower)
 		},
+		Zoom = {
+			INCAMERA_FOV = 60,    -- degrees -- camera FieldOfView while InCamera (PlayerStats.BaseFOV is 70, so this reads as a zoom in)
+			FOV_CHANGE_RATE = 12, -- higher = snappier scope-in; PlayerStats.FOVChangeRate (8) is the out-of-camera rate
+		},
 		Stability = {
 			MoveThreshold = 0.05,     -- Humanoid.MoveDirection.Magnitude above this counts as moving
 			VelocityThreshold = 0.5,  -- studs/sec of root part velocity above this counts as moving
@@ -64,11 +68,35 @@ CameraStats.Stats = {
 		Flash = {
 			Enabled = true,
 			Color = Color3.fromRGB(255, 255, 245),
-			Duration = 0.4,          -- seconds -- shared by both the screen and world-light renderers
+			Duration = 0.4,          -- seconds -- the DEFAULT flash length, used by any flash that isn't part of a capture sequence; Sequence below overrides it per-flash during a capture
 			ScreenIntensity = 1.0,   -- 0-1, peak opacity of the full-screen fade; 0 disables it without removing the renderer
-			LightBrightness = 6,     -- PointLight.Brightness at flash peak
+			LightBrightness = 3,     -- PointLight.Brightness at flash peak
 			LightRange = 40,         -- studs -- doubles as the future monster-detection radius
 			LightAngle = 90,         -- degrees -- reserved for a future SpotLight/viewing-angle check
+			-- Two-stage capture, played by CameraSession.Capture. Both stages
+			-- are HELD SOLID, not faded -- only the very last beat eases out.
+			-- Cumulative timeline from the shutter press:
+			--   0.000  CAMERA LIGHT on -- world light only, NO screen flash
+			--   1.000  light off, hard cut (+CameraProcess)
+			--   1.300  FLASH on -- world light AND screen (+Gap)
+			--   1.383  flash fades, shutter sound, shot resolved, session
+			--          exits (+SecondHold). The fade outlives the session by
+			--          design; the flash GUI is independent of the viewfinder.
+			--
+			-- CameraProcess doubles as the exposure window: the player must
+			-- hold still from the press until the session ends, or the shot is
+			-- forced to Weak. See CameraSession.Capture.
+			Sequence = {
+				CameraProcess = 0.5,  -- seconds -- the camera light / exposure window
+				Gap = 0.3,          -- seconds of darkness between light and flash
+				SecondHold = 0.083, -- seconds -- flash held solid before it fades
+				SecondFade = 0.2,   -- seconds -- the flash's ease-out
+				-- Scales LightBrightness for the CameraProcess beat only, so the
+				-- pre-shutter light reads as the camera warming up rather than
+				-- competing with the shutter itself. The shutter beat always
+				-- fires at full LightBrightness.
+				CameraProcessBrightness = 0.5,
+			},
 		},
 	},
 
@@ -84,6 +112,10 @@ CameraStats.Stats = {
 		},
 		Movement = {
 			INCAMERA_WALK_SPEED_MULTIPLIER = 0.85, -- only 15% slower, lighter camera
+		},
+		Zoom = {
+			INCAMERA_FOV = 60,
+			FOV_CHANGE_RATE = 16, -- snappier scope than Camera1, matching its lighter feel
 		},
 		Stability = {
 			MoveThreshold = 0.05,
@@ -116,6 +148,13 @@ CameraStats.Stats = {
 			LightBrightness = 8,
 			LightRange = 50,
 			LightAngle = 90,
+			Sequence = {
+				CameraProcess = 1,
+				Gap = 0.3,
+				SecondHold = 0.083,
+				SecondFade = 0.2,
+				CameraProcessBrightness = 0.5,
+			},
 		},
 	},
 }
@@ -152,6 +191,13 @@ end
 
 function CameraStats.GetMovementSettings(cameraId)
 	return CameraStats.GetStats(cameraId).Movement
+end
+
+-- Nil-guarded like GetFlashSettings rather than raw-indexed like the others:
+-- a camera entry authored before the Zoom block existed would otherwise
+-- return nil and silently disable scope-in for that camera only.
+function CameraStats.GetZoomSettings(cameraId)
+	return CameraStats.GetStats(cameraId).Zoom or CameraStats.Default.Zoom
 end
 
 function CameraStats.GetStabilitySettings(cameraId)

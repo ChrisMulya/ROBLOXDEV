@@ -84,6 +84,10 @@ function GameBoot.Start()
 		-- dependencies, but must be listening before MatchSpawner loads any
 		-- character -- placed with the other early always-on services.
 		require(ServerScriptService.GameService.Player.CharacterMovementService),
+		-- Flashlight toggle. No dependencies (reads Player.Character directly
+		-- off the request), placed with the other early always-on per-player
+		-- services.
+		require(ServerScriptService.GameService.Player.FlashlightService),
 		-- Blueprint D5. After CharacterMovementService: reads
 		-- IsSprinting(player) every Heartbeat, so the accessor must exist
 		-- before this can query it (no ordering issue in practice --

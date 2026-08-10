@@ -48,6 +48,15 @@ Remotes.ALL_NAMES = {
 	-- value out on a timer -- the client renders it and never simulates it.
 	"SprintRequest",
 	"StaminaSync",
+	-- Flashlight is a toggle, not a state sync: the client fires
+	-- FlashlightRequest on F down (desktop) or a mobile button tap, and
+	-- FlashlightService creates/destroys the SpotLight emitter server-side so
+	-- every client sees it, not just the one who toggled it.
+	"FlashlightRequest",
+	-- The holder's camera look vector, sent at FlashlightAim.SEND_RATE (30Hz).
+	-- Server-authoritative and posed for every client including the holder --
+	-- see FlashlightAim.
+	"FlashlightAim",
 }
 
 function Remotes.Get(name: string): RemoteEvent

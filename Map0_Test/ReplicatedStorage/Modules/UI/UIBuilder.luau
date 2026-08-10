@@ -29,10 +29,15 @@ end
 --
 --     0    Roblox TouchGui (engine-owned; thumbstick + jump button)
 --     0    most ScreenGuis -- no overlap, no opinion
+--    10    FirstPersonCrosshairGui -- centre "+" reticle; above plain
+--                               gameplay, below the match clock and modals
 --    20    MatchTimeGui      -- top-centre match clock; must lose to the
 --                               sprint button and both modals
 --    30    MobileSprintGui   -- must beat TouchGui (the thumbstick region
 --                               covers it) but lose to both modals below
+--    30    MobileFlashlightGui -- same rank as MobileSprintGui; sits above the
+--                               CameraTouchHud "Camera" button, disjoint from
+--                               both, so sharing the rank is safe
 --    40    DeathScreenGui
 --    50    MatchReceiptGui   -- covers DeathScreen at a death-triggered end
 --   100    CameraTouchHud    -- built directly, not via this function

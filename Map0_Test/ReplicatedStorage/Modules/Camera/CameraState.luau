@@ -8,6 +8,7 @@ local CameraState = {}
 local inCamera = false
 local stable = true
 local movementSettings = nil
+local zoomSettings = nil
 
 local listeners = {}
 local stableListeners = {}
@@ -81,6 +82,31 @@ function CameraState.GetWalkSpeedMultiplier(): number
 		return 1
 	end
 	return movementSettings.INCAMERA_WALK_SPEED_MULTIPLIER
+end
+
+-- Intended for CameraSession only.
+function CameraState.SetZoomSettings(settings)
+	zoomSettings = settings
+end
+
+-- The FOV to hold while scoped, or nil for "not scoped -- caller decides".
+-- Deliberately returns nil rather than a fallback number: PlayerMovementController
+-- owns the un-scoped FOV (base vs sprint) and this must not overrule it.
+function CameraState.GetFOV(): number?
+	if not inCamera or not zoomSettings then
+		return nil
+	end
+	return zoomSettings.INCAMERA_FOV
+end
+
+-- Scope-in smoothing rate, or nil when not scoped. Only applies on the way
+-- IN: on exit this goes nil with inCamera and the FOV eases back out at
+-- PlayerStats.FOVChangeRate instead, which is the slower of the two.
+function CameraState.GetFOVChangeRate(): number?
+	if not inCamera or not zoomSettings then
+		return nil
+	end
+	return zoomSettings.FOV_CHANGE_RATE
 end
 
 return CameraState

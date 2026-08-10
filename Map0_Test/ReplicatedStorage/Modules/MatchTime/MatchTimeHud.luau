@@ -18,8 +18,8 @@ local MatchTimeHud = {}
 -- See UIBuilder.CreateScreenGui's comment -- that comment is the registry.
 local DISPLAY_ORDER = 20
 
-local BAR_WIDTH = 320
-local BAR_HEIGHT = 34
+local BAR_WIDTH = 300
+local BAR_HEIGHT = 24
 
 local screenGui: ScreenGui? = nil
 local fill: Frame? = nil

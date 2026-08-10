@@ -67,7 +67,14 @@ function Wander.Update(instance, dt: number)
 	end
 
 	if memory.target then
-		local arrived = navigation:MoveTo(memory.target, dt)
+		local arrived, stuck = navigation:MoveTo(memory.target, dt)
+		if stuck then
+			-- Pressed against something for 3s straight -- drop this point
+			-- rather than grinding on it for the rest of the pause cycle.
+			-- No pause: picking again immediately is the "somewhere else".
+			memory.target = nil
+			return
+		end
 		if not arrived then
 			return
 		end

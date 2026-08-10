@@ -215,8 +215,18 @@ local function setupCharacter(character: Model)
 
 			-- FOV kick while sprinting -- same frame-rate independent smoothing
 			-- as the velocity lerp, so it eases in/out rather than snapping.
-			local targetFOV = isSprinting and PlayerStats.SprintFOV or PlayerStats.BaseFOV
-			local fovAlpha = 1 - math.exp(-PlayerStats.FOVChangeRate * dt)
+			--
+			-- Scope wins over sprint: CameraState.GetFOV() is non-nil only
+			-- while InCamera, and sprinting is already blocked in that state
+			-- (see the SprintIntent handler below), so the two can't
+			-- meaningfully disagree -- this just makes the precedence explicit
+			-- rather than relying on that. Kept HERE rather than written from
+			-- CameraSession so FieldOfView keeps exactly one writer; two loops
+			-- assigning it would fight every frame.
+			local scopeFOV = CameraState.GetFOV()
+			local targetFOV = scopeFOV or (isSprinting and PlayerStats.SprintFOV or PlayerStats.BaseFOV)
+			local fovRate = CameraState.GetFOVChangeRate() or PlayerStats.FOVChangeRate
+			local fovAlpha = 1 - math.exp(-fovRate * dt)
 			currentFOV += (targetFOV - currentFOV) * fovAlpha
 			camera.FieldOfView = currentFOV
 		end

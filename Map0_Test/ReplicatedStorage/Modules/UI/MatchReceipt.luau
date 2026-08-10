@@ -68,6 +68,17 @@ local returnButton: TextButton? = nil
 -- exists to back it).
 local returnHandler: (() -> ())? = nil
 
+-- Set via MatchReceipt.SetOnHide, same registration shape as
+-- SetReturnHandler. Lets MatchReceiptController know the instant the panel
+-- actually closes (Close button OR Return To Lobby), without this pure-UI
+-- module knowing anything about mouse/camera state itself -- it just reports
+-- the edge.
+local onHide: (() -> ())? = nil
+
+function MatchReceipt.SetOnHide(fn: (() -> ())?)
+	onHide = fn
+end
+
 -- workspace:GetServerTimeNow() deadline for the automatic return (set from
 -- payload.returnsAt, Game place only -- see MatchReplicator). nil means no
 -- countdown is running, either because there's no handler or the payload
@@ -635,6 +646,9 @@ end
 function MatchReceipt.Hide()
 	if screenGui then
 		screenGui.Enabled = false
+	end
+	if onHide then
+		onHide()
 	end
 end
 

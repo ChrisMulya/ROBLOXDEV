@@ -99,6 +99,54 @@ somewhere.
   codes live in `Shared/QueueResultCodes.luau` (covers both pad rejections and
   `MatchLauncher`'s launch-failure reasons — one codes module, one remote).
 
+### Monster AI framework (Game place only) — capability-driven, component-based
+
+Fully rearchitected off the old single-script `MonsterAgent`. A monster is a
+`MonsterConfig` row (`ReplicatedStorage/Modules/Monster/Configs/<Id>.luau`) —
+`Capabilities` (`MonsterCapabilities.luau`) decide which `ServerScriptService/
+GameService/Monster/Components/*` get constructed, which `States/*` become
+eligible, and which `Stimulus/StimulusKinds` get subscribed. Adding a monster
+is one config file; no existing file changes. `Monster1` is the only
+shipping monster today — the old `GreyCube` placeholder is deleted.
+
+Per-instance: `MonsterInstance` ticks `Components` in a fixed dependency
+order (Perception → Targeting → Aggression → Navigation → Combat), then
+`Brain` (`Brain/Brain.luau`) scores every eligible `States/*` module and
+`StateMachine` runs the winner. Bands are hard precedence (Attack > Chase >
+everything else); within a band, highest weighted `Score()` wins, with
+hysteresis against flapping. `MonsterBus` is per-instance pub-sub for
+same-tick events (`Arrived`, `StimulusReceived`, `Evolved`...); cross-service
+signals (`MonsterRegistry.Spawned`/`Died`) use `Shared/Signal` instead — do
+not mix the two.
+
+**Patrol is the actual default state** (Band 0, scores above `Wander`).
+`PatrolGraph.luau` scans Workspace once at boot for `IsPatrolPoint`/
+`IsSearchPoint` parts (same convention as `IsMonsterSpawn`) and answers
+spatial queries; connectivity is **implicit by distance**, no authored link
+data. `States/Patrol.luau` walks the network with junction-aware direction
+choice (uniform over left/right/forward buckets, not over points), a last-2
+history ring against oscillation, occasional `SearchPoint` detours, and an
+occasional stop-and-look pause at a PatrolPoint (`Stats.PatrolPauseChance`,
+multiplied to 0 by the evolution tier below). Candidate points are filtered
+by `Navigation:HasLineOfSight` first — a monster will not pick a destination
+through a wall, only falling back to an occluded one if nothing visible
+exists within range. **Neither published map has any `IsPatrolPoint`/
+`IsSearchPoint` parts placed yet** — until they are, `Monster1` falls
+straight through to `Wander` with a one-time warn; this is a map-authoring
+gap, not a code gap.
+
+Perception is capability-gated sensors (`Sensors/Vision|Hearing|Flash|
+Proximity`) plus a global `Stimulus/StimulusBus` for footsteps
+(`FootstepEmitter`) and camera flashes (`FlashStimulusAdapter`, which
+subscribes to `Flash/FlashEvents` — that publisher now has a real
+subscriber). `Targeting:FollowTrail` lets a lost-but-still-sprinting target
+be re-acquired from a fresher heard stimulus instead of the chase dying at
+stale `LastKnownPos`. `Evolution` (Stats-only mutation, hour-gated via
+`MatchTimeEvents`) is live on `Monster1` — the `Witching` tier fires at hour
+27, multiplying `WalkSpeed` and zeroing `PatrolPauseChance`. The rest of the
+tier schema (capability grants, new states/abilities) is **not**
+implemented; full design and rationale in `plans/EvolutionPlan.md`.
+
 ### Pickup System — hand-placed in v1, visuals are place-agnostic
 
 `GameService/Pickup/` (`PickupRegistry`, `PickupPrompt`, `PickupService`,
@@ -253,9 +301,9 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 | XP persistence | works | ProfileStore (`RewardStore_v2`), real session lock. `RewardStore_v1` is a legacy read path only — see Tracked sunset conditions |
 | Match time / sunrise ending | works | Game place only; `MatchTime/` server + shared. Single authority on match length — see Match time above |
 | Match time HUD | works | top-centre bar + hour label, `DisplayOrder` 20, `KeepDuringCamera`. Client renders from replicated anchors; never simulates |
-| Monsters | works | `Monster/EncounterDirector.luau` gives `MonsterService.Spawn` a real caller; live agents re-stat on phase change via `MonsterService.Restage` |
+| Monsters | works | Capability-driven component architecture (`Monster/`); see Phase section above. `Monster1` only; Patrol is the default state but has no map points placed yet |
 | Objectives | works | registry/service/replicator + client visuals |
-| Flash | works | client `FlashSignal` → screen + world-light renderers; server `FlashEvents` has a publisher, still zero subscribers |
+| Flash | works | client `FlashSignal` → screen + world-light renderers; server `FlashEvents` publishes to `Camera` clients and now also to `Stimulus/FlashStimulusAdapter` for monster perception |
 | Touch-device detection | works | `Shared/TouchSession.IsActive()` — the single answer, called never cached; see G6 |
 | Mobile landscape lock | works | `ScreenOrientationController.local.luau` — `LandscapeSensor`, re-applied on change (see G19). No-op on desktop |
 | Spectate | works | `Custom` + `CameraSubject` with a re-assert guard — see G12; camera resolved per call, never cached |
@@ -270,8 +318,9 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 - **`RewardModifiers`** — registry exists, zero entries. The Combo/Streak/Event seam, unproven.
 - **`MatchTimeEvents`** — registry + monotonic-cursor dispatcher exist and are exercised by the clock, but ship with **zero registered entries**. The seam for timed spawn waves / extraction windows.
 - **`MatchPhases` flags beyond `MonsterStage`** — `MonstersAggressive` and `ExtractionOpen` are declared and read by nothing yet.
-- **`GreyCube` Stage 2 numbers** — real and reachable from `DeepNight`, but tuned by eye, not by playtest.
-- **`FlashEvents`** (server) — has a publisher (`CameraShotHandler.legacy.luau`), zero subscribers. Reserved for monster perception.
+- **`Monster1` Stage 2 / Evolution numbers** — real and reachable (`DeepNight` at hour 24, `Witching` evolution tier at hour 27), tuned by eye against the player's `WalkSpeed`/`SprintSpeed`, not by playtest. See tuning comments in `Configs/Monster1.luau`.
+- **Evolution's non-Stats tier schema** (capability grants, new states/abilities) — see `plans/EvolutionPlan.md`.
+- **PatrolPoint/SearchPoint authoring** — `PatrolGraph` and `States/Patrol.luau` are complete; neither published map has any points placed. Patrol falls back to `Wander` until they exist.
 - **`SoundIds.luau`** — TODO stub.
 - **Party client surface** — see Phase section above.
 
@@ -337,8 +386,10 @@ Non-derivable from code. These will burn a session if forgotten.
 | `QueuePadCount` / `QueuePadCapacity` / `QueuePadEndsAt` | the pad's `Zone` Part | Server-written, read-only display state. `QueuePadEndsAt` is `0` when idle, else a `workspace:GetServerTimeNow()` deadline |
 | `MatchState` | `ReplicatedStorage.MatchInfo` Folder | Current `MatchStates` name. Written by `MatchReplicator` |
 | `MatchScheduleId`, `MatchTimeStartedAt`, `MatchTimeEndsAt`, `MatchTimeAnchorAt`, `MatchTimeAnchorHour` | same `MatchInfo` Folder | Match clock anchors, written by `MatchTimeReplicator`. **All nil outside `Playing`** — absent must read as "no match time", never hour 0. `AnchorAt`/`AnchorHour` equal `StartedAt`/`StartHour` unless a schedule is swapped mid-match |
-| `IsMonsterSpawn` | Part or Model, Workspace | Hand-placed monster spawn point. Optional `MonsterId` (default `GreyCube`) and `Stage` (default 1) |
+| `IsMonsterSpawn` | Part or Model, Workspace | Hand-placed monster spawn point. Optional `MonsterId` (default `Monster1`) and `Stage` (default 1) |
 | `MonsterId` / `Stage` | spawned monster Model | `Stage` here is the **effective** stage and is rewritten on every re-stage — the authored floor lives on the spawn point, not on this |
+| `EvolutionTier` / `AIState` / `AggressionLevel` | spawned monster Model | Replicated for client-side reads: current evolution tier name, current state name, quantised aggression band (`Low`/`Medium`/`High` — not the raw scalar, see `MonsterConstants.AggressionLevels`) |
+| `IsPatrolPoint` / `IsSearchPoint` | invisible Part, Workspace | Hand-placed Patrol network node / secondary investigation spot. Optional `MonsterId` to restrict to one monster type. None placed yet in either map — see Half-built |
 | `IsPickup` / `PickupType` | Model or Part, Workspace | Pickup identity. Owned by `Pickup/PickupTypes.luau`; never hardcode elsewhere |
 | `PickupAmount` | same instance | Optional per-instance override of a Cash pickup's `Params.Amount` |
 
