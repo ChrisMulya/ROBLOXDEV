@@ -74,12 +74,61 @@ MonsterConstants.DefaultWanderRadius = 20
 MonsterConstants.DefaultWanderPause  = 1.5
 MonsterConstants.DefaultHysteresis       = 1.1
 
+-- Navmesh gap tolerance. Roblox has NO agent parameter for "ignore small
+-- gaps": the navmesh either connects two surfaces or it does not, so a 2-stud
+-- slit between two floor pieces splits the mesh and pathfinding either detours
+-- the long way around it or refuses outright -- over an imperfection a player
+-- walks across without noticing.
+--
+-- These drive a direct-route override in HumanoidPathLocomotion: a ground
+-- break no wider than this, or a step no taller than this, is something the
+-- Humanoid crosses on its own, so the pathfinder's answer is overridden and
+-- the monster walks straight. Overridable per monster under Config.Navigation.
+MonsterConstants.DefaultNavGapTolerance           = 2
+-- Only probe for a direct route within this range. Bounds the cost: the probe
+-- is one spherecast plus a ground raycast every GapTolerance/2 studs, and a
+-- gap worth stepping over is a short-range problem.
+MonsterConstants.DefaultNavDirectRouteMaxDistance = 40
+-- How much longer than the straight line a computed path must be before it
+-- counts as a detour worth second-guessing. Below this the navmesh and the
+-- straight line agree and the probe is skipped entirely, which is the common
+-- case and costs nothing.
+MonsterConstants.DefaultNavDirectRouteDetourRatio = 1.5
+
 -- Phase F: Config.Navigation.Patrol overrides any of these per monster. See
 -- States/Patrol and plans/create-a-read-only-implementation-calm-ripple.md §20.
 MonsterConstants.DefaultPatrolLinkRadius         = 60
+-- Fallback radius used ONLY when nothing inside LinkRadius is selectable
+-- without turning back into recent history. Points spaced further apart than
+-- LinkRadius would otherwise be invisible to selection entirely, leaving the
+-- monster bouncing between the two neighbours it can see -- radius must be a
+-- cheaper concession than reversing, or sparse networks oscillate forever.
+MonsterConstants.DefaultPatrolMaxLinkRadius      = 150
+-- No longer read by selection (bearing clustering replaced the fixed forward
+-- cone) -- retained so an existing config that sets it does not error.
 MonsterConstants.DefaultPatrolForwardConeDegrees = 45
 MonsterConstants.DefaultPatrolReverseCutoff      = -0.5
-MonsterConstants.DefaultPatrolHistoryLength      = 2
+-- Visited-point ring size: how many of the monster's own last stops it will
+-- not turn back into.
+MonsterConstants.DefaultPatrolHistoryLength      = 3
+-- Bearing gap (degrees) that starts a new "direction" cluster when candidate
+-- PatrolPoints are sorted by angle from the monster's travel heading.
+MonsterConstants.DefaultPatrolDirectionSplitDegrees   = 45
+-- A cluster wider than this is split at its largest internal gap, so a fan of
+-- points spanning a wide arc doesn't read as one direction.
+MonsterConstants.DefaultPatrolDirectionMaxSpanDegrees = 90
+-- Within a chosen direction, candidates within this many studs of the closest
+-- one are tied and broken at random, so stacked/clustered points don't lock
+-- to one deterministic pick.
+MonsterConstants.DefaultPatrolDistanceTieStuds        = 4
+-- How long a PatrolPoint that timed out or got the monster stuck is held out
+-- of selection. Temporary, unlike the resolve-failure cache below -- the
+-- block (a closed door, a body-blocking player) may clear.
+MonsterConstants.DefaultPatrolDeferDuration           = 20
+-- How long a PatrolPoint that failed ResolveReachable stays excluded before
+-- being re-probed. Without this a point that was briefly unreachable (a door
+-- shut when first checked) is excluded for the monster's entire lifetime.
+MonsterConstants.DefaultPatrolUnreachableRetryAfter   = 60
 -- Longer than any single leg should plausibly take; exists only to recover
 -- from a path a closed door or a body-blocking player made impossible.
 MonsterConstants.DefaultPatrolLegTimeout         = 30
@@ -131,5 +180,10 @@ MonsterConstants.StrictBlackboard = false
 -- default because a monster that legitimately cannot reach a player would spam
 -- it. Turn on when tuning AgentParams.
 MonsterConstants.DebugPathfinding = false
+
+-- Prints one line per PatrolPoint selection: cluster count, chosen bearing,
+-- chosen point. Off by default; turn on to verify direction-split behaviour
+-- (e.g. T-junction 50/50) in Studio, since that's impractical to eyeball.
+MonsterConstants.DebugPatrol = false
 
 return MonsterConstants

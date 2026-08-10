@@ -53,25 +53,129 @@ local WAYPOINT_EPSILON = 2
 -- How close counts as reaching the GOAL. Separate from the above on purpose.
 local ARRIVE_DISTANCE = 3
 
+-- Ground probe envelope for the direct-route check. Same values and the same
+-- reasoning as Navigation:ResolveReachable -- up first so a sample sunk
+-- slightly into the floor still finds it, then down far enough to catch a step
+-- or ramp but not so far that a sample over a stairwell finds the storey below.
+local GROUND_PROBE_UP = 6
+local GROUND_PROBE_DOWN = 24
+
 -- Horizontal only: the monster's root and the player's root sit at different
 -- heights, and on stairs the Y difference would otherwise read as distance.
 local function flatDistance(a: Vector3, b: Vector3): number
 	return Vector3.new(a.X - b.X, 0, a.Z - b.Z).Magnitude
 end
 
+local function pathLength(waypoints): number
+	local total = 0
+	for i = 2, #waypoints do
+		total += (waypoints[i].Position - waypoints[i - 1].Position).Magnitude
+	end
+	return total
+end
+
+local function hasJumpWaypoint(waypoints): boolean
+	for _, waypoint in ipairs(waypoints) do
+		if waypoint.Action == Enum.PathWaypointAction.Jump then
+			return true
+		end
+	end
+	return false
+end
+
 function HumanoidPathLocomotion.new(instance, navConfig)
 	navConfig = navConfig or {}
 
+	-- Own RaycastParams rather than borrowing Navigation's: Navigation owns
+	-- this module, so reaching back up for them would close a dependency
+	-- cycle. Same configuration and the same reasoning for RespectCanCollide
+	-- as Navigation -- only solid geometry should count as floor or wall, or
+	-- decorative non-colliding parts would read as ground over a real hole.
+	local probeParams = RaycastParams.new()
+	probeParams.FilterType = Enum.RaycastFilterType.Exclude
+	probeParams.FilterDescendantsInstances = { instance.model }
+	probeParams.RespectCanCollide = true
+
 	return setmetatable({
 		instance      = instance,
+		navConfig     = navConfig,
 		agentParams   = navConfig.AgentParams or {},
+		agentRadius   = (navConfig.AgentParams and navConfig.AgentParams.AgentRadius) or 0,
+		probeParams   = probeParams,
 		waypoints     = nil,
 		waypointIndex = 1,
 		pathedTo      = nil,
 		lastComputeAt = 0,
 		computing     = false,
 		lastStatus    = nil,
+		-- Set when the probe below has cleared a straight walk to the goal, so
+		-- MoveTo steers at the goal itself and ignores the navmesh's route.
+		directRoute   = false,
 	}, HumanoidPathLocomotion)
+end
+
+-- Can the monster just WALK from `from` to `to`, ignoring what the navmesh
+-- thinks? Two independent questions, and both must pass:
+--
+--   * Is anything solid in the way? A spherecast of AgentRadius, so this asks
+--     "can a body this wide pass", not "is the centre line clear" -- the same
+--     question PickRoamPoint asks, for the same reason.
+--   * Is the floor continuous ENOUGH? Sampled along the segment. A run of
+--     missing floor no wider than GapTolerance is a slit the Humanoid crosses
+--     without input, and a step no taller than GapTolerance is one it climbs.
+--     Either exceeding the tolerance means this is a real hole or a real
+--     ledge, and the navmesh was right to route around it.
+--
+-- This deliberately second-guesses PathfindingService, which is why it lives
+-- here next to the pathfinding it overrides rather than beside Navigation's
+-- general-purpose probes.
+function HumanoidPathLocomotion:_isDirectRouteWalkable(from: Vector3, to: Vector3): boolean
+	local cfg = self.navConfig
+	local tolerance = cfg.GapTolerance or MonsterConstants.DefaultNavGapTolerance
+	local maxDistance = cfg.DirectRouteMaxDistance or MonsterConstants.DefaultNavDirectRouteMaxDistance
+
+	local flat = Vector3.new(to.X - from.X, 0, to.Z - from.Z)
+	local distance = flat.Magnitude
+	if distance < 1e-3 or distance > maxDistance then
+		return false
+	end
+	local direction = flat.Unit
+
+	local radius = math.max(self.agentRadius, 0.5)
+	-- Swept FLAT from `from`, which is the root position and therefore already
+	-- at body height -- lifting it further (as a probe starting from a ground
+	-- point would have to) would raise the sweep to head height and miss
+	-- exactly the knee-high clutter this is meant to catch. The direction is
+	-- flattened, so the sweep holds that height for its whole length.
+	if workspace:Spherecast(from, radius, direction * distance, self.probeParams) then
+		return false
+	end
+
+	-- Half the tolerance, so a gap exactly at the limit cannot hide between
+	-- two samples.
+	local step = math.max(tolerance / 2, 0.5)
+	local drop = Vector3.new(0, -(GROUND_PROBE_UP + GROUND_PROBE_DOWN), 0)
+	local missingRun, lastGroundY = 0, nil
+
+	for i = 0, math.floor(distance / step) do
+		local point = from + direction * math.min(i * step, distance)
+		local hit = workspace:Raycast(point + Vector3.new(0, GROUND_PROBE_UP, 0), drop, self.probeParams)
+
+		if hit then
+			if lastGroundY and math.abs(hit.Position.Y - lastGroundY) > tolerance then
+				return false
+			end
+			lastGroundY = hit.Position.Y
+			missingRun = 0
+		else
+			missingRun += step
+			if missingRun > tolerance then
+				return false
+			end
+		end
+	end
+
+	return true
 end
 
 function HumanoidPathLocomotion:_computeAsync(goal: Vector3)
@@ -103,22 +207,68 @@ function HumanoidPathLocomotion:_computeAsync(goal: Vector3)
 		local status = ok and path.Status or nil
 		self.lastStatus = status
 
+		local cfg = self.navConfig
+
 		if status == Enum.PathStatus.Success then
-			self.waypoints = path:GetWaypoints()
+			local waypoints = path:GetWaypoints()
+			self.waypoints = waypoints
 			-- Waypoint 1 is where we already are.
 			self.waypointIndex = 2
 			self.pathedTo = goal
+			self.directRoute = false
+
+			-- Second-guess the navmesh in exactly two cases, both of which mean
+			-- "a gap split the mesh":
+			--
+			--   * The route is much longer than the straight line -- it walked
+			--     around the gap.
+			--   * The route JUMPS. With AgentCanJump on, the navmesh bridges a
+			--     small slit with a jump link instead of detouring, so the path
+			--     is short and the detour test alone would never fire -- and the
+			--     monster would hop over an imperfection it should stride across.
+			--     Walk first, jump only where walking genuinely won't do.
+			--
+			-- Everywhere else the probe is skipped, so the common case pays
+			-- nothing for this.
+			local straight = flatDistance(origin, goal)
+			local detourRatio = cfg.DirectRouteDetourRatio or MonsterConstants.DefaultNavDirectRouteDetourRatio
+			local detoured = straight > 1e-3 and pathLength(waypoints) > straight * detourRatio
+			local jumps = hasJumpWaypoint(waypoints)
+
+			if (detoured or jumps) and self:_isDirectRouteWalkable(origin, goal) then
+				self.directRoute = true
+				self.waypoints = nil
+
+				if MonsterConstants.DebugPathfinding then
+					warn(("[Path] %s: overriding navmesh route (%s) over %.0f studs -- direct walk is clear within gap tolerance")
+						:format(self.instance.monsterId, jumps and "jump link" or "detour", straight))
+				end
+			end
 		else
 			-- Unreachable for these AgentParams. Drop the stale path so MoveTo
-			-- falls back to walking straight at the goal, and leave pathedTo
-			-- nil so the next tick retries rather than assuming this path holds.
+			-- falls back to walking straight at the goal.
 			self.waypoints = nil
-			self.pathedTo = nil
-			self.instance.bus:Fire("PathBlocked", {})
+
+			-- A refused path over a walkable slit is the same gap problem as a
+			-- detour, just expressed as NoPath. When the probe clears it this is
+			-- a COMMITTED direct route, not a blind straight-line: pathedTo is
+			-- set so the next tick steers instead of recomputing every cooldown
+			-- against geometry that will refuse it again.
+			self.directRoute = self:_isDirectRouteWalkable(origin, goal)
+			self.pathedTo = self.directRoute and goal or nil
+
+			if not self.directRoute then
+				self.instance.bus:Fire("PathBlocked", {})
+			end
 
 			if MonsterConstants.DebugPathfinding then
-				warn(("[Path] %s: %s over %.0f studs -- falling back to straight-line, which will snag on geometry")
-					:format(self.instance.monsterId, tostring(status), flatDistance(origin, goal)))
+				if self.directRoute then
+					warn(("[Path] %s: %s over %.0f studs -- but direct walk is clear within gap tolerance, committing to it")
+						:format(self.instance.monsterId, tostring(status), flatDistance(origin, goal)))
+				else
+					warn(("[Path] %s: %s over %.0f studs -- falling back to straight-line, which will snag on geometry")
+						:format(self.instance.monsterId, tostring(status), flatDistance(origin, goal)))
+				end
 			end
 		end
 
@@ -240,6 +390,10 @@ function HumanoidPathLocomotion:Stop()
 	end
 	self.waypoints = nil
 	self.pathedTo = nil
+	-- Cleared with the path it was derived from: the next journey has its own
+	-- geometry and must be probed on its own terms, not inherit this one's
+	-- verdict.
+	self.directRoute = false
 end
 
 function HumanoidPathLocomotion:Destroy()
@@ -251,6 +405,7 @@ function HumanoidPathLocomotion:Destroy()
 	end
 	self.waypoints = nil
 	self.pathedTo = nil
+	self.directRoute = false
 end
 
 return HumanoidPathLocomotion

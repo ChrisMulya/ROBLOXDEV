@@ -178,10 +178,18 @@ return {
 		-- the monster straight-lines and snags on geometry, which reads as
 		-- "it gave up". 1.5 still respects doorways without being precious
 		-- about clutter. Raise it if the monster starts clipping corners.
+		-- AgentCanJump is the BACKUP for broken navmesh, not the primary answer.
+		-- With it off, a gap the mesh won't span leaves the monster detouring
+		-- or refusing outright; with it on, the mesh can bridge one. But a jump
+		-- is loud and readable, and a monster hopping over a 2-stud floor slit
+		-- looks wrong -- so HumanoidPathLocomotion probes for a straight walk
+		-- first and overrides any route that jumps a gap it could have strolled
+		-- across. Jumping survives only where walking genuinely cannot reach.
+		-- Tune the threshold via Config.Navigation.GapTolerance.
 		AgentParams = {
 			AgentRadius  = 1.5,
 			AgentHeight  = 5,
-			AgentCanJump = false,
+			AgentCanJump = true,
 		},
 	},
 
