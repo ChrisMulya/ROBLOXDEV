@@ -11,8 +11,11 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 local MatchStates = require(ReplicatedStorage.Modules.Shared.MatchStates)
+local MatchDifficulty = require(ReplicatedStorage.Modules.Shared.MatchDifficulty)
+local SpawnMath = require(ReplicatedStorage.Modules.Shared.SpawnMath)
 local MatchManager = require(ServerScriptService.GameService.Match.MatchManager)
 local MatchParticipants = require(ServerScriptService.GameService.Match.MatchParticipants)
+local MatchSettings = require(ServerScriptService.GameService.Match.MatchSettings)
 local CashWallet = require(ServerScriptService.GameService.Player.CashWallet)
 
 local Cash = {}
@@ -47,7 +50,30 @@ function Cash.Collect(player: Player, instance: Instance, typeDef: any): (boolea
 		return false, "HandlerFailed", nil
 	end
 
-	amount = math.floor(amount)
+	-- TryGet, not Get: this runs inside PickupService's claim window, which is
+	-- not pcalled and has already set claimed[instance] and disabled the
+	-- prompt. An assert here would escape before that module's un-claim path
+	-- and brick the pickup for the rest of the match. Returning HandlerFailed
+	-- instead reuses the recovery PickupService already has for a bad amount.
+	-- Unreachable in practice -- CanCollect gates on Playing, which is strictly
+	-- downstream of MatchArrival's Capture() -- but the failure mode is bad
+	-- enough to not rely on that.
+	local settings = MatchSettings.TryGet()
+	if not settings then
+		warn("Cash.Collect: MatchSettings not captured -- refusing to grant rather than guess a multiplier")
+		return false, "HandlerFailed", nil
+	end
+
+	-- Roster-size devaluation of VALUE only -- never touches how many Cash
+	-- pickups were selected to spawn (that's SpawnSelection/MatchDifficulty.
+	-- SpawnFraction.Cash, driven by PlayerScaling.Cash = 0 so it never scales).
+	-- math.max(1, ...) after the multiply, not just after the raw amount,
+	-- because a small authored PickupAmount override could otherwise floor to
+	-- 0 under a heavy multiplier and become an uncollectable pickup that looks
+	-- collectable (Cash.CanCollect already passed).
+	local scaling = MatchDifficulty.CashRewardScaling
+	local multiplier = SpawnMath.CashRewardMultiplier(settings.playerCount, scaling.PerExtraPlayer, scaling.Floor)
+	amount = math.max(1, math.floor(amount * multiplier))
 	local newValue = CashWallet.Add(player, amount)
 	if not newValue then
 		return false, "CurrencyNotReady", nil

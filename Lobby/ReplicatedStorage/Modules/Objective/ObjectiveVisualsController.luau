@@ -1,7 +1,8 @@
--- Client-side discovery + nearest-N budget pooling. Roblox renders roughly
--- 31 Highlights before silently dropping the rest, so this never applies a
--- highlight to more than MAX_VISIBLE objectives at once, re-evaluated on a
--- slow loop rather than every frame.
+-- Client-side discovery + range gate + nearest-N budget pooling. Roblox
+-- renders roughly 31 Highlights before silently dropping the rest, so this
+-- never applies a highlight to more than MAX_VISIBLE objectives at once,
+-- re-evaluated on a slow loop rather than every frame. Objectives beyond
+-- MAX_DISTANCE studs are excluded before that budget is applied.
 --
 -- Boot: required (for its side effect) from StarterPlayerScripts/ClientBootstrap,
 -- so objectives glow from game start regardless of whether the player has
@@ -17,6 +18,11 @@ local ObjectiveStateClient = require(ReplicatedStorage.Modules.Objective.Objecti
 local ObjectiveVisuals = require(ReplicatedStorage.Modules.Objective.ObjectiveVisuals)
 
 local MAX_VISIBLE = 16
+-- Studs. An objective farther than this draws no outline at all, regardless
+-- of how few are on screen. Distinct from MAX_VISIBLE, which is a Highlight
+-- budget: this is a hard range gate applied FIRST, so the nearest-N budget
+-- only ever chooses among objectives already in range.
+local MAX_DISTANCE = 210
 local CULL_INTERVAL = 0.25
 
 local known = {} -- [instance] = true
@@ -114,7 +120,10 @@ RunService.Heartbeat:Connect(function(dt)
 			if ObjectiveStates.IsVisible(state) then
 				local position = positionOf(instance)
 				if position then
-					table.insert(candidates, { instance = instance, distance = (position - myPosition).Magnitude })
+					local distance = (position - myPosition).Magnitude
+					if distance <= MAX_DISTANCE then
+						table.insert(candidates, { instance = instance, distance = distance })
+					end
 				end
 			end
 		end

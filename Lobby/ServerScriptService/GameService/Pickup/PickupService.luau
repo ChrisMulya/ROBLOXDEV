@@ -12,6 +12,13 @@
 -- DataStore write, an async call) has to claim first, yield, then report
 -- back -- never the reverse, or two claims can interleave.
 --
+-- Both handler entry points are invoked through pcall. That does NOT relax
+-- the no-yield contract above -- pcall doesn't yield, so the mutex still
+-- holds. It exists because a handler that ERRORS (rather than returning
+-- false) would otherwise skip the un-claim path below, leaving the pickup
+-- permanently claimed and prompt-disabled for the rest of the match. A
+-- raised error is treated exactly like a returned failure.
+--
 -- No remote is involved anywhere in this flow: PromptTriggered fires
 -- server-side with the triggering player, so there is nothing here for a
 -- client to forge.
@@ -104,7 +111,16 @@ local function onPromptTriggered(prompt: ProximityPrompt, player: Player)
 		return
 	end
 
-	local canCollect, gateCode = handler.CanCollect(player, instance, typeDef)
+	-- Nothing has been mutated yet at this point, so an error here strands no
+	-- state -- but it would still propagate out of the PromptTriggered
+	-- handler. Refusing the collect is the same outcome as CanCollect
+	-- returning false, and keeps the failure to this one trigger.
+	local gateOk, canCollect = pcall(handler.CanCollect, player, instance, typeDef)
+	if not gateOk then
+		warn(("PickupService: handler '%s' errored in CanCollect for %s -- %s"):format(
+			typeDef.Handler, instance:GetFullName(), tostring(canCollect)))
+		return
+	end
 	if not canCollect then
 		return
 	end
@@ -115,12 +131,21 @@ local function onPromptTriggered(prompt: ProximityPrompt, player: Player)
 	claimed[instance] = true
 	PickupPrompt.Disable(instance)
 
-	local ok, code, amount = handler.Collect(player, instance, typeDef)
-	if not ok then
-		claimed[instance] = nil
-		PickupPrompt.Enable(instance)
+	-- Past the claim: an escaping error here would brick the instance (see the
+	-- header). `ok` carries the error message when invokeOk is false.
+	local invokeOk, ok, code, amount = pcall(handler.Collect, player, instance, typeDef)
+
+	if not invokeOk then
+		warn(("PickupService: handler '%s' errored collecting %s -- %s"):format(
+			typeDef.Handler, instance:GetFullName(), tostring(ok)))
+	elseif not ok then
 		warn(("PickupService: %s failed to collect %s (%s)"):format(
 			player.Name, instance:GetFullName(), PickupResultCodes.GetMessage(code)))
+	end
+
+	if not invokeOk or not ok then
+		claimed[instance] = nil
+		PickupPrompt.Enable(instance)
 		return
 	end
 

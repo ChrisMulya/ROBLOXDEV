@@ -14,6 +14,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 local MatchManager = require(script.Parent.MatchManager)
 local MatchParticipants = require(script.Parent.MatchParticipants)
+local MatchSettings = require(script.Parent.MatchSettings)
 
 local MatchArrival = {}
 
@@ -66,9 +67,14 @@ local function seedFrom(player: Player)
 
 	-- Guarded separately: a second Loading -> WaitingForPlayers would be an
 	-- illegal transition and warn, and in the Studio path this runs once per
-	-- arriving player.
+	-- arriving player. MatchSettings.Capture happens here too, immediately
+	-- before the transition it gates on -- MatchParticipants.All() is already
+	-- correct at this point (the roster is seeded above), and every
+	-- WaitingForPlayers subscriber must see MatchSettings.Get() succeed with
+	-- no dependency on subscriber order (G20).
 	if not advanced then
 		advanced = true
+		MatchSettings.Capture(teleportData, modeId)
 		MatchManager.RequestTransition("WaitingForPlayers", "MatchArrival")
 	end
 end

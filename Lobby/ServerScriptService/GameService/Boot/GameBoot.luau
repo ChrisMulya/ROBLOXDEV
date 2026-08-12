@@ -12,6 +12,8 @@ local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 local PlaceIds = require(ReplicatedStorage.Modules.Shared.PlaceIds)
 local MatchStates = require(ReplicatedStorage.Modules.Shared.MatchStates)
 local PlayerStates = require(ReplicatedStorage.Modules.Shared.PlayerStates)
+local MatchDifficulty = require(ReplicatedStorage.Modules.Shared.MatchDifficulty)
+local SpawnCategories = require(ReplicatedStorage.Modules.Shared.SpawnCategories)
 local MatchSchedule = require(ReplicatedStorage.Modules.MatchTime.MatchSchedule)
 local MatchPhases = require(ReplicatedStorage.Modules.MatchTime.MatchPhases)
 local ExitConfig = require(ReplicatedStorage.Modules.Exit.ExitConfig)
@@ -68,6 +70,8 @@ function GameBoot.Start()
 	-- later -- this is the closest thing to a test suite either table gets.
 	MatchStates.Validate()
 	PlayerStates.Validate()
+	MatchDifficulty.Validate()
+	SpawnCategories.Validate()
 	-- Same reasoning: a malformed schedule (a gap between segments, a last
 	-- segment that doesn't land on EndHour) becomes a loud boot failure
 	-- rather than a clock that silently runs to the wrong time.
@@ -86,6 +90,10 @@ function GameBoot.Start()
 		-- dependencies, but must be listening before MatchSpawner loads any
 		-- character -- placed with the other early always-on services.
 		require(ServerScriptService.GameService.Player.CharacterMovementService),
+		-- Flashlight toggle. No dependencies (reads Player.Character directly
+		-- off the request), placed with the other early always-on per-player
+		-- services.
+		require(ServerScriptService.GameService.Player.FlashlightService),
 		-- Blueprint D5. After CharacterMovementService: reads
 		-- IsSprinting(player) every Heartbeat, so the accessor must exist
 		-- before this can query it (no ordering issue in practice --
@@ -180,6 +188,13 @@ function GameBoot.Start()
 		require(ServerScriptService.GameService.Pickup.PickupRegistry),
 		require(ServerScriptService.GameService.Pickup.PickupService),
 		require(ServerScriptService.GameService.Pickup.PickupCleanupHook),
+		-- Match-start spawn selection: thins hand-placed Cash/Objective/
+		-- Document instances by difficulty x player count. After PickupRegistry
+		-- and MatchCleanup (registers a teardown step into it, registry before
+		-- registrant), and after MatchManager (subscribes to StateChanged) --
+		-- all required above. Before MatchArrival, which is last and fires the
+		-- WaitingForPlayers transition this reacts to.
+		require(ServerScriptService.GameService.Match.SpawnSelection),
 		-- Before RewardResultHook, which reads it: the per-match reward delta
 		-- accumulator must be subscribed to RewardService.Granted before any
 		-- reward can be granted.
