@@ -11,6 +11,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local MatchPhases = require(script.Parent.MatchPhases)
 local UIBuilder = require(ReplicatedStorage.Modules.UI.UIBuilder)
 local UITheme = require(ReplicatedStorage.Modules.UI.UITheme)
+local UIScaleController = require(ReplicatedStorage.Modules.UI.UIScaleController)
+local MatchTimeAnnouncer = require(script.Parent.MatchTimeAnnouncer)
+local MatchEventAnnouncer = require(script.Parent.MatchEventAnnouncer)
 
 local MatchTimeHud = {}
 
@@ -18,8 +21,11 @@ local MatchTimeHud = {}
 -- See UIBuilder.CreateScreenGui's comment -- that comment is the registry.
 local DISPLAY_ORDER = 20
 
-local BAR_WIDTH = 320
-local BAR_HEIGHT = 34
+-- Matches Map0_Test's value; Lobby previously used 320x34, a divergence with
+-- no documented reason that made the shared UIScale factor produce two
+-- differently-sized bars depending on place. See plans/responsive-hud.md.
+local BAR_WIDTH = 300
+local BAR_HEIGHT = 24
 
 local screenGui: ScreenGui? = nil
 local fill: Frame? = nil
@@ -38,15 +44,37 @@ local function ensureBuilt()
 	-- of the match.
 	screenGui:SetAttribute("KeepDuringCamera", true)
 
+	-- Column owns the anchor/position the holder used to own directly, and
+	-- carries the single UIScale for both the bar and the announcer beneath
+	-- it -- one scale factor for the whole widget, never two that could
+	-- drift apart. Grows downward (AutomaticSize Y) so adding the announcer
+	-- never moves the bar.
+	local column = Instance.new("Frame")
+	column.Name = "MatchTimeColumn"
+	column.AnchorPoint = Vector2.new(0.5, 0)
+	column.Position = UDim2.new(0.5, 0, 0, -8)
+	column.Size = UDim2.fromOffset(BAR_WIDTH, 0)
+	column.AutomaticSize = Enum.AutomaticSize.Y
+	column.BackgroundTransparency = 1
+	column.Parent = screenGui
+
+	local columnLayout = Instance.new("UIListLayout")
+	columnLayout.FillDirection = Enum.FillDirection.Vertical
+	columnLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	columnLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	columnLayout.Padding = UDim.new(0, 6)
+	columnLayout.Parent = column
+
+	UIScaleController.Attach(column)
+
 	local holder = Instance.new("Frame")
 	holder.Name = "MatchTimeHolder"
-	holder.AnchorPoint = Vector2.new(0.5, 0)
-	holder.Position = UDim2.new(0.5, 0, 0, 12)
+	holder.LayoutOrder = 1
 	holder.Size = UDim2.fromOffset(BAR_WIDTH, BAR_HEIGHT)
 	holder.BackgroundColor3 = UITheme.Colors.PanelBackground
 	holder.BackgroundTransparency = 0.25
 	holder.BorderSizePixel = 0
-	holder.Parent = screenGui
+	holder.Parent = column
 
 	local holderCorner = Instance.new("UICorner")
 	holderCorner.CornerRadius = UDim.new(0, 6)
@@ -57,6 +85,11 @@ local function ensureBuilt()
 	holderStroke.Thickness = 1
 	holderStroke.Transparency = 0.35
 	holderStroke.Parent = holder
+
+	MatchTimeAnnouncer.Attach(column, BAR_WIDTH)
+	-- Beneath the time announcer, same column and therefore the same single
+	-- UIScale -- see the column comment above.
+	MatchEventAnnouncer.Attach(column, BAR_WIDTH)
 
 	fill = Instance.new("Frame")
 	fill.Name = "Fill"
@@ -81,6 +114,11 @@ local function ensureBuilt()
 	hourLabel.Text = ""
 	hourLabel.ZIndex = 2
 	hourLabel.Parent = holder
+
+	local hourConstraint = Instance.new("UITextSizeConstraint")
+	hourConstraint.MinTextSize = 10
+	hourConstraint.MaxTextSize = 22
+	hourConstraint.Parent = hourLabel
 end
 
 -- The fill is written every tick and deliberately NOT tweened -- same reason

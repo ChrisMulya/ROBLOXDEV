@@ -63,17 +63,31 @@ PlayerStates.All = {
 		CanSpectate = false,
 		Terminal = true,
 	},
+	-- Reached the exit and got out. Not CountsAsActive, so SunriseEndHook
+	-- (which only kills still-active participants) and MatchEndCondition
+	-- both treat an escapee exactly like a non-survivor for "is anyone left"
+	-- purposes -- but CanSpectate = true hands them straight to
+	-- SpectateService with no new code path. Never transitions back to
+	-- Alive: escape is final.
+	Escaped = {
+		CanControlCharacter = false,
+		CanScore = false,
+		CountsAsActive = false,
+		CanSpectate = true,
+		Terminal = false,
+	},
 }
 
 -- Disconnected is deliberately NOT terminal -- that's what makes reconnect
 -- support a config change later rather than a redesign. Leaving is terminal:
 -- this player will not be seen again on this server.
 PlayerStates.Transitions = {
-	Alive = { Dead = true, Disconnected = true, Leaving = true },
+	Alive = { Dead = true, Disconnected = true, Leaving = true, Escaped = true },
 	Dead = { Spectating = true, Alive = true, Disconnected = true, Leaving = true },
 	Spectating = { Alive = true, Disconnected = true, Leaving = true },
 	Disconnected = { Alive = true, Leaving = true },
 	Leaving = {},
+	Escaped = { Disconnected = true, Leaving = true },
 }
 
 function PlayerStates.IsValid(state: string): boolean

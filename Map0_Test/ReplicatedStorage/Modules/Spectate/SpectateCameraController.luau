@@ -18,20 +18,25 @@
 -- back to the local humanoid on respawn -- handled by the guard below rather
 -- than by giving up engine camera control.
 --
--- Mouse lock: verified live that entering spectate leaves MouseBehavior
--- stuck at LockCenter even though FirstPersonCrosshair already dropped
--- CameraMode to Classic for Dead/Spectating -- Roblox's own camera script
--- keeps re-forcing the lock here independent of CameraMode, driven by
--- CameraType.Custom + a Humanoid CameraSubject. Same fix as
--- MatchReceiptController: a one-shot MouseBehavior = Default doesn't stick,
--- so this fights it back every frame for as long as spectating is active,
--- and stops fighting (not force-relocks) on Stop().
+-- Mouse lock: spectating is mouse-LOCKED on purpose. LockCenter is what makes
+-- the mouse a look control instead of a pointer, so the spectator can swing
+-- the camera freely around whoever they are watching -- exactly the orbit
+-- Roblox's Custom camera gives a shift-locked player. An unlocked cursor here
+-- would freeze the view at whatever angle the target's back happened to be.
+-- Target switching is therefore keyboard/touch (Q/E, or the HUD buttons on
+-- touch), never a click on a HUD button with a free cursor.
+--
+-- Both writes are one-shot EDGE writes, not a render-step loop. Verified live
+-- (see this file's history) that Roblox's own camera script re-forces
+-- LockCenter during spectate anyway, so there is nothing to fight -- and a
+-- per-frame lock here would fight MatchReceiptController's per-frame unlock,
+-- which runs while a spectator is still Spectating at match end and must win
+-- so the receipt's buttons stay clickable.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
 
 local SpectateCameraController = {}
 
@@ -87,29 +92,32 @@ local function tryExitCameraSession()
 	end
 end
 
-local mouseUnlocked = false
+local mouseLocked = false
 
-local function unlockSpectateMouse()
-	if mouseUnlocked then
+local function lockSpectateMouse()
+	if mouseLocked then
 		return
 	end
-	mouseUnlocked = true
-	UserInputService.MouseIconEnabled = true
-	RunService:BindToRenderStep("SpectateMouseUnlock", Enum.RenderPriority.Camera.Value + 1, function()
-		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-	end)
+	mouseLocked = true
+	-- The icon would otherwise sit pinned at screen centre for the whole
+	-- session, since FirstPersonCrosshair turns it back ON at the moment the
+	-- player stops being alive and then leaves it alone (its own crosshair is
+	-- gated on isAlive()).
+	UserInputService.MouseIconEnabled = false
+	UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
 end
 
-local function relockSpectateMouse()
-	if not mouseUnlocked then
+local function unlockSpectateMouse()
+	if not mouseLocked then
 		return
 	end
-	mouseUnlocked = false
-	RunService:UnbindFromRenderStep("SpectateMouseUnlock")
-	-- Deliberately does not force MouseBehavior/MouseIconEnabled back: if the
-	-- local player respawned into Alive, CameraMode returns to LockFirstPerson
-	-- (FirstPersonCrosshair) and its own RenderStepped loop reclaims both the
-	-- moment Roblox's camera script settles MouseBehavior back to LockCenter.
+	mouseLocked = false
+	-- Restored explicitly rather than left to settle: leaving spectate for the
+	-- receipt or the lobby needs a usable cursor immediately, and if the local
+	-- player respawned into Alive instead, FirstPersonCrosshair's RenderStepped
+	-- loop takes the icon back the same frame.
+	UserInputService.MouseIconEnabled = true
+	UserInputService.MouseBehavior = Enum.MouseBehavior.Default
 end
 
 local function resolveSubject(targetPlayer: Player?): Instance
@@ -164,7 +172,7 @@ function SpectateCameraController.SetTarget(targetPlayer: Player?)
 		previousSubject = camera.CameraSubject
 		tryExitCameraSession()
 		active = true
-		unlockSpectateMouse()
+		lockSpectateMouse()
 	end
 
 	camera.CameraType = Enum.CameraType.Custom
@@ -196,7 +204,7 @@ function SpectateCameraController.Stop()
 		return
 	end
 	active = false
-	relockSpectateMouse()
+	unlockSpectateMouse()
 
 	if subjectGuard then
 		subjectGuard:Disconnect()

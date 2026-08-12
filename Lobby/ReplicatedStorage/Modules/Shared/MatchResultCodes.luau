@@ -14,6 +14,7 @@ MatchResultCodes.Messages = {
 	Sunrise = "The sun came up.",
 	Aborted = "Match ended early.",
 	HostShutdown = "Server shutting down.",
+	Extracted = "You made it out.",
 }
 
 -- Any other/unknown code falls back to a generic string rather than nil.

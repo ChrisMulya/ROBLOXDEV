@@ -57,6 +57,20 @@ Remotes.ALL_NAMES = {
 	-- Server-authoritative and posed for every client including the holder --
 	-- see FlashlightAim.
 	"FlashlightAim",
+	-- Per-player escape dwell progress, pushed while that player stands in an
+	-- open exit. Server->client only: the countdown is a render of a timer
+	-- ExitService owns, never a client-reported one. A remote rather than a
+	-- MatchInfo attribute because this is genuinely per-player -- two players
+	-- in two different exits have two different countdowns.
+	"ExitDwellSync",
+	-- One-shot match event announcements for the HUD's event announcer line.
+	-- Server->client broadcast, and the payload is an ID from
+	-- MatchTime/MatchEvents rather than a string -- the client resolves the
+	-- wording and colour, so the wire can't carry arbitrary on-screen text.
+	-- Identical for everyone, but a remote rather than a MatchInfo attribute
+	-- because this is an EVENT (fired once, shown for 10s) and not state --
+	-- an attribute would replay to late joiners minutes after the fact.
+	"MatchEventAnnounce",
 }
 
 function Remotes.Get(name: string): RemoteEvent

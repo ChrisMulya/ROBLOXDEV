@@ -180,9 +180,11 @@ function Navigation:HasLineOfSight(from: Vector3, to: Vector3, ignore: Instance?
 	return false
 end
 
--- A random point within radius of origin that the monster can reach and stand
--- on. Shared by Wander and Check, which both used to roll their own unchecked
--- point and hand it straight to MoveTo.
+-- Sweeps a body-width spherecast from origin along direction for up to
+-- distance, truncates short of anything it hits, and hands the result to
+-- ResolveReachable. Shared by PickRoamPoint (random direction) and
+-- Investigation's Visual candidate (a specific escape heading) -- both are
+-- "walk this way, but not into a wall".
 --
 -- Why the check is needed at all: an unvalidated point routinely lands inside
 -- a wall. PathfindingService then returns NoPath, HumanoidPathLocomotion drops
@@ -197,17 +199,10 @@ end
 -- distance is already measured from the body surface, which is what makes
 -- WALL_MARGIN a literal gap rather than a centre-point fudge.
 --
--- Uniform within the disc, not within the radius: sqrt() on the random draw
--- stops points bunching toward the centre, which would leave the monster
--- pacing the same few studs instead of covering the area.
---
--- Returns nil when there is nowhere worth walking to, so callers can re-roll
--- rather than committing to a zero-length or unreachable trip.
-function Navigation:PickRoamPoint(origin: Vector3, radius: number): Vector3?
-	local angle = math.random() * (2 * math.pi)
-	local distance = math.sqrt(math.random()) * radius
-	local direction = Vector3.new(math.cos(angle), 0, math.sin(angle))
-
+-- direction must already be a unit vector. Returns nil when there is nowhere
+-- worth walking to, so callers can re-roll or fall back rather than
+-- committing to a zero-length or unreachable trip.
+function Navigation:ProjectAlong(origin: Vector3, direction: Vector3, distance: number): Vector3?
 	local from = origin + Vector3.new(0, ROAM_RAY_HEIGHT, 0)
 	local probeRadius = math.max(self.agentRadius, 0.5)
 	local sweep = workspace:Spherecast(from, probeRadius, direction * distance, self.roamParams)
@@ -224,6 +219,21 @@ function Navigation:PickRoamPoint(origin: Vector3, radius: number): Vector3?
 	end
 
 	return self:ResolveReachable(origin + direction * usable)
+end
+
+-- A random point within radius of origin that the monster can reach and stand
+-- on. Shared by Wander and Check, which both used to roll their own unchecked
+-- point and hand it straight to MoveTo.
+--
+-- Uniform within the disc, not within the radius: sqrt() on the random draw
+-- stops points bunching toward the centre, which would leave the monster
+-- pacing the same few studs instead of covering the area.
+function Navigation:PickRoamPoint(origin: Vector3, radius: number): Vector3?
+	local angle = math.random() * (2 * math.pi)
+	local distance = math.sqrt(math.random()) * radius
+	local direction = Vector3.new(math.cos(angle), 0, math.sin(angle))
+
+	return self:ProjectAlong(origin, direction, distance)
 end
 
 -- Body-displacement stuck check, not a wall-contact check: the question is

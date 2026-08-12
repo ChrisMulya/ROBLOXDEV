@@ -53,6 +53,20 @@ local WAYPOINT_EPSILON = 2
 -- How close counts as reaching the GOAL. Separate from the above on purpose.
 local ARRIVE_DISTANCE = 3
 
+-- Forward-clearance probe, used ONLY when straight-lining blind (see
+-- _isForwardBlocked). Deliberately short: the question is "am I about to
+-- press into that", not "will this route eventually work".
+local BLOCK_PROBE_DISTANCE = 2.5
+-- Under AgentRadius on purpose. A corridor barely wider than the monster puts
+-- its walls at almost exactly AgentRadius, so a full-width sweep would report
+-- "blocked" for every hallway the monster legitimately walks down.
+local BLOCK_PROBE_RADIUS_SCALE = 0.75
+-- How head-on a surface must be to count as "in front of" rather than
+-- "alongside". 0.5 is a 60-degree cone: a wall being driven into has a normal
+-- opposing travel (dot near 1), one being slid past has a normal near
+-- perpendicular (dot near 0).
+local BLOCK_HEADON_DOT = 0.5
+
 -- Ground probe envelope for the direct-route check. Same values and the same
 -- reasoning as Navigation:ResolveReachable -- up first so a sample sunk
 -- slightly into the floor still finds it, then down far enough to catch a step
@@ -276,6 +290,34 @@ function HumanoidPathLocomotion:_computeAsync(goal: Vector3)
 	end)
 end
 
+-- Is something solid directly in front, head-on?
+--
+-- Asked ONLY when the monster is about to straight-line blind -- no navmesh
+-- path and no probe-cleared direct route -- which is the one case where
+-- nothing has verified the way forward. With a real path the navmesh already
+-- guarantees an agent-width corridor, and directRoute means
+-- _isDirectRouteWalkable cleared it; second-guessing either per tick would
+-- stop the monster mid-route on ordinary corners.
+--
+-- Two discriminators keep this from firing on walls the monster is merely
+-- walking ALONGSIDE (see the two constants above): a sweep radius under
+-- AgentRadius, and a normal that has to actually face the monster.
+--
+-- Standing still is the correct answer here, not a failure mode: the goal is
+-- one PathfindingService already refused, so pressing into the geometry in
+-- its general direction cannot make progress. Navigation's displacement-based
+-- _checkStuck sees the monster stop moving and reports stuck on schedule,
+-- which is what lets the calling state pick somewhere else.
+function HumanoidPathLocomotion:_isForwardBlocked(position: Vector3, direction: Vector3): boolean
+	local radius = math.max(self.agentRadius * BLOCK_PROBE_RADIUS_SCALE, 0.35)
+	local sweep = workspace:Spherecast(position, radius, direction * BLOCK_PROBE_DISTANCE, self.probeParams)
+	if not sweep then
+		return false
+	end
+
+	return sweep.Normal:Dot(-direction) >= BLOCK_HEADON_DOT
+end
+
 -- speed is supplied by Navigation, which resolves it per active state; this
 -- module deliberately does not read Stats.WalkSpeed itself. Falls back to the
 -- stat only if a caller omits it.
@@ -320,20 +362,36 @@ function HumanoidPathLocomotion:MoveTo(targetPosition: Vector3, dt: number, spee
 
 	self:_advanceWaypoints(position, humanoid, walkSpeed, dt)
 
-	-- Unconditional: every tick ends with a movement command. Straight-lining
-	-- when there is no path is worse than pathing but keeps it moving; the
-	-- DebugPathfinding warn above says when that is happening.
+	-- Every tick ends with a movement command -- including, where the way
+	-- forward is blocked, an explicit ZERO one. Never simply returning without
+	-- issuing anything is what keeps MoveDirection from going stale.
+	--
+	-- followingPath covers both "no path at all" and "path ran out before the
+	-- goal did": in either case steerTarget is the raw goal and nothing has
+	-- verified the line to it.
 	local waypoints = self.waypoints
 	local steerTarget = targetPosition
+	local followingPath = false
 	if waypoints and self.waypointIndex <= #waypoints then
 		steerTarget = waypoints[self.waypointIndex].Position
+		followingPath = true
 	end
 
 	-- Flattened: feeding a Y component into Move fights gravity and the
 	-- humanoid's own state machine on slopes and stairs.
 	local delta = Vector3.new(steerTarget.X - position.X, 0, steerTarget.Z - position.Z)
 	if delta.Magnitude > 0.001 then
-		humanoid:Move(delta.Unit, false)
+		local direction = delta.Unit
+
+		-- Straight-lining blind at something solid: stand still instead of
+		-- pressing into it. The old behaviour drove into the surface and held
+		-- there for the whole stuck window, which is the wall-hugging.
+		if not followingPath and not self.directRoute and self:_isForwardBlocked(position, direction) then
+			humanoid:Move(Vector3.zero, false)
+			return false
+		end
+
+		humanoid:Move(direction, false)
 	end
 
 	return false

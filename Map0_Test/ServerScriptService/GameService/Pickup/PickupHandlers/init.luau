@@ -11,6 +11,7 @@ local PickupHandlers = {}
 
 local handlers = {
 	Cash = require(script.Cash),
+	Document = require(script.Document),
 }
 
 function PickupHandlers.Get(name: string)

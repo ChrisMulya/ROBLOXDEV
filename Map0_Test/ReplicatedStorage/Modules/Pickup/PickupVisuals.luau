@@ -32,6 +32,21 @@ PickupVisuals.Styles = {
 			Range = 12,
 		},
 	},
+	DocumentGlow = {
+		Spin = { DegreesPerSecond = 45 },
+		Pillar = {
+			Color = Color3.fromRGB(60, 255, 120),
+			Height = 5,
+			Width0 = 1,
+			Width1 = 1,
+		},
+		Light = {
+			Enabled = true,
+			Color = Color3.fromRGB(60, 255, 120),
+			Brightness = 1,
+			Range = 12,
+		},
+	},
 }
 
 PickupVisuals.Default = PickupVisuals.Styles.CashGlow

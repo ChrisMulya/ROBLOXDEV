@@ -24,6 +24,17 @@ with XP persisted. Loadout (camera choice) survives both a teleport and a
 plain rejoin. Reward persistence is on ProfileStore with a real per-session
 lock. Verified live on the published two-place build.
 
+**Uncommitted work-in-progress on top of that baseline** (not yet verified
+live, not yet committed): a formal Match layer (`GameService/Match/*`)
+replacing the old ad hoc lifecycle glue, a shared Mission List HUD, a
+Monster investigation/search overhaul (`Investigation` component,
+`VisualScan` behaviour, `PointSelector`), a capture-target registry feeding a
+rewritten cone-based `PhotoCapture`, a Document pickup, and the match-time
+announcer + responsive-HUD work described in `plans/`. See the new
+subsections below and `git status` for the exact file list — this paragraph
+only orients; it is not a substitute for reading the diff before touching any
+of it.
+
 **Known-broken and half-built items are their own sections below** — this
 paragraph is the only narrative allowed in this file. For how any of this was
 built, or what it used to be, see `git log`.
@@ -66,6 +77,163 @@ to `MatchStates`. A monster's effective stage is
 `max(spawnPoint.Stage, phase.MonsterStage)`: the authored stage is a floor, so
 the ramp is monotonic and collapses to today's behaviour when there is no match
 time.
+
+### Match layer (`ServerScriptService/GameService/Match/`) — Game place only, uncommitted
+
+A formal phased lifecycle replacing the previous ad hoc glue. Each module owns
+exactly one concern and the boundaries are enforced in each file's own header
+comment — read the module before extending it rather than guessing from the
+name:
+
+- `MatchManager` — owns the current `MatchStates` value and is the **one**
+  guarded entry point (`RequestTransition`) every state change goes through,
+  including `RequestEnd`/`Abort`. No gameplay logic, no remotes/attributes.
+- `MatchParticipants` — the authoritative roster (who was teleported in and
+  is expected), independent of `Players:GetPlayers()`. A disconnected
+  participant is still a participant.
+- `MatchArrival` — Game-side counterpart to the Lobby's `ArrivalService`:
+  consumes `TeleportData`, seeds `MatchParticipants`, advances
+  `Loading → WaitingForPlayers`. Falls back to a solo participant (the
+  arriving player) with no `TeleportData`, so a direct Studio Play-test still
+  produces a runnable match of one.
+- `MatchSpawner` — loads a character for each participant. Required because
+  `GameBoot` sets `CharacterAutoLoads = false`; without this an arriving
+  participant is a disembodied camera.
+- `MatchClock` — optional per-mode timers (`WaitingForPlayers` timeout,
+  `Countdown` ticks, the `Ending → Cleanup` hold). Drives transitions only
+  through `MatchManager`, holds no state of its own. Supersedes
+  `MatchCleanup`'s old placeholder `ENDING_HOLD_SECONDS` constant.
+- `MatchEndCondition` — the one module allowed to correlate the roster
+  (`MatchParticipants`) with per-player state (`PlayerStateService`) to
+  decide when a live match has nobody left to end for. Policy only; does not
+  itself clean up or teleport.
+- `MatchReplicator` — mirrors `MatchManager`'s state onto
+  `ReplicatedStorage.MatchInfo` attributes (shared state → attribute, per the
+  existing invariant). The one Match module allowed to touch remotes: on
+  entering `Ending` it also builds and sends the per-player
+  `MatchResultSync` payload.
+- `MatchResultBuilder` — assembles the end-of-match summary from registered
+  contributors (`RegisterContributor`, same non-yielding/side-effect-free
+  contract as `RewardService.RegisterContextProvider`). Feature systems
+  register their own slice; this module never learns what an objective or
+  reward type is. `MatchRosterHook` (display names) and `MatchStats`
+  (survival time + capture counts, feeding `Shared/MatchGrade.luau`'s letter
+  grade) are its two current registered contributors.
+- `MatchCleanup` — saves and destroys on reaching `Cleanup`. Systems opt in
+  via `RegisterSaveStep`/`RegisterTeardownStep`. Must not teleport (that's
+  `ReturnToLobbyService`) or compute rewards itself.
+- `ReturnToLobbyService` — teleports everyone home on `Finished`, then lets
+  Roblox destroy the empty reserved server naturally. Only reacts once
+  `Cleanup` has actually finished saving. A watchdog force-kicks stragglers
+  if the return teleport doesn't empty the server after a grace period —
+  this is the source of the `ReturnToLobbyService: watchdog elapsed` /
+  `TeleportAsync failed: Request Context Failure` lines seen in Studio
+  Output; expected there (G10 — `TeleportAsync` 403s in Studio Play), not
+  evidence of a live bug.
+- `MissionProgress` / `MissionReplicator` — see Mission List section below;
+  live in this folder because mission progress is match-scoped shared state,
+  the same category as the roster and the clock.
+
+**Relationship to existing systems, not yet reconciled in prose elsewhere:**
+`MatchClock` here is a distinct module from `MatchTime/`'s clock described
+above — this one times the `WaitingForPlayers`/`Countdown`/`Ending→Cleanup`
+states *around* a match; `MatchTime` times the *Playing* night itself. Same
+naming collision the original "Match time" section already calls out for the
+old `MatchClock` — worth a rename pass before this ships, not done here.
+
+### Mission List HUD — shared match-scoped progress, uncommitted
+
+`Mission/MissionClient` (read-only mirror of `MatchInfo` attributes) →
+`Mission/MissionHudController` (wires client to HUD, no heartbeat — repaints
+on attribute change since mission values are event-shaped, not a clock) →
+`Mission/MissionHud` (pure UI: Monster Photo score, Soft Objective count,
+Document placeholder). Same three-layer split as `MatchTime`'s
+Client/Controller/Hud. Required only from `ClientBootstrap`'s `GameServer`
+branch — the Lobby never builds it.
+
+Server side, `Match/MissionProgress` owns the shared (not per-player) counts:
+photo score, soft-objective completions, and Document pickups. Documents are
+counted from `PickupService.Collected`, not a marker attribute — a collected
+pickup is destroyed, so there's no instance left to mark; the denominator is
+therefore fixed at spawn count, not a live scan. `MissionReplicator` publishes
+onto `MatchInfo` attributes only while `Playing`, the same
+`ShowsMatchTime`-only convention the match clock uses — nil outside `Playing`
+is "no mission list," not zero.
+
+`HudLeftColumn` is new shared UI infrastructure: Cash and the Mission List
+both parent into one left-column Frame so they share a single anchor and
+`UIScale` and stack via `LayoutOrder` (Cash 1, Mission List 2) — the same
+`AutomaticSize.Y` + `UIListLayout` shape `MatchTimeHud`'s announcer column
+uses. Deliberately **not** tagged `KeepDuringCamera`: `CameraSession`'s
+`hideOtherGuis` already hides any untagged, enabled ScreenGui on camera entry,
+which is the behavior Cash's ScreenGui already had.
+
+### Monster investigation / search overhaul — uncommitted
+
+Extends the capability-driven Monster framework above with a real
+investigate-and-search cycle, replacing whatever `States/Check.luau` did
+before (585-line rewrite):
+
+- `Components/Investigation` — decides **where** an LOS-loss, footstep, or
+  other stimulus investigation should go and **why**. Ticks right after
+  Targeting in the same `MonsterInstance:Tick`, so it always sees that
+  frame's Targeting writes with no event subscription needed (same pattern
+  Aggression uses against Perception). Sole writer of
+  `Blackboard.InvestigationPosition/Reason/At`. `States/Check` reads only
+  this channel — never `LastStimulus`/`LastKnownPos` directly — because
+  Investigation is what enforces "a footstep never becomes a sighting."
+- `States/Check` — branches on `InvestigationReason`. Visual (LOS loss):
+  settle ~1s (`losdelay`) → relocate to a PatrolPoint continuing the escape
+  route (360° discovery around the projected focus) → brief wander →
+  walk to a relevant SearchPoint → `Behaviors/VisualScan` → linger 4-8s →
+  give up to `Patrol`. Non-visual (heard stimulus/trail) presumably takes a
+  shorter path directly to search — read the file before relying on the
+  exact branch, this summary is from the header comment only.
+- `Behaviors/VisualScan` — a transient (constructed-and-discarded, not a
+  component) slow rotate-one-way-then-other-then-back search behavior.
+  Perception keeps ticking independently during it, so a monster can be
+  re-spotted mid-scan and resume `Chase` with no extra wiring.
+- `Search/PointSelector` — one gate-and-rank engine shared by SearchPoint
+  selection (hard directional cone) and PatrolPoint selection (360°
+  discovery, direction is a soft bonus only), reusing Navigation's existing
+  reachability/occlusion checks and `PatrolGraph`'s spatial scans rather than
+  adding a second point-selection system. `States/Patrol`'s own selection
+  logic is a separate, established caller.
+- `MonsterConstants.luau` (new, `ReplicatedStorage/Modules/Monster/`) —
+  centralizes attribute names and defaults the framework would otherwise
+  spell as string literals/magic numbers. Deliberately does **not** own
+  `IsMonster` — that stays with `Reward/CaptureTargets` per the existing
+  attribute-ownership invariant.
+
+Same map-authoring gap as before applies doubly now: this entire investigate
+cycle needs `IsPatrolPoint`/`IsSearchPoint` parts placed, and **neither
+published map has any** — falls back to `Wander` with a one-time warn.
+
+### Capture registry + rewritten photo detection — uncommitted
+
+`Reward/CaptureRegistry` — discovery/lifecycle for every capturable instance
+in Workspace, generalized over every `CaptureTargets`-registered type
+(Monster, Objective, future types) instead of `PhotoCapture` hardcoding
+`IsObjective`/`IsMonster` scans itself. Modelled on
+`Objective/ObjectiveRegistry`.
+
+`PhotoCapture` is rewritten (240-line diff) from a 5×5 spread raycast to
+angular candidate selection → geometry proof → line-of-sight confirm
+(design in `plans/photo-capture-detection.md`, not read in full here). The
+aim cone half-angle is claimed byte-identical to the old grid's outer ring —
+the stated intent is every accuracy gain comes from removing false negatives
+*inside* the cone, never widening it. `USE_CONE_DETECTION` gates the new path
+so the old 5×5 path stays reachable as an instant rollback. **Check this flag
+before relying on either path being active.**
+
+### Document pickup — match-scoped mission collectible, uncommitted
+
+`Pickup/PickupHandlers/Document` — grants no currency, no per-player state.
+Collecting one *is* the event; `MissionProgress` (subscribed to
+`PickupService.Collected`) owns the shared count. Not gated on `KitGiven`
+(that gate exists only to stop a late kit grant overwriting
+`leaderstats.Cash`, and this handler never touches the wallet). Same
+disposal semantics as every other pickup — nothing persists past the match.
 
 ### Queue pads (lobby matchmaking entry point)
 
@@ -312,6 +480,13 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 | Party | server-only | see Phase section above — no client surface |
 | Loadout persistence | works | camera choice survives teleport and rejoin |
 | Pickup / Cash collection | works | Prompt + grant are Game place only; visuals are place-agnostic; hand-placed pickups, no spawner yet — see Phase section above |
+| Match layer (`GameService/Match/*`) | uncommitted, unverified | Formal phased lifecycle replacing prior ad hoc glue — see Phase section above |
+| Mission List HUD | uncommitted, unverified | Shared match-scoped progress (photo score / soft objectives / documents) — see Phase section above |
+| Monster investigation/search overhaul | uncommitted, unverified | `Investigation` + `VisualScan` + `PointSelector`; needs the same unplaced Patrol/Search points as Patrol |
+| Photo capture (cone detection) | uncommitted, unverified | Rewritten from 5×5 grid to angular-cone detection behind `USE_CONE_DETECTION`; old path still reachable |
+| Document pickup | uncommitted, unverified | Match-scoped mission collectible, no currency |
+| Match-time announcer (countdown / 3 AM enrage) | uncommitted, unverified | Plan says "not implemented" but the files exist and are wired — verify against `plans/match-time-announcer.md`'s checklist before trusting either claim |
+| Responsive HUD scaling | implemented per plan, unverified this session | `UIScaleController` + Cash/MatchTime/Stamina holders — see `plans/responsive-hud.md` |
 
 ## Half-built / not wired
 

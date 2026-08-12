@@ -45,10 +45,12 @@ end
 -- Construction order is not constrained: no component reads another's
 -- Blackboard keys at construction, only during Tick. So one list serves both.
 -- Anything not named here is built and ticked after, in capability order.
--- Aggression sits after Targeting because its Proximity modifier reads
--- VisibleTargets, and before the Brain (which runs after all components) so a
--- threshold crossed this tick is acted on this tick.
-local TICK_ORDER = { "Perception", "Targeting", "Aggression", "Navigation", "Combat" }
+-- Investigation sits right after Targeting because it reads LastKnownPos/
+-- LastSeenDirection/LoSLostAt/TrailPos/TrailAt, all written by Targeting this
+-- same tick. Aggression sits after Targeting because its Proximity modifier
+-- reads VisibleTargets, and before the Brain (which runs after all
+-- components) so a threshold crossed this tick is acted on this tick.
+local TICK_ORDER = { "Perception", "Targeting", "Investigation", "Aggression", "Navigation", "Combat" }
 
 local function buildComponents(self)
 	local writers = {}
@@ -79,16 +81,22 @@ local function buildComponents(self)
 		build(name)
 	end
 
-	-- Perception before Targeting is the ordering that actually matters, so
-	-- assert it rather than trusting TICK_ORDER to stay correct through edits.
-	local perceptionIndex, targetingIndex
+	-- Perception before Targeting, and Targeting before Investigation, are
+	-- orderings that actually matter, so assert them rather than trusting
+	-- TICK_ORDER to stay correct through edits.
+	local perceptionIndex, targetingIndex, investigationIndex
 	for index, name in ipairs(self.componentOrder) do
 		if name == "Perception" then perceptionIndex = index end
 		if name == "Targeting" then targetingIndex = index end
+		if name == "Investigation" then investigationIndex = index end
 	end
 	if perceptionIndex and targetingIndex then
 		assert(perceptionIndex < targetingIndex,
 			"MonsterInstance: Perception must tick before Targeting")
+	end
+	if targetingIndex and investigationIndex then
+		assert(targetingIndex < investigationIndex,
+			"MonsterInstance: Targeting must tick before Investigation")
 	end
 
 	-- Static for the instance's lifetime -- see GetTickRate.

@@ -20,7 +20,20 @@ local MatchArrival = {}
 local DEFAULT_MODE = "Default"
 
 local modeId = DEFAULT_MODE
-local seeded = false
+
+-- Two separate latches, because they answer two different questions.
+-- rosterLatched: "is the roster already complete?" -- true only once a
+-- TeleportData roster has been read, since that single payload carries every
+-- participant. advanced: "has Loading -> WaitingForPlayers already fired?" --
+-- always exactly once, no matter how many players seed.
+--
+-- These used to be one flag, which silently broke every multi-client Studio
+-- test: the fallback path below latched on the FIRST arrival, so every later
+-- client stayed out of MatchParticipants -- and therefore never got a
+-- character, since GameBoot sets CharacterAutoLoads = false and MatchSpawner
+-- only loads for the roster.
+local rosterLatched = false
+local advanced = false
 
 -- MatchClock needs the mode id to look up MatchConfig tunables but has no
 -- other way to learn it -- this is the one piece of state MatchArrival
@@ -30,22 +43,34 @@ function MatchArrival.GetModeId(): string
 end
 
 local function seedFrom(player: Player)
-	if seeded then
+	if rosterLatched then
 		return
 	end
-	seeded = true
 
 	local joinData = player:GetJoinData()
 	local teleportData = joinData and joinData.TeleportData
 
 	if teleportData and teleportData.participantUserIds then
+		-- Production: the first arrival's payload already names every
+		-- participant, so one seed is the complete answer and later arrivals
+		-- must not re-seed.
+		rosterLatched = true
 		modeId = teleportData.modeId or DEFAULT_MODE
 		MatchParticipants.Seed(teleportData.participantUserIds)
 	else
+		-- Studio Play-test or a direct join: there is no roster to read, so
+		-- each arrival is its own participant. Deliberately does NOT latch --
+		-- see the comment on rosterLatched above.
 		MatchParticipants.Seed({ player.UserId })
 	end
 
-	MatchManager.RequestTransition("WaitingForPlayers", "MatchArrival")
+	-- Guarded separately: a second Loading -> WaitingForPlayers would be an
+	-- illegal transition and warn, and in the Studio path this runs once per
+	-- arriving player.
+	if not advanced then
+		advanced = true
+		MatchManager.RequestTransition("WaitingForPlayers", "MatchArrival")
+	end
 end
 
 local started = false

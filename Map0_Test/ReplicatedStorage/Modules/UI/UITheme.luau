@@ -20,6 +20,18 @@ UITheme.Colors = {
 	TextMuted = Color3.fromRGB(158, 158, 166),
 	Danger = Color3.fromRGB(255, 92, 92),
 	Backdrop = Color3.fromRGB(0, 0, 0),
+
+	-- Added for the 3 AM enrage announcer. Purely additive, same rule as the
+	-- block above. Deliberately much darker than Danger and than the bar's
+	-- own Dawn-phase red so the two reads stay distinguishable when both fire
+	-- at hour 27 simultaneously.
+	DangerDeep = Color3.fromRGB(138, 18, 18),
+
+	-- Added for the event announcer line (see MatchTime/MatchEvents). Purely
+	-- additive. A high-luminance yellow rather than a saturated one: the
+	-- announcer sits over whatever the night lighting is doing to the scene,
+	-- and pure RGB(255,255,0) reads as a UI error state next to Danger.
+	Warning = Color3.fromRGB(255, 209, 71),
 }
 
 UITheme.Fonts = {

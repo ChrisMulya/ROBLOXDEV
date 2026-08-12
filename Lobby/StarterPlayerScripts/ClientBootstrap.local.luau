@@ -34,4 +34,12 @@ elseif ServerRole.Is("GameServer") then
 	-- find no anchors and stay hidden -- but not requiring it is the actual
 	-- guarantee.)
 	require(ReplicatedStorage.Modules.MatchTime.MatchTimeHudController)
+	-- Game place only, same reasoning as the clock: the Mission List is
+	-- match-scoped shared progress and the Lobby has no MatchInfo mission
+	-- attributes to read.
+	require(ReplicatedStorage.Modules.Mission.MissionHudController)
+	-- Game place only: ExitDwellSync is only ever fired by ExitService, which
+	-- asserts GameServer. The Lobby provisions the remote (so the two trees
+	-- stay byte-identical) but nothing there ever fires it.
+	require(ReplicatedStorage.Modules.Exit.ExitCountdownController)
 end

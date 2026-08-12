@@ -11,12 +11,13 @@
 local Components = {}
 
 local modules = {
-	Perception = require(script.Perception),
-	Targeting  = require(script.Targeting),
-	Aggression = require(script.Aggression),
-	Navigation = require(script.Navigation),
-	Combat     = require(script.Combat),
-	Evolution  = require(script.Evolution),
+	Perception    = require(script.Perception),
+	Targeting     = require(script.Targeting),
+	Investigation = require(script.Investigation),
+	Aggression    = require(script.Aggression),
+	Navigation    = require(script.Navigation),
+	Combat        = require(script.Combat),
+	Evolution     = require(script.Evolution),
 }
 
 local planned = {

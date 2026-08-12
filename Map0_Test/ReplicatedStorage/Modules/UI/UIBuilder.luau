@@ -29,9 +29,13 @@ end
 --
 --     0    Roblox TouchGui (engine-owned; thumbstick + jump button)
 --     0    most ScreenGuis -- no overlap, no opinion
+--     0    HudLeftGui        -- persistent left column (Cash + Mission List)
 --    10    FirstPersonCrosshairGui -- centre "+" reticle; above plain
 --                               gameplay, below the match clock and modals
 --    20    MatchTimeGui      -- top-centre match clock; must lose to the
+--                               sprint button and both modals
+--    25    ExitCountdownGui  -- escape dwell countdown; beats the clock (it's
+--                               live and time-critical) but loses to the
 --                               sprint button and both modals
 --    30    MobileSprintGui   -- must beat TouchGui (the thumbstick region
 --                               covers it) but lose to both modals below

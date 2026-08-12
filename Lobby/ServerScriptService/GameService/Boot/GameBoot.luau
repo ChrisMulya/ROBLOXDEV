@@ -14,6 +14,7 @@ local MatchStates = require(ReplicatedStorage.Modules.Shared.MatchStates)
 local PlayerStates = require(ReplicatedStorage.Modules.Shared.PlayerStates)
 local MatchSchedule = require(ReplicatedStorage.Modules.MatchTime.MatchSchedule)
 local MatchPhases = require(ReplicatedStorage.Modules.MatchTime.MatchPhases)
+local ExitConfig = require(ReplicatedStorage.Modules.Exit.ExitConfig)
 
 local GameBoot = {}
 
@@ -72,6 +73,7 @@ function GameBoot.Start()
 	-- rather than a clock that silently runs to the wrong time.
 	MatchSchedule.Validate()
 	MatchPhases.Validate()
+	ExitConfig.Validate(MatchSchedule.Get("Default"))
 
 	local services = {
 		require(ServerScriptService.GameService.PlayerState.PlayerStateService),
@@ -108,6 +110,15 @@ function GameBoot.Start()
 		-- (which captures resultCode/duration) to have already run.
 		require(ServerScriptService.GameService.Match.MatchResultBuilder),
 		require(ServerScriptService.GameService.Match.MatchReplicator),
+		-- Shared mission progress (Monster Photo score, Soft Objective count).
+		-- After MatchManager, whose StateChanged it subscribes to for the
+		-- WaitingForPlayers reset; MissionReplicator after MissionProgress,
+		-- publisher before subscriber. Order-tolerant otherwise -- the
+		-- RewardService.Awarded / ObjectiveService.StateChanged signals it
+		-- also subscribes to are already wired by the time GameBoot runs
+		-- (see Bootstrap.legacy.luau's pre-boot requires).
+		require(ServerScriptService.GameService.Match.MissionProgress),
+		require(ServerScriptService.GameService.Match.MissionReplicator),
 		require(ServerScriptService.GameService.Match.MatchCleanup),
 		-- Match Time System. After MatchCleanup because MatchTimeLighting
 		-- registers a teardown step into it (registry before registrant),
@@ -115,6 +126,19 @@ function GameBoot.Start()
 		-- StateChanged (publisher before subscriber). Within the block:
 		-- registry, then the publisher, then its three subscribers.
 		require(ServerScriptService.GameService.MatchTime.MatchTimeEvents),
+		-- The event announcer broadcast channel. Before any module that can
+		-- call Announce (ExitAnnounceHook below), and order-tolerant otherwise
+		-- -- its Start() only resolves a remote.
+		require(ServerScriptService.GameService.MatchTime.MatchEventService),
+		-- Exit System discovery + the hour-27 Alternate-unlock registration.
+		-- Registry (ExitRegistry) before registrant (ExitState), and both
+		-- before MatchTimeService.Start() begins sampling: ExitState.Start()
+		-- registers into MatchTimeEvents, and that registration must land
+		-- before the clock can dispatch past hour 27 (Debug schedules run
+		-- fast enough for this to matter). ExitState also reads
+		-- MissionProgress (required above) and MatchManager.StateChanged.
+		require(ServerScriptService.GameService.Exit.ExitRegistry),
+		require(ServerScriptService.GameService.Exit.ExitState),
 		require(ServerScriptService.GameService.MatchTime.MatchTimeService),
 		require(ServerScriptService.GameService.MatchTime.MatchTimeReplicator),
 		require(ServerScriptService.GameService.MatchTime.MatchTimeLighting),
@@ -122,6 +146,26 @@ function GameBoot.Start()
 		-- MatchEndCondition above races it harmlessly -- RequestEnd is
 		-- idempotent, so whoever fires first wins and the other no-ops.
 		require(ServerScriptService.GameService.MatchTime.SunriseEndHook),
+		-- Exit interaction + replication + result/cleanup hooks. After
+		-- ExitState (the availability authority it reads), PlayerStateService
+		-- (Alive/Escaped transitions), and MatchParticipants/MatchManager,
+		-- all required above. Registry-before-registrant for the two hooks,
+		-- same rule as RewardCleanupHook/PickupCleanupHook below.
+		require(ServerScriptService.GameService.Exit.ExitService),
+		require(ServerScriptService.GameService.Exit.ExitReplicator),
+		-- Presentation for the authored world-space exit signs. After
+		-- ExitState/ExitRegistry (both read) and MissionProgress (progress
+		-- numbers); its Start() paints the pre-match text immediately.
+		require(ServerScriptService.GameService.Exit.ExitLabel),
+		-- Tints the marked Part green while its exit is usable. Same
+		-- placement rule as ExitLabel: after ExitState/ExitRegistry, and its
+		-- Start() captures the authored colours immediately.
+		require(ServerScriptService.GameService.Exit.ExitVisuals),
+		-- Announces the Alternate opening. After ExitState (the signal it
+		-- subscribes to) and MatchEventService (the channel it fires into).
+		require(ServerScriptService.GameService.Exit.ExitAnnounceHook),
+		require(ServerScriptService.GameService.Exit.ExitResultHook),
+		require(ServerScriptService.GameService.Exit.ExitCleanupHook),
 		-- After MatchCleanup: registers a save step into its registry.
 		-- Order-tolerant at boot (RegisterSaveStep just appends to a
 		-- table), but this position keeps the list's dependency direction

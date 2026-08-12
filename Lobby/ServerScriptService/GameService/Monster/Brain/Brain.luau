@@ -41,6 +41,9 @@ local WAKE_EVENTS = {
 	-- monster tracking a sprinting player should turn on the new lead rather
 	-- than finish walking to the old one first.
 	"TrailUpdated",
+	-- Investigation committed to a new destination or reason (fresh LOS loss,
+	-- a newer trail/stimulus overriding an older one). Same latency argument.
+	"InvestigationUpdated",
 }
 
 function Brain.new(instance)

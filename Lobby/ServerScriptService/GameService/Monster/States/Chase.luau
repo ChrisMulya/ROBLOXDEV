@@ -9,10 +9,6 @@
 -- Update returns nothing. It used to return the next state (and always
 -- returned nil); the Brain owns that decision now.
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local StimulusKinds = require(ReplicatedStorage.Modules.Stimulus.StimulusKinds)
-
 local Chase = {}
 
 Chase.Name = "Chase"
@@ -65,8 +61,26 @@ local function committedUtility(instance, blackboard): number?
 	return 0.5 + 0.5 * ((aggression - threshold) / (1 - threshold))
 end
 
--- Eligible while there's a target, or a last known position that hasn't gone
--- stale.
+-- The moment pursuit is anchored to: the newer of the last SIGHTING and the
+-- last HEARD trail update. A footstep heard after LOS broke keeps the pursuit
+-- window alive exactly as sight would have; TrailAt defaults to 0 so a
+-- target that has never left a trail falls back to sight alone.
+local function pursuitAnchor(blackboard): number
+	return math.max(blackboard.LastSeenAt or 0, blackboard.TrailAt or 0)
+end
+
+-- Position to walk toward while pursuing a lost target: the newer of
+-- LastKnownPos (sight) and TrailPos (hearing). Never conflates the two --
+-- each stays in its own pair, this just picks the fresher one to walk at.
+local function pursuitTarget(blackboard): Vector3?
+	if blackboard.TrailAt and blackboard.TrailAt > (blackboard.LastSeenAt or 0) then
+		return blackboard.TrailPos
+	end
+	return blackboard.LastKnownPos
+end
+
+-- Eligible while there's a target, or a last known/heard position that hasn't
+-- gone stale.
 function Chase.Score(instance, blackboard): number?
 	if blackboard.Target then
 		return committedUtility(instance, blackboard)
@@ -82,7 +96,7 @@ function Chase.Score(instance, blackboard): number?
 	-- always wins over walking to where they used to be.
 	if blackboard.LastKnownPos then
 		local pursuitDuration = instance.config.Stats.PursuitDuration or 0
-		if os.clock() - blackboard.LastSeenAt <= pursuitDuration then
+		if os.clock() - pursuitAnchor(blackboard) <= pursuitDuration then
 			return 0.5
 		end
 	end
@@ -114,10 +128,11 @@ function Chase.Update(instance, dt: number)
 		return
 	end
 
-	-- Lost them. Walk to where they were; on giving up, forget entirely --
-	-- which drops Chase.Score to nil and lets the Brain pick something else.
-	local lastKnown = blackboard.LastKnownPos
-	if not lastKnown then
+	-- Lost them. Walk to the freshest lead (sight or trail); on giving up,
+	-- forget entirely -- which drops Chase.Score to nil and lets the Brain
+	-- pick something else.
+	local destination = pursuitTarget(blackboard)
+	if not destination then
 		return
 	end
 
@@ -126,7 +141,7 @@ function Chase.Update(instance, dt: number)
 	-- PursuitDuration caps how long the WALK may take, not how long to stand
 	-- around once it is over.
 	local pursuitDuration = instance.config.Stats.PursuitDuration or 0
-	if os.clock() - blackboard.LastSeenAt > pursuitDuration then
+	if os.clock() - pursuitAnchor(blackboard) > pursuitDuration then
 		if targeting then
 			targeting:Forget()
 		end
@@ -137,7 +152,7 @@ function Chase.Update(instance, dt: number)
 		return
 	end
 
-	if not navigation:MoveTo(lastKnown, dt) then
+	if not navigation:MoveTo(destination, dt) then
 		return
 	end
 
@@ -149,15 +164,13 @@ function Chase.Update(instance, dt: number)
 	-- spot for the entire remaining PursuitDuration -- up to 20 seconds of
 	-- looking broken.
 	--
-	-- Hand the position to Check instead. It already knows how to work an
-	-- area: hold, then sweep random points around it for a randomised 10-20s.
-	-- Forgetting is what makes that possible -- Chase is Band 1 and Check is
+	-- Forgetting is what hands off to Check: Chase is Band 1 and Check is
 	-- Band 0, so Check can never outscore an eligible Chase; Chase has to
-	-- become ineligible before the search can start.
-	local perception = instance:GetComponent("Perception")
-	if perception then
-		perception:Inject(StimulusKinds.LostTarget, lastKnown, 1)
-	end
+	-- become ineligible before an investigation can start. Investigation (a
+	-- component ticking right after Targeting, same frame) has already read
+	-- LastKnownPos/LastSeenDirection/LoSLostAt -- written by Targeting:Clear
+	-- back when LOS first broke -- into its own InvestigationPosition/Reason/
+	-- At keys, so Forget clearing Targeting's keys here is harmless.
 	if targeting then
 		targeting:Forget()
 	end

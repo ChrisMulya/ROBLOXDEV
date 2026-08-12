@@ -141,17 +141,27 @@ local function reassignSpectatorsWatching(targetUserId: number)
 end
 
 local function onPlayerStateChanged(player: Player, newState: string, oldState: string?)
-	if newState == "Spectating" then
-		assignBest(player)
-		return
-	end
-
+	-- Order matters, and the early return this used to open with was wrong for
+	-- any state that both ENDS a run and starts a spectate in one transition.
+	-- Alive -> Escaped is exactly that: the player stops being a valid target
+	-- for others AND becomes a spectator themselves, so both halves below have
+	-- to run. Dead -> Spectating never exposed the bug because Alive -> Dead
+	-- had already done the reassign a moment earlier.
 	if oldState and PlayerStates.CanControlCharacter(oldState) and not PlayerStates.CanControlCharacter(newState) then
 		reassignSpectatorsWatching(player.UserId)
 	end
 
-	if oldState == "Spectating" and newState ~= "Spectating" then
+	if oldState and PlayerStates.CanSpectate(oldState) and not PlayerStates.CanSpectate(newState) then
 		assignments[player.UserId] = nil
+	end
+
+	-- Reads the CanSpectate FLAG rather than the literal "Spectating", per
+	-- this repo's own rule (see PlayerStates' header: never branch on a state
+	-- name outside PlayerStateService's guard). Without this an Escaped player
+	-- has a destroyed character, no camera subject, and an empty viewport --
+	-- and a future Observer state gets its camera here for free.
+	if PlayerStates.CanSpectate(newState) then
+		assignBest(player)
 	end
 end
 

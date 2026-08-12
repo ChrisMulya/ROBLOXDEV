@@ -12,6 +12,7 @@ local TweenService = game:GetService("TweenService")
 
 local PlayerStats = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PlayerStats"))
 local PlayerRuntimeStats = require(ReplicatedStorage.Modules.PlayerRuntimeStats)
+local UIScaleController = require(ReplicatedStorage.Modules.UI.UIScaleController)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -47,6 +48,8 @@ container.Position = UDim2.new(1, -24, 0, 24)
 container.Size = UDim2.new(0, BAR_WIDTH, 0, (BAR_HEIGHT + BAR_SPACING) * #BAR_CONFIG)
 container.BackgroundTransparency = 1
 container.Parent = screenGui
+
+UIScaleController.Attach(container)
 
 -- fills[statName] = the Frame we tween the size of
 local fills: { [string]: Frame } = {}
@@ -106,6 +109,11 @@ local function createBar(order: number, config: { stat: string, max: string, col
 	label.ZIndex = 2
 	label.Parent = background
 
+	local labelConstraint = Instance.new("UITextSizeConstraint")
+	labelConstraint.MinTextSize = 9
+	labelConstraint.MaxTextSize = 16
+	labelConstraint.Parent = label
+
 	local valueLabel = Instance.new("TextLabel")
 	valueLabel.Name = "Value"
 	valueLabel.Size = UDim2.new(1, -8, 1, 0)
@@ -119,6 +127,11 @@ local function createBar(order: number, config: { stat: string, max: string, col
 	valueLabel.Text = ""
 	valueLabel.ZIndex = 2
 	valueLabel.Parent = background
+
+	local valueConstraint = Instance.new("UITextSizeConstraint")
+	valueConstraint.MinTextSize = 9
+	valueConstraint.MaxTextSize = 16
+	valueConstraint.Parent = valueLabel
 
 	fills[config.stat] = fill
 	percentLabels[config.stat] = valueLabel

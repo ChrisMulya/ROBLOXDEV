@@ -55,17 +55,19 @@ MonsterCapabilities.All = {
 	CanOpenDoors    = { Requires = { "CanNavigate", "CanInteract" } },
 }
 
--- Every monster gets these regardless of what it declares. Both are sole
+-- Every monster gets these regardless of what it declares. All three are sole
 -- writers of a Blackboard key that many things read (see blueprint 2):
--- Targeting owns Target, Aggression owns Aggression. Without them there is
--- nobody to own the key, and every reader would have to nil-check.
+-- Targeting owns Target, Aggression owns Aggression, Investigation owns
+-- InvestigationPosition/Reason/At. Without them there is nobody to own the
+-- key, and every reader would have to nil-check.
 --
 -- Note this is the ONE place the additive-capability rule bends, and it bends
 -- toward ownership rather than behaviour: a monster with no Aggression config
 -- gets the component but no modifiers, so it sits at 0 and behaves exactly as
--- if it had none. There is no CanBeAngry because there is nothing to switch
--- off.
-MonsterCapabilities.AlwaysOn = { "Targeting", "Aggression" }
+-- if it had none. Same for Investigation on a monster with no CanChase/
+-- CanInvestigate -- it will simply never see a candidate worth writing. There
+-- is no CanBeAngry because there is nothing to switch off.
+MonsterCapabilities.AlwaysOn = { "Targeting", "Aggression", "Investigation" }
 
 local function expand(name: string, into: { [string]: boolean }, seen: { [string]: boolean }, monsterId: string?)
 	if into[name] then

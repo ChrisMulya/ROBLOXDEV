@@ -7,7 +7,9 @@
       "mcp__Roblox_Studio__script_grep",
       "Bash(graphify update)",
       "mcp__Roblox_Studio__start_stop_play",
-      "Bash(set -e)"
+      "Bash(set -e)",
+      "Bash(cp \"/c/Users/pixel/.claude/plans/make-a-read-only-blueprint-plan-crystalline-hamster.md\" \"/c/Users/pixel/Desktop/ROBLOX-DEV/plans/match-time-announcer.md\")",
+      "Bash(rm \"/c/Users/pixel/.claude/plans/make-a-read-only-blueprint-plan-crystalline-hamster.md\")"
     ]
   }
 }

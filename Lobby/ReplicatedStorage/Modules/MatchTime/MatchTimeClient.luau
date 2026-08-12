@@ -49,6 +49,33 @@ function MatchTimeClient.GetAnchors(): { [string]: any }?
 	}
 end
 
+-- The schedule this match is running, for callers (the announcer) that need
+-- to convert their own target hours to real seconds via MatchTimeMath rather
+-- than going through GetHour.
+function MatchTimeClient.GetSchedule()
+	local anchors = MatchTimeClient.GetAnchors()
+	if not anchors then
+		return nil
+	end
+	return MatchSchedule.Get(anchors.scheduleId)
+end
+
+-- Real seconds elapsed since match start, on the same anchor math GetHour
+-- uses. Not clamped to the schedule's total -- a caller comparing against a
+-- fixed real-seconds window (the announcer) needs the true elapsed value,
+-- including past EndHour.
+function MatchTimeClient.GetElapsedReal(): number?
+	local anchors = MatchTimeClient.GetAnchors()
+	if not anchors then
+		return nil
+	end
+
+	local schedule = MatchSchedule.Get(anchors.scheduleId)
+	local elapsedSinceAnchor = workspace:GetServerTimeNow() - anchors.anchorAt
+	local anchorReal = MatchTimeMath.HourToReal(schedule, anchors.anchorHour)
+	return anchorReal + elapsedSinceAnchor
+end
+
 function MatchTimeClient.GetHour(): number?
 	local anchors = MatchTimeClient.GetAnchors()
 	if not anchors then

@@ -33,6 +33,8 @@ local UIBuilder = require(script.Parent.UIBuilder)
 local UITheme = require(script.Parent.UITheme)
 local MatchResultCodes = require(script.Parent.Parent.Shared.MatchResultCodes)
 local CaptureTargets = require(script.Parent.Parent.Reward.CaptureTargets)
+local ExitTypes = require(script.Parent.Parent.Exit.ExitTypes)
+local MatchTimeMath = require(script.Parent.Parent.MatchTime.MatchTimeMath)
 
 local MatchReceipt = {}
 
@@ -458,10 +460,17 @@ end
 -- personal-stats block), so repeating them here would just be noise. This is
 -- what keeps R2 for anything genuinely new: a future contributor's field
 -- shows up here with zero edits, even though the three named ones don't.
+local DEDICATED_CONTRIBUTORS = {
+	Player = true, -- name/columns
+	Reward = true, -- the scoreboard
+	Stats = true, -- the grade + personal-stats block
+	Exit = true, -- the "Escaped" personal-stat row (see renderStats)
+}
+
 local function formatDetail(perPlayer: { [string]: any }): string
 	local lines = {}
 	for contributorName, slice in pairs(perPlayer) do
-		if contributorName ~= "Player" and contributorName ~= "Reward" and contributorName ~= "Stats" then
+		if not DEDICATED_CONTRIBUTORS[contributorName] then
 			if typeof(slice) == "table" then
 				for key, value in pairs(slice) do
 					table.insert(lines, ("%s.%s: %s"):format(contributorName, key, tostring(value)))
@@ -489,7 +498,23 @@ end
 -- (0 if there was nothing to show). CaptureTargets.OrderedNames() drives the
 -- row list, so a future Artifact row appears here the moment it's added to
 -- that table -- nothing in this file needs to change.
-local function renderStats(stats: { survivedSeconds: number?, captures: { [string]: number }?, grade: string? }?): number
+-- "Escaped: Main Exit (6 AM)". The exit's display name comes from ExitTypes
+-- rather than the raw "Main"/"Alternate" key, for the same reason the capture
+-- rows read StatLabel off CaptureTargets -- the registry owns its own wording.
+local function formatEscape(exit: { exitType: string?, escapedAtHour: number? }): string
+	local typeDef = ExitTypes.Get(exit.exitType)
+	local label = (typeDef and typeDef.DisplayName) or exit.exitType or "Exit"
+
+	if typeof(exit.escapedAtHour) == "number" then
+		return ("Escaped: %s (%s)"):format(label, MatchTimeMath.FormatHour(exit.escapedAtHour))
+	end
+	return ("Escaped: %s"):format(label)
+end
+
+local function renderStats(
+	stats: { survivedSeconds: number?, captures: { [string]: number }?, grade: string? }?,
+	exit: { escaped: boolean?, exitType: string?, escapedAtHour: number? }?
+): number
 	if typeof(stats) ~= "table" then
 		gradeLabel.Visible = false
 		for _, child in ipairs(statsHolder:GetChildren()) do
@@ -514,6 +539,13 @@ local function renderStats(stats: { survivedSeconds: number?, captures: { [strin
 		local label = (typeDef and typeDef.StatLabel) or typeName
 		local count = captures[typeName] or 0
 		buildStatRow(("%s: %d"):format(label, count), order).Parent = statsHolder
+	end
+
+	-- Absent for anyone who didn't get out, which is the whole signal -- the
+	-- row appears only for an actual escape rather than reading "Escaped: no".
+	if typeof(exit) == "table" and exit.escaped then
+		order += 1
+		buildStatRow(formatEscape(exit), order).Parent = statsHolder
 	end
 
 	return order * STAT_ROW_HEIGHT + (order - 1) * STAT_ROW_GAP
@@ -568,11 +600,11 @@ function MatchReceipt.Show(payload: { [string]: any })
 		y += GRADE_HEIGHT
 		y += GAP
 		statsHolder.Position = UDim2.fromOffset(pad, y)
-		local statsHeight = renderStats(perPlayer.Stats)
+		local statsHeight = renderStats(perPlayer.Stats, perPlayer.Exit)
 		statsHolder.Size = UDim2.new(1, -(pad * 2), 0, statsHeight)
 		y += statsHeight
 	else
-		renderStats(nil)
+		renderStats(nil, nil)
 	end
 
 	if showsRoster then

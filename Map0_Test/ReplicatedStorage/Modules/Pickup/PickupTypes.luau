@@ -39,6 +39,24 @@ PickupTypes.Types = {
 			Amount = 50,
 		},
 	},
+	-- Mission collectible, held only for the duration of a match. Its handler
+	-- is not implemented yet, so PickupService refuses to grant it; the row
+	-- exists so the visuals layer can style it green.
+	Document = {
+		DisplayName = "Document",
+		Handler = "Document", -- key into PickupHandlers (not registered yet)
+		VisualStyle = "DocumentGlow", -- key into PickupVisuals.Styles
+		ClaimPolicy = "Consume",
+		MaxInteractDistance = 12,
+		Prompt = {
+			ActionText = "Take",
+			ObjectText = "Document",
+			HoldDuration = 0.35,
+			MaxActivationDistance = 10,
+			RequiresLineOfSight = false,
+		},
+		Params = {},
+	},
 }
 
 -- Ordered by DisplayName, computed once at module load rather than on every

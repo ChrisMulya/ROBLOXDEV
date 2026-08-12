@@ -30,14 +30,14 @@ CameraStats.Stats = {
 		},
 		Shots = {
 			Weak = {
-				Range = 100,        -- studs — max raycast distance for a Weak (moving) shot; read server-side in PhotoCapture
+				Range = 350,        -- studs — max raycast distance for a Weak (moving) shot; read server-side in PhotoCapture
 				Cooldown = 0.5,     -- seconds — minimum time between accepted Weak shots per player (anti-spam)
-				SpreadRadius = 0.015, -- tangent-scale spread width for the 5x5 raycast grid; larger = more forgiving aim, smaller = more precise
+				SpreadRadius = 0.015, -- tangent of the aim cone's half-angle (coneHalfAngle = atan(2 * SpreadRadius) in PhotoCapture); larger = more forgiving aim, smaller = more precise
 			},
 			Strong = {
-				Range = 150,        -- studs — max raycast distance for a Strong (stable) shot; longer range rewards standing still
+				Range = 350,        -- studs — max raycast distance for a Strong (stable) shot; longer range rewards standing still
 				Cooldown = 0.5,     -- seconds — minimum time between accepted Strong shots per player (anti-spam)
-				SpreadRadius = 0.015, -- tangent-scale spread width for the 5x5 raycast grid; larger = more forgiving aim, smaller = more precise
+				SpreadRadius = 0.015, -- tangent of the aim cone's half-angle (coneHalfAngle = atan(2 * SpreadRadius) in PhotoCapture); larger = more forgiving aim, smaller = more precise
 			},
 		},
 		ColorGrade = {
@@ -122,8 +122,8 @@ CameraStats.Stats = {
 			VelocityThreshold = 0.5,
 		},
 		Shots = {
-			Weak = { Range = 130, Cooldown = 0.4, SpreadRadius = 0.02 },
-			Strong = { Range = 200, Cooldown = 0.4, SpreadRadius = 0.02 },
+			Weak = { Range = 350, Cooldown = 0.4, SpreadRadius = 0.02 },
+			Strong = { Range = 350, Cooldown = 0.4, SpreadRadius = 0.02 },
 		},
 		ColorGrade = {
 			Brightness = 0,

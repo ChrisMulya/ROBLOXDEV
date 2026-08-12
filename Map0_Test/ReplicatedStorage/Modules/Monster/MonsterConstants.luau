@@ -148,6 +148,105 @@ MonsterConstants.DefaultPatrolSearchDurationMax  = 20
 MonsterConstants.DefaultPatrolSearchSweepRadius  = 12
 MonsterConstants.DefaultPatrolSearchPointCooldown = 90
 
+-- LOS-loss investigation: how far past LastKnownPos the monster projects
+-- along LastSeenDirection, continuing the player's escape trajectory instead
+-- of stopping dead at the corner where sight broke. Overridable per monster
+-- under Config.Investigation.
+MonsterConstants.DefaultLoSProjectionMin = 10
+MonsterConstants.DefaultLoSProjectionMax = 20
+-- Window (seconds, ending at the moment sight was lost) sampled to derive
+-- LastSeenDirection. Short on purpose -- a long window would smear a recent
+-- turn into a stale average heading.
+MonsterConstants.DefaultDirectionSampleWindow = 0.5
+-- Minimum horizontal displacement across that window before a direction is
+-- considered real rather than sensor/position noise. Below this the target
+-- read as stationary and LastSeenDirection is left nil (no overshoot).
+MonsterConstants.DefaultDirectionMinDisplacement = 1
+-- How long after LoSLostAt the Visual investigation candidate stays eligible,
+-- on top of PursuitDuration. Investigation is evaluated independently of
+-- Chase's own pursuit window, so this is its own grace period.
+MonsterConstants.DefaultVisualInvestigationGrace = 4
+
+-- SearchPoint investigation (the phase after Check's initial sweep). All
+-- overridable under Config.Investigation.
+MonsterConstants.DefaultSearchPointEnabled = true
+MonsterConstants.DefaultInvestigationSearchPointRadius = 40
+MonsterConstants.DefaultInvestigationSearchPointMinDistance = 6
+MonsterConstants.DefaultInvestigationSearchPointFocusRadius = 40
+-- Maximum angle (degrees) a SearchPoint may sit off LastSeenDirection,
+-- measured from LastKnownPos, to count as relevant to THIS investigation.
+-- Skipped (full 360) when there is no direction.
+MonsterConstants.DefaultSearchPointConeDegrees = 120
+-- Reject a SearchPoint whose resolved ground height differs from the
+-- monster's current height by more than this -- the "different floor" gate.
+MonsterConstants.DefaultSearchPointMaxElevationDelta = 12
+-- How long a checked SearchPoint is excluded from re-selection.
+MonsterConstants.DefaultInvestigationSearchPointCooldown = 90
+-- How many SearchPoints one investigation will visit before giving up and
+-- lingering. Caps searchpoint -> scan from chaining indefinitely.
+MonsterConstants.DefaultSearchPointsPerInvestigation = 1
+-- An occluded (no-LOS-from-monster) SearchPoint is demoted, not rejected --
+-- dead ends and rooms around a corner are exactly where a player hides -- but
+-- only chosen when no LOS-clear candidate exists. Set false to hard-reject.
+MonsterConstants.DefaultAllowOccludedSearchPoints = true
+
+-- Refinement 2: after LOS breaks, Check settles for this long (measured from
+-- LoSLostAt) before committing to a PatrolPoint -- a readable "lost you" beat
+-- rather than reacting instantly. Not a stimulus; a phase timer over
+-- information Targeting already wrote. Overridable under Config.Investigation.
+MonsterConstants.DefaultLoSLostSettleDelay = 1
+
+-- PatrolPoint relocation after a Visual LOS-loss investigation: the monster
+-- continues the player's escape route to a PatrolPoint rather than milling at
+-- LastKnownPos. Discovery is 360 degrees around the investigation focus, NOT
+-- gated by a directional cone (unlike SearchPoints) -- direction only ranks
+-- candidates, never rejects one, so a PatrolPoint behind the monster is still
+-- selected when it's all that exists. All overridable under Config.Investigation.
+MonsterConstants.DefaultInvestigationPatrolPointRadius = 60
+MonsterConstants.DefaultInvestigationPatrolPointMinDistance = 6
+-- How long a checked PatrolPoint is excluded from re-selection.
+MonsterConstants.DefaultInvestigationPatrolPointCooldown = 45
+-- Bounded retries (stuck/unreachable) before falling through to SearchPoint
+-- investigation rather than grinding on the same failed selection.
+MonsterConstants.DefaultPatrolPointSelectAttempts = 2
+-- Anti-stall deadline for the whole PatrolPoint travel phase. Displacement-
+-- based stuck detection (Navigation's STUCK_WINDOW/STUCK_DISTANCE) can miss a
+-- monster that is moving but not actually making progress (slow circling);
+-- this is the belt-and-braces backstop.
+MonsterConstants.DefaultPatrolPointTravelTimeout = 20
+-- Randomised per investigation, same reasoning as SearchDurationMin/Max: a
+-- flat duration would be the only non-randomised beat in the whole chain.
+MonsterConstants.DefaultPatrolPointWanderMin = 4
+MonsterConstants.DefaultPatrolPointWanderMax = 6
+-- How far from the PatrolPoint the wander roams. Deliberately tight -- this
+-- is a brief look-around at a route node, not working an area, and a wide
+-- radius reads as aimless drifting rather than checking a spot. Note
+-- Navigation's MIN_ROAM_DISTANCE (2) discards rolls shorter than that, so
+-- shrinking this much further starts costing re-rolls instead of tightening
+-- the pattern.
+MonsterConstants.DefaultPatrolPointWanderRadius = 8
+
+-- Deliberate visual scan performed at a SearchPoint: rotate left, then right,
+-- then return, while normal perception/LOS stays active throughout.
+--
+-- The sweep travels 640 degrees in total, not 160: out to one extreme (160),
+-- across to the other (320), then back to the starting heading (160). So the
+-- scan costs 640/Speed seconds of rotation plus one Pause at each of the
+-- three leg ends -- ~6.5s at the current values. Still deliberate rather than
+-- a snap; drop Speed toward 60 if it should read slower.
+MonsterConstants.DefaultScanSweepDegrees = 160
+MonsterConstants.DefaultScanSpeed = 120 -- degrees/second
+MonsterConstants.DefaultScanPause = 0.4 -- seconds held at each extreme
+
+-- After a completed (nothing found) SearchPoint scan: wander the area for a
+-- randomised duration before leaving and resuming Patrol. Kept in the same
+-- 4-8s band as the PatrolPoint wander above -- both are "look around briefly
+-- and move on", and a long tail here is what made the whole investigation
+-- chain outstay its welcome.
+MonsterConstants.DefaultPostSearchLingerMin = 4
+MonsterConstants.DefaultPostSearchLingerMax = 8
+MonsterConstants.DefaultPostSearchLingerRadius = 8
+
 -- Bands the AggressionLevel attribute is quantised into, highest Min first.
 -- The raw scalar is never replicated: it would let a client read the exact
 -- moment a monster is about to commit, which is a solve, not a tell.
@@ -185,5 +284,10 @@ MonsterConstants.DebugPathfinding = false
 -- chosen point. Off by default; turn on to verify direction-split behaviour
 -- (e.g. T-junction 50/50) in Studio, since that's impractical to eyeball.
 MonsterConstants.DebugPatrol = false
+
+-- Prints Investigation's candidate arbitration (Visual/Trail/Stimulus) and
+-- SearchPoint selection decisions. Off by default; turn on to verify LOS-loss
+-- projection and SearchPoint gating in Studio.
+MonsterConstants.DebugInvestigation = false
 
 return MonsterConstants
