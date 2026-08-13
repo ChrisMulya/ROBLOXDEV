@@ -27,6 +27,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlayerStats = require(ReplicatedStorage.Modules.PlayerStats)
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
+local PlayerEffects = require(script.Parent.PlayerEffects)
 
 local CharacterMovementService = {}
 
@@ -48,6 +49,8 @@ type Entry = {
 	sprinting: boolean,
 	jumpBlocked: boolean,
 	idleTime: number,
+	locked: boolean,
+	requestId: number,
 }
 
 local entries: { [Player]: Entry } = {}
@@ -55,26 +58,64 @@ local sprintRemote: RemoteEvent
 local staminaRemote: RemoteEvent
 local syncAccumulator = 0
 
-local function targetWalkSpeed(entry: Entry): number
-	local base = entry.sprinting and PlayerStats.SprintSpeed or PlayerStats.WalkSpeed
+-- Reads PlayerEffects.GetStat rather than PlayerStats directly -- WalkSpeed/
+-- SprintSpeed/MaxStamina are all buffable per-player (Pills, Adrenaline Shot,
+-- Energy Drink), and PlayerStats.Get would return the shared base for every
+-- player on the server. locked (ItemUseService's movement hold) wins over
+-- both: a player mid-item-use gets a zero budget regardless of any buff.
+local function targetWalkSpeed(player: Player, entry: Entry): number
+	if entry.locked then
+		return 0
+	end
+	local base = entry.sprinting and PlayerEffects.GetStat(player, "SprintSpeed") or PlayerEffects.GetStat(player, "WalkSpeed")
 	return base * BUDGET_HEADROOM
 end
 
-local function applyBudget(entry: Entry)
-	local speed = targetWalkSpeed(entry)
+local function applyBudget(player: Player, entry: Entry)
+	local speed = targetWalkSpeed(player, entry)
 	if entry.humanoid.WalkSpeed ~= speed then
 		entry.humanoid.WalkSpeed = speed
 	end
 end
 
 local function syncPlayer(player: Player, entry: Entry)
-	staminaRemote:FireClient(player, entry.stamina)
+	staminaRemote:FireClient(player, {
+		stamina = entry.stamina,
+		maxStamina = PlayerEffects.GetStat(player, "MaxStamina"),
+		walkSpeed = PlayerEffects.GetStat(player, "WalkSpeed"),
+		sprintSpeed = PlayerEffects.GetStat(player, "SprintSpeed"),
+		-- The server's sprint verdict, plus the id of the request it answers.
+		-- The client applies it as a CANCEL only, and only when the id matches
+		-- its own most recent request -- see the staminaRemote handler in
+		-- PlayerMovementController for why the pairing is required.
+		--
+		-- Without this the client had no way to learn the server had revoked
+		-- (or never granted) a sprint: it inferred exhaustion from seeing a
+		-- synced stamina of 0, which is a single packet the very next sync
+		-- overwrites with a regenerating value. Miss that one packet and the
+		-- client sprinted on a budget it was never given, with the server not
+		-- draining a thing.
+		sprinting = entry.sprinting,
+		requestId = entry.requestId,
+	})
 	-- Mirrored to an attribute purely for observability: stamina lived only in
 	-- this module's private table, so "is the server actually regenerating?"
 	-- was unanswerable from Studio without adding print statements. Nothing
 	-- reads this -- the HUD goes through StaminaSync.
 	player:SetAttribute("Stamina", entry.stamina)
 	player:SetAttribute("Sprinting", entry.sprinting)
+end
+
+-- ItemUseService's movement hold. Cleared unconditionally on every session
+-- exit path (completion, cancel, death, disconnect, invalidation) by that
+-- module's Trove -- never left set past the session that requested it.
+function CharacterMovementService.SetMovementLocked(player: Player, locked: boolean)
+	local entry = entries[player]
+	if not entry or entry.locked == locked then
+		return
+	end
+	entry.locked = locked
+	applyBudget(player, entry)
 end
 
 -- Server-granted sprint, not the client's request: onSprintRequest only sets
@@ -145,16 +186,23 @@ local function onCharacterAdded(player: Player, character: Model)
 	humanoid.JumpHeight = PlayerStats.JumpHeight
 
 	-- Full stamina on every spawn: dying while exhausted must not respawn you
-	-- exhausted.
+	-- exhausted. locked defaults false -- a respawn must never inherit a
+	-- movement lock from whatever the previous character was mid-doing.
 	local entry: Entry = {
 		humanoid = humanoid,
-		stamina = PlayerStats.MaxStamina,
+		stamina = PlayerEffects.GetStat(player, "MaxStamina"),
 		sprinting = false,
 		jumpBlocked = false,
 		idleTime = 0,
+		locked = false,
+		-- 0 matches no client request (the client's counter starts at 1), so
+		-- the syncs sent before this character's first SprintRequest carry a
+		-- verdict the client correctly ignores. It has nothing to cancel then
+		-- anyway -- a fresh character starts not sprinting on both sides.
+		requestId = 0,
 	}
 	entries[player] = entry
-	applyBudget(entry)
+	applyBudget(player, entry)
 	syncPlayer(player, entry)
 
 	humanoid.StateChanged:Connect(function(_old, new)
@@ -164,7 +212,7 @@ local function onCharacterAdded(player: Player, character: Model)
 	end)
 end
 
-local function onSprintRequest(player: Player, wantsSprint: any)
+local function onSprintRequest(player: Player, wantsSprint: any, requestId: any)
 	if typeof(wantsSprint) ~= "boolean" then
 		return
 	end
@@ -174,12 +222,26 @@ local function onSprintRequest(player: Player, wantsSprint: any)
 		return
 	end
 
+	-- Recorded before the gate, so every sync from here on answers THIS
+	-- request. A client on an older build sends no id; the entry keeps its
+	-- previous one and the verdict simply goes unmatched, which is the old
+	-- behaviour rather than a wrong one.
+	if typeof(requestId) == "number" then
+		entry.requestId = requestId
+	end
+
 	local granted = wantsSprint and entry.stamina >= PlayerStats.MinStaminaToSprint
 	if entry.sprinting == granted then
+		-- A DENIED request is this branch, not a no-op: sprinting was already
+		-- false and stays false. The client still has to hear the "no" --
+		-- its own stamina copy is up to SYNC_INTERVAL stale, so it can read
+		-- above MinStaminaToSprint and locally grant itself a sprint the
+		-- server just refused. Syncing here is what corrects that.
+		syncPlayer(player, entry)
 		return
 	end
 	entry.sprinting = granted
-	applyBudget(entry)
+	applyBudget(player, entry)
 	syncPlayer(player, entry)
 end
 
@@ -214,10 +276,18 @@ local function step(dt: number)
 		else
 			entry.stamina += PlayerStats.StaminaRegenRate * dt
 		end
-		entry.stamina = math.clamp(entry.stamina, 0, PlayerStats.MaxStamina)
+		entry.stamina = math.clamp(entry.stamina, 0, PlayerEffects.GetStat(player, "MaxStamina"))
 
+		-- Called every tick, not just on a sprint toggle: WalkSpeed/SprintSpeed
+		-- are buffable now (Pills, Adrenaline Shot), so the budget can change
+		-- with no sprint-state change at all (a buff expiring mid-stride). The
+		-- equality check inside applyBudget keeps this a no-op write on every
+		-- tick where nothing actually changed. Immediate sync is still gated on
+		-- the sprint toggle -- a buff change reaches the client on the regular
+		-- 10Hz sync below instead, which is frequent enough for a stat that
+		-- only steps at multi-second intervals.
+		applyBudget(player, entry)
 		if entry.sprinting ~= wasSprinting then
-			applyBudget(entry)
 			syncPlayer(player, entry)
 		end
 	end

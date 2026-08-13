@@ -18,6 +18,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerStats = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PlayerStats"))
 local PlayerRuntimeStats = require(ReplicatedStorage.Modules.PlayerRuntimeStats)
 local CameraState = require(ReplicatedStorage.Modules.Camera.CameraState)
+local CCTVViewController = require(ReplicatedStorage.Modules.Item.CCTVViewController)
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
 local SprintIntent = require(ReplicatedStorage.Modules.Movement.SprintIntent)
 local CAMERA_SPEED_MULTIPLIER = 0.7
@@ -41,6 +42,18 @@ local activeHumanoid: Humanoid? = nil
 -- finished late would overwrite the live one -- leaving movement driving a
 -- humanoid that no longer exists.
 local setupGeneration = 0
+
+-- Stamped on every SprintRequest and echoed back in StaminaSync, so a verdict
+-- can be told apart from a stale sync that was already in flight when the key
+-- was pressed. Monotonic for the whole session, never reset per character --
+-- the server records whatever id it last saw, so a respawn needs no agreement
+-- on where the numbering restarts.
+local sprintRequestId = 0
+
+local function requestSprint(wanted: boolean)
+	sprintRequestId += 1
+	sprintRemote:FireServer(wanted, sprintRequestId)
+end
 
 local function setupCharacter(character: Model)
 	-- Bounded waits with a bail, the same shape DeathService.bindCharacter
@@ -192,7 +205,14 @@ local function setupCharacter(character: Model)
 			isSprinting = false
 		end
 
-		local topSpeed = isSprinting and PlayerStats.SprintSpeed or PlayerStats.WalkSpeed
+		-- Read from the synced runtime values, not the PlayerStats base --
+		-- WalkSpeed/SprintSpeed are buffable per-player now (Pills, Adrenaline
+		-- Shot), and StaminaSync mirrors the server's effective numbers here
+		-- for exactly that reason. Falls back to the PlayerStats base before
+		-- the first sync lands.
+		local topSpeed = isSprinting
+			and (PlayerRuntimeStats.Get("SprintSpeed") or PlayerStats.SprintSpeed)
+			or (PlayerRuntimeStats.Get("WalkSpeed") or PlayerStats.WalkSpeed)
 		topSpeed *= CameraState.GetWalkSpeedMultiplier()
 		
 		local targetVelocity = Vector3.new(moveDir.X, 0, moveDir.Z) * topSpeed
@@ -205,12 +225,20 @@ local function setupCharacter(character: Model)
 		linearVelocity.VectorVelocity = currentVelocity
 
 		-- Face camera yaw so strafing/aiming reads correctly in first person.
+		--
+		-- Skipped while a CCTV feed is open: the camera is the security
+		-- camera's then, not the player's, so this would spin the body on the
+		-- spot to face wherever the CCTV happens to point. Invisible to the
+		-- viewer, who is looking through the camera -- but every other player
+		-- watches them pirouette.
 		local camera = workspace.CurrentCamera
 		if camera then
-			local look = camera.CFrame.LookVector
-			local flatLook = Vector3.new(look.X, 0, look.Z)
-			if flatLook.Magnitude > 0.001 then
-				rootPart.CFrame = CFrame.new(rootPart.Position, rootPart.Position + flatLook)
+			if not CCTVViewController.IsActive() then
+				local look = camera.CFrame.LookVector
+				local flatLook = Vector3.new(look.X, 0, look.Z)
+				if flatLook.Magnitude > 0.001 then
+					rootPart.CFrame = CFrame.new(rootPart.Position, rootPart.Position + flatLook)
+				end
 			end
 
 			-- FOV kick while sprinting -- same frame-rate independent smoothing
@@ -245,10 +273,10 @@ SprintIntent.Changed:Connect(function(wanted: boolean)
 			-- what ultimately caps us.
 			isSprinting = true
 		end
-		sprintRemote:FireServer(true)
+		requestSprint(true)
 	else
 		isSprinting = false
-		sprintRemote:FireServer(false)
+		requestSprint(false)
 	end
 end)
 
@@ -275,12 +303,40 @@ UserInputService.InputEnded:Connect(function(input, _gameProcessed)
 end)
 
 
--- Authoritative stamina from CharacterMovementService. The sole writer of the
--- Stamina runtime stat -- the HUD renders this and nothing else. It
--- deliberately carries no sprint flag: a sync already in flight when Shift is
--- pressed would otherwise cancel the sprint we just started.
-staminaRemote.OnClientEvent:Connect(function(stamina: number)
-	PlayerRuntimeStats.Set("Stamina", stamina)
+-- Authoritative stamina/speed from CharacterMovementService. The sole writer
+-- of these runtime stats -- the HUD and this script's own topSpeed read them
+-- and nothing else. Payload widened from a bare stamina number to a table
+-- (Stamina Sync now doubles as the effective-stat sync, since WalkSpeed/
+-- SprintSpeed/MaxStamina are all buffable per-player).
+--
+-- It now DOES carry the server's sprint verdict, which it deliberately didn't
+-- before -- a sync already in flight when Shift is pressed must not cancel the
+-- sprint just started. That reason still holds, so the flag is paired with the
+-- id of the request it answers and applied under two rules:
+--
+--   1. Cancel only. A payload can end a sprint, never start one; sprint still
+--      begins locally on the input frame.
+--   2. Only when it answers our LATEST request. An older id is a verdict about
+--      a press we have already moved past, and is ignored.
+--
+-- Why this exists at all: the heartbeat's `stamina <= 0` test was the only way
+-- the client ever dropped out of a sprint it started, and that depends on
+-- observing one specific packet -- the server begins regenerating the very next
+-- frame, so every later sync reports a positive value. Two clients hit that:
+-- one whose exhaustion sync got batched behind a fresher one, and one that
+-- tapped Shift while its stamina copy still read above MinStaminaToSprint and
+-- the server's had already fallen below it. Both ended up sprinting locally
+-- with the server never granting it -- and therefore never draining -- so
+-- stamina refilled underneath them and the sprint never ended.
+staminaRemote.OnClientEvent:Connect(function(payload: { stamina: number, maxStamina: number, walkSpeed: number, sprintSpeed: number, sprinting: boolean?, requestId: number? })
+	PlayerRuntimeStats.Set("Stamina", payload.stamina)
+	PlayerRuntimeStats.Set("MaxStamina", payload.maxStamina)
+	PlayerRuntimeStats.Set("WalkSpeed", payload.walkSpeed)
+	PlayerRuntimeStats.Set("SprintSpeed", payload.sprintSpeed)
+
+	if isSprinting and payload.sprinting == false and payload.requestId == sprintRequestId then
+		isSprinting = false
+	end
 end)
 
 if player.Character then

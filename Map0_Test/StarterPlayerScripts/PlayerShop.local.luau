@@ -14,6 +14,8 @@ local UserInputService = game:GetService("UserInputService")
 local playerModule = require(player:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule"))
 local controls = playerModule:GetControls()
 
+local ShopCatalog = require(ReplicatedStorage.Modules.Shop.ShopCatalog)
+local EffectAttributes = require(ReplicatedStorage.Modules.Player.EffectAttributes)
 local ShopGui = require(ReplicatedStorage.Modules.Shop.ShopGui)
 local PurchaseNotification = require(ReplicatedStorage.Modules.Shop.PurchaseNotification)
 
@@ -49,6 +51,16 @@ local function readSlotState(): ({ [string]: boolean }, number)
 					ownedIds[itemId] = true
 				end
 			end
+		end
+	end
+
+	-- Instant items own no slot, so the scan above can never see them -- their
+	-- ownership lives in the Effect_<Id> attribute PlayerEffects mirrors onto
+	-- the Player. Folded into the same ownedIds set so ShopGui needs no second
+	-- concept of "owned".
+	for _, item in ipairs(ShopCatalog.GetOrdered()) do
+		if item.Instant and EffectAttributes.IsActive(player, item.Id) then
+			ownedIds[item.Id] = true
 		end
 	end
 
@@ -163,6 +175,15 @@ end)
 -- states stay live while the shop is open (and cost nothing while it's not --
 -- Refresh no-ops before ShopGui has been built).
 player:WaitForChild("leaderstats"):WaitForChild("Cash").Changed:Connect(refreshGui)
+
+-- Same idea for Instant items, whose ownership is an attribute rather than a
+-- slot: an effect cleared by death or match end has to un-grey its row without
+-- waiting for the next purchase.
+player.AttributeChanged:Connect(function(attributeName)
+	if string.sub(attributeName, 1, #EffectAttributes.PREFIX) == EffectAttributes.PREFIX then
+		refreshGui()
+	end
+end)
 
 local function watchContainer(container: Instance)
 	container.ChildAdded:Connect(refreshGui)

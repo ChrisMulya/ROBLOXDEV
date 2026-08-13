@@ -86,6 +86,12 @@ function GameBoot.Start()
 		-- list -- placed early so IsInCamera is truthful as soon as the
 		-- server is up, same reasoning as PlayerStateService above.
 		require(ServerScriptService.GameService.Camera.CameraSessionTracker),
+		-- Per-player temporary stat deltas (Energy Drink, Pills, Adrenaline
+		-- Shot, Brighter Flashlight). No dependencies, but must be listening
+		-- before CharacterMovementService's onCharacterAdded calls
+		-- GetStat -- publisher before consumer, same convention as every
+		-- other pairing in this list.
+		require(ServerScriptService.GameService.Player.PlayerEffects),
 		-- Server-owned Humanoid movement budget (WalkSpeed/JumpHeight). No
 		-- dependencies, but must be listening before MatchSpawner loads any
 		-- character -- placed with the other early always-on services.
@@ -220,6 +226,19 @@ function GameBoot.Start()
 		-- Loads characters for the roster once WaitingForPlayers begins.
 		require(ServerScriptService.GameService.Match.MatchSpawner),
 		require(ServerScriptService.GameService.Death.DeathService),
+		-- Support-item gameplay (Motion Sensor, Compact Speaker, Portable
+		-- CCTV, and the shared 3-second hold lifecycle). After DeathService
+		-- (all four subscribe DeathService.Died), MonsterFramework (Motion
+		-- Sensor/Compact Speaker both read MonsterRegistry.ForEach), and
+		-- MatchCleanup (DeployableRegistry registers a teardown step into
+		-- it, registry before registrant, same rule as RewardCleanupHook
+		-- above) -- all required earlier in this list. Registry
+		-- (DeployableRegistry) before the services that Track() into it.
+		require(ServerScriptService.GameService.Item.ItemWorld.DeployableRegistry),
+		require(ServerScriptService.GameService.Item.ItemWorld.MotionSensorService),
+		require(ServerScriptService.GameService.Item.ItemWorld.SpeakerService),
+		require(ServerScriptService.GameService.Item.ItemWorld.CCTVService),
+		require(ServerScriptService.GameService.Item.ItemUseService),
 		require(ServerScriptService.GameService.Spectate.SpectateService),
 		-- Third MatchResultBuilder contributor ("Stats" -> survival time +
 		-- capture counts). After DeathService: subscribes to

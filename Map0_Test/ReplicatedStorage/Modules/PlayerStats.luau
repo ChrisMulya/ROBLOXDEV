@@ -70,9 +70,9 @@ PlayerStats.StaminaIdleRegenDelay = 3
 -- Range is capped by the engine at 120 -- Roblox silently clamps
 -- SpotLight.Range to that, so an upgrade tier above 120 buys nothing. Angle is
 -- likewise clamped to 180. Verified by setting 151 and reading back 120.
-PlayerStats.FlashlightRange      = 80  -- studs the beam reaches (engine max 120)
-PlayerStats.FlashlightBrightness = 4   -- SpotLight Brightness (no engine cap)
-PlayerStats.FlashlightAngle      = 32  -- degrees, full cone width (engine max 180)
+PlayerStats.FlashlightRange      = 56  -- studs the beam reaches (engine max 120)
+PlayerStats.FlashlightBrightness = 1.4 -- SpotLight Brightness (no engine cap)
+PlayerStats.FlashlightAngle      = 48 -- degrees, full cone width (engine max 180)
 
 -- ===== Money =====
 PlayerStats.StartingCash = 100

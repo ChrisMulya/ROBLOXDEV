@@ -13,7 +13,9 @@ PurchaseResultCodes.Messages = {
 	NoSlot = "No empty slot available.",
 	InsufficientFunds = "Not enough cash for %s.",
 	TooFarAway = "Move closer to the shop.",
-	AlreadyOwned = "You're already carrying that.",
+	-- Covers both a Tool already in a slot and an Instant item's effect that is
+	-- still live, so it deliberately doesn't say "carrying".
+	AlreadyOwned = "You already have that.",
 	ItemDisabled = "That item is unavailable right now.",
 	ShopUnavailable = "The shop isn't open right now.",
 	NotOpen = "Open the shop first.",

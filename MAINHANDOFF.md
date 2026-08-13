@@ -385,6 +385,17 @@ stamina number.
   `walk-or-sprint × BUDGET_HEADROOM` (1.15). The headroom absorbs slopes,
   knockback and the client's accel-lerp overshoot; it is too small to spend as
   a second sprint.
+- **WalkSpeed/SprintSpeed/MaxStamina are per-player buffable** (`Pills`,
+  `AdrenalineShot`, `EnergyDrink`) via `Player/PlayerEffects` — a delta stored
+  against the `PlayerStats` base, additive and independently timed, never a
+  captured/restored absolute (see that module's own header for why). Every
+  reader of these three stats goes through `PlayerEffects.GetStat`, never
+  `PlayerStats.Get`, on both server and client — the client's copy arrives
+  over the widened `StaminaSync` payload (`{stamina, maxStamina, walkSpeed,
+  sprintSpeed}`, not a bare number) and is mirrored onto `PlayerRuntimeStats`.
+  A movement HOLD (`ItemUseService`, during a 3s item use) is a separate,
+  stronger override — `CharacterMovementService.SetMovementLocked` forces the
+  budget to 0 regardless of any buff.
 - **The client still zeroes `WalkSpeed` locally** and re-zeroes it whenever the
   server's value replicates down — otherwise the engine's own movement fights
   the `LinearVelocity` drive.
@@ -463,6 +474,8 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 | Mobile sprint button | works | tap-to-arm, `MobileSprintButton.local.luau`; touch only |
 | HUD (stamina) | works | `StarterPlayerScripts`, **not** `StarterGui` — see G1 |
 | Inventory slots + shop | works | `ShopCatalog` (7 support items) drives price/description/UI; server-authoritative buy through `CashWallet`; empty slots tagged `IsEmpty`, held items tagged `ItemId`; Game place only |
+| Support item gameplay | uncommitted, unverified | Generic 3s hold-to-use lifecycle (`Item/ItemUseService`, client `ItemUseClient.local.luau`) reads `ShopCatalog.Effect`; per-player stat buffs go through `Player/PlayerEffects` (deltas, not absolutes — additive/independent-timer stacking); Motion Sensor/Compact Speaker/Portable CCTV are placed world objects under `workspace.Deployables` via `Item/ItemWorld/*`. Needs `Assets.Tool.SupportItem.ItemRemotes.*` and `Assets.Tool.SupportItem.PlacedItem.*` authored in Studio — see `plans/create-a-read-only-implementation-foamy-cookie.md` |
+| Flashlight | works | `Player/FlashlightService`, both places now (ported from Map0-only — see Phase note below); Brighter Flashlight's range/brightness bonus goes through `PlayerEffects`, not `PlayerStats.Set` |
 | Currency UI | works | remote-driven |
 | Camera framework | works | client session/viewfinder/touch HUD + shelf; one `Trove` per session |
 | Photo capture → reward | works | 5×5 spread raycast → `CaptureTargets.Resolve` → `RewardService` |
@@ -574,6 +587,7 @@ Non-derivable from code. These will burn a session if forgotten.
 | Order | ScreenGui |
 |---|---|
 | 0 | Roblox `TouchGui` (engine-owned), and most of this repo's GUIs |
+| 15 | `ItemUseGui` — support-item hold progress bar + Motion Sensor warning |
 | 20 | `MatchTimeGui` — top-centre match clock; loses to the sprint button and both modals |
 | 30 | `MobileSprintGui` — beats `TouchGui`, loses to both modals |
 | 40 | `DeathScreenGui` |
@@ -583,7 +597,11 @@ Non-derivable from code. These will burn a session if forgotten.
 
 **Asset paths** (tree structure differs — don't assume parity):
 - `ReplicatedStorage.Assets.Tool.SupportItem`
+- `ReplicatedStorage.Assets.Tool.SupportItem.ItemRemotes.{CompactSpeakerRemotes, PortableCCTVTablet}` — **post-use replacement tools, not shop stock.** The shop grants the plain `CompactSpeaker`/`PortableCCTV` Tool from `SupportItem`; using it places the world object and swaps the held Tool for the matching one here (`ShopCatalog`'s `ReplaceWith`). Both have `Enabled = false` catalog rows so they resolve an asset and an ItemId but can never be bought
+- `ReplicatedStorage.Assets.Tool.SupportItem.PlacedItem.{PlacedMotionSensor, PlacedCompactSpeaker, PlacedPortableCCTV}` — the world objects Deploy-kind items place; `PlacedPortableCCTV` needs a child Part named `Lens` (falls back to `PrimaryPart`) as the CCTV camera subject. Missing asset degrades to a `"Failed"` ItemUseResult, no hard error
 - `ReplicatedStorage.Assets.Tool.Camera.Camera1`
 - `ReplicatedStorage.Assets.Pickup.Cash` — Studio-authored, Anchored, `PrimaryPart` set if a Model
+- `ReplicatedStorage.Sounds.Tool.FlashLightSound` — needed by both places now that Flashlight is ported to Lobby too
+- `ReplicatedStorage.Sounds.Tool.CompactSpeakerSound` — cloned onto the placed speaker when its remotes arm it, and looped for the active window. Server-created on a replicated part, so every client hears it positionally. Missing clip = a silent but still functional lure (warn only)
 
 **Security boundary:** `CameraSessionTracker`'s InCamera flag is client-reported — UX guard only, never a security check.

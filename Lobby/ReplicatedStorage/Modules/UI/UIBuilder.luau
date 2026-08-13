@@ -30,6 +30,9 @@ end
 --     0    Roblox TouchGui (engine-owned; thumbstick + jump button)
 --     0    most ScreenGuis -- no overlap, no opinion
 --     0    HudLeftGui        -- persistent left column (Cash + Mission List)
+--    15    ItemUseGui        -- support-item hold progress bar + Motion
+--                               Sensor warning; must beat the base UI (0) but
+--                               lose to the match clock and everything above it
 --    20    MatchTimeGui      -- top-centre match clock; must lose to the
 --                               sprint button and both modals
 --    25    ExitCountdownGui  -- escape dwell countdown; beats the clock (it's
@@ -41,6 +44,9 @@ end
 --                               sprint button but lose to Death/MatchReceipt
 --    40    DeathScreenGui
 --    50    MatchReceiptGui   -- covers DeathScreen at a death-triggered end
+--    60    PurchaseNotificationGui -- built directly, not via this function.
+--                               A transient toast that answers a shop click,
+--                               so it must beat ShopGui (35)
 --   100    CameraTouchHud    -- built directly, not via this function
 --  1000    ScreenFlashRenderer
 function UIBuilder.CreateScreenGui(name: string, parent: Instance, displayOrder: number?): ScreenGui

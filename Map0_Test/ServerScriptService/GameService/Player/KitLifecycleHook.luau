@@ -37,8 +37,10 @@ local function onCharacterAdded(player: Player, character: Model)
 		return
 	end
 
-	StartGameService.GivePlayerStarterKit(player)
-
+	-- Died is bound BEFORE the grant, not after: GivePlayerStarterKit yields
+	-- now (it waits for the Backpack and verifies the grant survived the
+	-- spawn's Backpack swap), and a teardown listener attached only after that
+	-- returns would miss a death during the wait.
 	local humanoid = character:WaitForChild("Humanoid", 5)
 	if humanoid then
 		humanoid.Died:Connect(function()
@@ -50,6 +52,8 @@ local function onCharacterAdded(player: Player, character: Model)
 			RemoveAllSlot.ClearPlayerTools(player)
 		end)
 	end
+
+	StartGameService.GivePlayerStarterKit(player)
 end
 
 local started = false

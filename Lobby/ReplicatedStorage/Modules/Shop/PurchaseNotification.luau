@@ -33,6 +33,11 @@ local function showText(text, color)
 		screenGui = Instance.new("ScreenGui")
 		screenGui.Name = "PurchaseNotificationGui"
 		screenGui.ResetOnSpawn = false
+		-- DisplayOrder 60 -- registered in UIBuilder.CreateScreenGui's comment.
+		-- Must beat ShopGui (35): every purchase result fires while the shop
+		-- panel is open, so at the default 0 the message rendered behind the
+		-- thing it is a response to.
+		screenGui.DisplayOrder = 60
 		screenGui.Parent = playerGui
 	end
 

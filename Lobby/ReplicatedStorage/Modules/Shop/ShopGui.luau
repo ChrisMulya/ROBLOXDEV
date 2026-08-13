@@ -287,7 +287,10 @@ function ShopGui.Refresh(cash: number, ownedIds: { [string]: boolean }, freeSlot
 				button.BackgroundColor3 = UITheme.Colors.PanelElevated
 				button.TextColor3 = UITheme.Colors.TextMuted
 				button.BackgroundTransparency = 0
-			elseif freeSlotCount <= 0 then
+			-- Instant items grant no Tool, so a full backpack is no obstacle --
+			-- see ShopItem.Instant. Without this they'd read FULL alongside
+			-- everything else, which the server would have happily sold.
+			elseif freeSlotCount <= 0 and not item.Instant then
 				button.Text = "FULL"
 				button.Active = false
 				button.BackgroundColor3 = UITheme.Colors.PanelElevated

@@ -8,11 +8,13 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
 local PlayerStats = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PlayerStats"))
 local PlayerRuntimeStats = require(ReplicatedStorage.Modules.PlayerRuntimeStats)
 local UIScaleController = require(ReplicatedStorage.Modules.UI.UIScaleController)
+local EffectAttributes = require(ReplicatedStorage.Modules.Player.EffectAttributes)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -29,9 +31,19 @@ local BAR_CONFIG = {
 	{ stat = "Stamina", max = "MaxStamina", color = Color3.fromRGB(230, 200, 60), label = "Stamina", animated = false },
 }
 
+-- Every timed Stat-kind item PlayerEffects tracks (see ShopCatalog: EnergyDrink,
+-- Pills, AdrenalineShot). sourceId matches ShopCatalog's item Id, which is what
+-- PlayerEffects mirrors its Effect_/EffectExpiry_ attributes under.
+local BUFF_CONFIG = {
+	{ sourceId = "EnergyDrink", label = "Energy Drink" },
+	{ sourceId = "Pills", label = "Pill" },
+	{ sourceId = "AdrenalineShot", label = "Adrenaline" },
+}
+
 local BAR_WIDTH = 220
 local BAR_HEIGHT = 18
 local BAR_SPACING = 8
+local BUFF_ROW_HEIGHT = 16
 local TWEEN_TIME = 0.25
 
 -- === Build the GUI ===
@@ -141,6 +153,83 @@ for i, config in ipairs(BAR_CONFIG) do
 	createBar(i, config)
 end
 
+-- Beneath the Stamina bar: one row per timed buff, shown only while its
+-- EffectExpiry_ attribute is set, counting down to it every frame.
+local buffsContainer = Instance.new("Frame")
+buffsContainer.Name = "BuffsContainer"
+buffsContainer.AnchorPoint = Vector2.new(1, 0)
+buffsContainer.Position = UDim2.new(1, -24, 0, 24 + container.Size.Y.Offset + BAR_SPACING)
+buffsContainer.Size = UDim2.new(0, BAR_WIDTH, 0, 0)
+buffsContainer.AutomaticSize = Enum.AutomaticSize.Y
+buffsContainer.BackgroundTransparency = 1
+buffsContainer.Parent = screenGui
+
+UIScaleController.Attach(buffsContainer)
+
+local buffsListLayout = Instance.new("UIListLayout")
+buffsListLayout.FillDirection = Enum.FillDirection.Vertical
+buffsListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+buffsListLayout.Padding = UDim.new(0, 4)
+buffsListLayout.Parent = buffsContainer
+
+-- [sourceId] = { label = TextLabel, text = string }
+local buffLabels: { [string]: { label: TextLabel, text: string } } = {}
+
+for i, config in ipairs(BUFF_CONFIG) do
+	local label = Instance.new("TextLabel")
+	label.Name = config.sourceId .. "Buff"
+	label.LayoutOrder = i
+	label.Size = UDim2.new(1, 0, 0, BUFF_ROW_HEIGHT)
+	label.BackgroundTransparency = 1
+	label.Font = Enum.Font.GothamBold
+	label.TextSize = 12
+	label.TextColor3 = Color3.fromRGB(255, 255, 255)
+	label.TextStrokeTransparency = 0.5
+	label.TextXAlignment = Enum.TextXAlignment.Right
+	label.Text = ""
+	label.Visible = false
+	label.Parent = buffsContainer
+
+	buffLabels[config.sourceId] = { label = label, text = config.label }
+end
+
+local function updateBuff(sourceId: string)
+	local entry = buffLabels[sourceId]
+	if not entry then
+		return
+	end
+	local expiresAt = EffectAttributes.GetExpiry(player, sourceId)
+	if typeof(expiresAt) ~= "number" then
+		entry.label.Visible = false
+		return
+	end
+	local remaining = math.max(0, expiresAt - workspace:GetServerTimeNow())
+	entry.label.Text = string.format("%s: %ds", entry.text, math.ceil(remaining))
+	entry.label.Visible = true
+end
+
+for _, config in ipairs(BUFF_CONFIG) do
+	updateBuff(config.sourceId)
+end
+
+-- One attribute per source flips Visible on/off; the countdown text itself
+-- still needs a per-frame tick while visible, same reasoning as
+-- ItemUseHud's bar -- there is no "attribute ticks down" primitive.
+player.AttributeChanged:Connect(function(attributeName: string)
+	if string.sub(attributeName, 1, #EffectAttributes.EXPIRY_PREFIX) == EffectAttributes.EXPIRY_PREFIX then
+		local sourceId = string.sub(attributeName, #EffectAttributes.EXPIRY_PREFIX + 1)
+		updateBuff(sourceId)
+	end
+end)
+
+RunService.Heartbeat:Connect(function()
+	for _, config in ipairs(BUFF_CONFIG) do
+		if buffLabels[config.sourceId].label.Visible then
+			updateBuff(config.sourceId)
+		end
+	end
+end)
+
 -- === Updating ===
 local function updateBar(statName: string)
 	local fill = fills[statName]
@@ -153,7 +242,10 @@ local function updateBar(statName: string)
 	if not config then return end
 
 	local current = PlayerRuntimeStats.Get(statName) or 0
-	local max = PlayerStats.Get(config.max) or 1
+	-- MaxStamina is buffable per-player now (Energy Drink) and synced onto
+	-- PlayerRuntimeStats alongside Stamina itself -- read that first, falling
+	-- back to the PlayerStats base before the first sync lands.
+	local max = PlayerRuntimeStats.Get(config.max) or PlayerStats.Get(config.max) or 1
 	local percent = max > 0 and math.clamp(current / max, 0, 1) or 0
 
 	if config.animated then
@@ -180,17 +272,27 @@ end
 for _, config in ipairs(BAR_CONFIG) do
 	local fill = fills[config.stat]
 	local current = PlayerRuntimeStats.Get(config.stat) or 0
-	local max = PlayerStats.Get(config.max) or 1
+	-- MaxStamina is buffable per-player now (Energy Drink) and synced onto
+	-- PlayerRuntimeStats alongside Stamina itself -- read that first, falling
+	-- back to the PlayerStats base before the first sync lands.
+	local max = PlayerRuntimeStats.Get(config.max) or PlayerStats.Get(config.max) or 1
 	local percent = max > 0 and math.clamp(current / max, 0, 1) or 0
 	fill.Size = UDim2.new(percent, 0, 1, 0)
 	percentLabels[config.stat].Text = string.format("%d / %d", math.floor(current + 0.5), max)
 end
 
--- React to runtime stat changes (Stamina). Max* values (PlayerStats) are
--- tuning constants that don't currently change at runtime, so only the
--- runtime-state signal needs a subscriber here.
+-- React to runtime stat changes. Covers both the value itself (Stamina) and
+-- its buffable max (MaxStamina, via Energy Drink) -- a max-only change (the
+-- current value untouched) still needs the bar redrawn, or the fill fraction
+-- stays wrong until Stamina next ticks.
 PlayerRuntimeStats.Changed:Connect(function(statName: string, _newValue: number, _oldValue: number)
 	if fills[statName] then
 		updateBar(statName)
+		return
+	end
+	for _, config in ipairs(BAR_CONFIG) do
+		if config.max == statName then
+			updateBar(config.stat)
+		end
 	end
 end)

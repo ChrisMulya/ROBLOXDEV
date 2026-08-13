@@ -71,6 +71,21 @@ Remotes.ALL_NAMES = {
 	-- because this is an EVENT (fired once, shown for 10s) and not state --
 	-- an attribute would replay to late joiners minutes after the fact.
 	"MatchEventAnnounce",
+	-- Generic hold-to-use item lifecycle (ItemUseService). Client fires Begin/
+	-- Cancel; the server owns the hold duration and pushes ItemUseState so the
+	-- progress bar renders off a deadline, never a client-side timer.
+	-- ItemUseResult carries a code string for a rejected/failed Begin, same
+	-- *Result convention as PurchaseResult.
+	"ItemUseRequest",
+	"ItemUseState",
+	"ItemUseResult",
+	-- Owner-only edge-transition warning from a placed MotionSensor. Per-player
+	-- (only the placer sees it), so a remote rather than an instance attribute.
+	"MotionSensorAlert",
+	-- Server-driven CCTV view state (which lens, or nil to exit). The server
+	-- is the sole decider of who may view; the client only renders what it's
+	-- told.
+	"CCTVViewState",
 }
 
 function Remotes.Get(name: string): RemoteEvent

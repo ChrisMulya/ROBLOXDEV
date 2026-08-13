@@ -1,16 +1,16 @@
-# Graph Report - ROBLOX-DEV  (2026-08-12)
+# Graph Report - ROBLOX-DEV  (2026-08-14)
 
 ## Corpus Check
-- 458 files · ~273,246 words
+- 563 files · ~336,835 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2596 nodes · 4468 edges · 229 communities (209 shown, 20 thin omitted)
-- Extraction: 80% EXTRACTED · 20% INFERRED · 0% AMBIGUOUS · INFERRED: 892 edges (avg confidence: 0.8)
+- 3140 nodes · 5679 edges · 264 communities (238 shown, 26 thin omitted)
+- Extraction: 78% EXTRACTED · 22% INFERRED · 0% AMBIGUOUS · INFERRED: 1261 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a6750455`
+- Built from commit: `6196802b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -22,58 +22,58 @@
 - Lobby/ServerScriptService/GameService/Objective/ObjectiveService.luau
 - Map0_Test/ServerScriptService/GameService/Objective/ObjectiveService.luau
 - onPromptTriggered
-- MatchManager.Get
+- Lobby/ServerScriptService/GameService/Reward/RewardService.luau
 - Map0_Test/ServerScriptService/GameService/Match/MissionProgress.luau
 - Evolution.Tiers schema
 - Lobby/ReplicatedStorage/Modules/Shared/ServerRole.luau
 - onPromptTriggered
 - Lobby/ReplicatedStorage/Modules/Shared/MatchStates.luau
-- Map0_Test/ReplicatedStorage/Modules/Shared/ServerRole.luau
-- Map0_Test/ServerScriptService/GameService/Camera/PhotoCapture.luau
+- Map0_Test/ReplicatedStorage/Modules/Shared/Signal.luau
+- Map0_Test/ReplicatedStorage/Modules/Reward/CaptureTargets.luau
 - Lobby/ServerScriptService/GameService/Monster/States/Patrol.luau
 - Map0_Test/ServerScriptService/GameService/Monster/States/Patrol.luau
 - Lobby/ReplicatedStorage/Modules/UI/MatchReceipt.luau
 - Map0_Test/ReplicatedStorage/Modules/UI/MatchReceipt.luau
 - Map0_Test/ReplicatedStorage/Modules/Shared/PlayerStates.luau
 - Lobby/ReplicatedStorage/Modules/Shared/Remotes.luau
-- Lobby/ReplicatedStorage/Modules/Shared/Signal.luau
+- Lobby/ReplicatedStorage/Modules/Shared/PlayerStates.luau
 - Blueprint — Match Time Announcer (countdown + 3 AM enrage)
-- Lobby/ReplicatedStorage/Modules/Monster/MonsterConfig.luau
+- Lobby/ServerScriptService/GameService/Monster/Components/init.luau
 - Lobby/ServerScriptService/Vendor/ProfileStore.luau
 - Map0_Test/ReplicatedStorage/Modules/Monster/MonsterConfig.luau
 - Blueprint — Responsive HUD Scaling (Cash / Match Time / Stamina)
 - Map0_Test/ServerScriptService/Vendor/ProfileStore.luau
-- Lobby/ReplicatedStorage/Modules/Camera/CameraSession.luau
+- Lobby/ReplicatedStorage/Modules/Camera/CameraEffects.luau
 - Lobby/ServerScriptService/GameService/Monster/Components/Investigation.luau
 - Map0_Test/ReplicatedStorage/Modules/Shared/MatchStates.luau
-- Map0_Test/ServerScriptService/GameService/PlayerState/PlayerStateService.luau
+- Lobby/ServerScriptService/GameService/Exit/ExitState.luau
 - Lobby/ReplicatedStorage/Modules/CameraShelf/CameraShelfGui.luau
 - Map0_Test/ReplicatedStorage/Modules/CameraShelf/CameraShelfGui.luau
-- Lobby/ServerScriptService/GameService/Monster/MonsterInstance.luau
+- Lobby/ReplicatedStorage/Modules/Shared/Trove.luau
 - Map0_Test/ReplicatedStorage/Modules/Camera/CameraState.luau
 - Map0_Test/ServerScriptService/GameService/Monster/MonsterInstance.luau
-- Lobby/ServerScriptService/GameService/Monster/Brain/StateMachine.luau
+- Lobby/ReplicatedStorage/Modules/Monster/MonsterConstants.luau
 - Lobby/ReplicatedStorage/Modules/UI/UIScaleController.luau
-- Lobby/ReplicatedStorage/Modules/Shop/PurchaseNotification.luau
+- Lobby/ReplicatedStorage/Modules/Shop/ShopCatalog.luau
 - Map0_Test/ServerScriptService/GameService/Monster/Brain/StateMachine.luau
 - Map0_Test/StarterPlayerScripts/MobileSprintButton.local.luau
-- Map0_Test/ServerScriptService/GameService/Match/MatchParticipants.luau
-- Map0_Test/ReplicatedStorage/Modules/Shop/PurchaseNotification.luau
+- MatchManager.Is
+- Map0_Test/ReplicatedStorage/Modules/Shop/ShopCatalog.luau
 - Lobby/ServerScriptService/GameService/Reward/RewardStore.luau
-- Map0_Test/ReplicatedStorage/Modules/Shared/Trove.luau
+- Map0_Test/ReplicatedStorage/Modules/Camera/CameraEffects.luau
 - Map0_Test/ServerScriptService/GameService/Reward/CaptureGuard.luau
 - Map0_Test/ServerScriptService/GameService/Reward/RewardStore.luau
-- Lobby/ServerScriptService/GameService/Monster/EncounterDirector.luau
+- MonsterService.Spawn
 - Map0_Test/ServerScriptService/GameService/Monster/EncounterDirector.luau
 - Lobby/ServerScriptService/GameService/Reward/CaptureGuard.luau
 - Lobby/ReplicatedStorage/Modules/Camera/CameraViewfinder.luau
 - Map0_Test/ServerScriptService/GameService/Monster/Components/Investigation.luau
 - Map0_Test/ReplicatedStorage/Modules/Camera/CameraViewfinder.luau
 - Lobby/ServerScriptService/GameService/Monster/PatrolGraph.luau
-- MonsterConfig.Get
+- Lobby/ReplicatedStorage/Modules/Monster/MonsterConfig.luau
 - MatchManager
 - Lobby/ReplicatedStorage/Modules/Camera/CameraToolController.luau
-- Lobby/ServerScriptService/GameService/Player/CharacterMovementService.luau
+- Map0_Test/ServerScriptService/GameService/Exit/ExitState.luau
 - Lobby/ReplicatedStorage/Modules/Pickup/PickupVisualsController.luau
 - Lobby/ServerScriptService/GameService/Monster/Components/Aggression.luau
 - Map0_Test/ServerScriptService/GameService/Monster/PatrolGraph.luau
@@ -81,12 +81,12 @@
 - CameraSession.Enter
 - Map0_Test/ServerScriptService/GameService/Monster/Components/Aggression.luau
 - Map0_Test/ReplicatedStorage/Modules/Pickup/PickupVisualsController.luau
-- Lobby/ReplicatedStorage/Modules/Camera/CameraStats.luau
+- Lobby/ReplicatedStorage/Modules/Camera/CameraSession.luau
 - Map0_Test/ServerScriptService/GameService/Monster/Components/Navigation.luau
 - RewardStore
 - Lobby/ServerScriptService/GameService/Monster/States/Chase.luau
-- Lobby/ServerScriptService/GameService/Spectate/SpectateService.luau
-- Map0_Test/ServerScriptService/GameService/Death/DeathService.luau
+- Remotes.Get
+- Lobby/ServerScriptService/GameService/Item/ItemWorld/CCTVService.luau
 - Lobby/ReplicatedStorage/Modules/Camera/CameraState.luau
 - tick
 - Lobby/ServerScriptService/GameService/Monster/Components/Perception.luau
@@ -100,10 +100,10 @@
 - Lobby/ReplicatedStorage/Modules/Queue/QueuePadDisplay.luau
 - Lobby/ReplicatedStorage/Modules/Spectate/SpectateCameraController.luau
 - Lobby/ServerScriptService/GameService/Monster/Components/Evolution.luau
-- Lobby/ServerScriptService/GameService/Monster/MonsterRegistry.luau
+- MonsterRegistry.ForEach
 - PickupRegistry
 - Map0_Test/ReplicatedStorage/Modules/Camera/CameraSession.luau
-- ServerRole.AssertGameServer
+- Map0_Test/ReplicatedStorage/Modules/Shared/ServerRole.luau
 - Map0_Test/ReplicatedStorage/Modules/Shared/Remotes.luau
 - Map0_Test/ReplicatedStorage/Modules/Queue/QueuePadDisplay.luau
 - Map0_Test/ReplicatedStorage/Modules/Spectate/SpectateCameraController.luau
@@ -122,14 +122,14 @@
 - Work Modes
 - MatchArrival
 - Lobby/StarterPlayerScripts/ShotFeedbackHandler.local.luau
-- Lobby/ReplicatedStorage/Modules/Monster/MonsterConstants.luau
+- Lobby/ServerScriptService/GameService/Monster/Behaviors/VisualScan.luau
 - Lobby/ServerScriptService/GameService/Monster/MonsterFactory.luau
 - Identity by attribute, never by .Name
 - QueueService.luau
 - Map0_Test/StarterPlayerScripts/ShotFeedbackHandler.local.luau
-- tick
+- Map0_Test/ReplicatedStorage/Modules/UI/UITheme.luau
 - Map0_Test/ServerScriptService/GameService/Monster/MonsterFactory.luau
-- Lobby/ReplicatedStorage/Modules/PlayerStats.luau
+- Lobby/ReplicatedStorage/Modules/PlayerRuntimeStats.luau
 - Lobby/ServerScriptService/GameService/Stimulus/FootstepEmitter.luau
 - Lobby/ServerScriptService/GameService/Monster/States/Wander.luau
 - PickupService
@@ -139,7 +139,7 @@
 - Map0_Test/ServerScriptService/GameService/Monster/States/Wander.luau
 - LaunchGate.OnLaunched
 - Map0_Test/ReplicatedStorage/Modules/Monster/MonsterConstants.luau
-- Map0_Test/ReplicatedStorage/Modules/MatchTime/MatchTimeClient.luau
+- tick
 - Shared/TouchSession.IsActive
 - Map0_Test/ReplicatedStorage/Modules/UI/UIScaleController.luau
 - QueuePadService
@@ -148,23 +148,23 @@
 - Lobby/ReplicatedStorage/Modules/Mission/MissionHud.luau
 - Map0_Test/ReplicatedStorage/Modules/Mission/MissionHud.luau
 - PhotoScoring module
-- Lobby/ReplicatedStorage/Modules/Shared/PlayerStates.luau
+- Lobby/ServerScriptService/GameService/Match/SpawnSelection.luau
 - Lobby/ServerScriptService/GameService/CameraShelf/CameraInventory.luau
-- Map0_Test/ServerScriptService/GameService/Player/CharacterMovementService.luau
+- Map0_Test/ServerScriptService/GameService/Item/ItemWorld/CCTVService.luau
 - Map0_Test/ReplicatedStorage/Modules/Camera/CameraTouchHud.luau
 - PhotoCapture.luau
 - ServerRole
 - Lobby/ReplicatedStorage/Modules/Flash/FlashRenderers/ScreenFlashRenderer.luau
 - Lobby/ReplicatedStorage/Modules/Flash/FlashRenderers/WorldLightRenderer.luau
-- Lobby/ServerScriptService/GameService/Match/MatchManager.luau
+- MatchManager.Is
 - Continuous hour scale past 24
 - Map0_Test/ReplicatedStorage/Modules/Flash/FlashRenderers/ScreenFlashRenderer.luau
 - Map0_Test/ReplicatedStorage/Modules/Flash/FlashRenderers/WorldLightRenderer.luau
-- Lobby/ServerScriptService/GameService/Camera/PhotoCapture.luau
+- Lobby/ReplicatedStorage/Modules/Reward/CaptureTargets.luau
 - RewardCleanupHook
 - MatchClock
 - SpectateService
-- Map0_Test/StarterPlayerScripts/CameraToolWatcher.local.luau
+- Map0_Test/ServerScriptService/GameService/Match/SpawnSelection.luau
 - FlashSoundRenderer.luau
 - Config in data tables, not logic
 - ProfileStore.Backend.Mock
@@ -173,50 +173,80 @@
 - MatchReplicator
 - Phase 8V (published-build verification)
 - PlayerStates
-- Lobby/ServerScriptService/GameService/Monster/Search/PointSelector.luau
+- Map0_Test/StarterPlayerScripts/ItemUseClient.local.luau
 - Map0_Test/ServerScriptService/GameService/Monster/Search/PointSelector.luau
 - Map0_Test/ServerScriptService/GameService/MatchTime/MatchTimeReplicator.luau
 - Lobby/ServerScriptService/GameService/Player/StartGame.luau
-- Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeHud.luau
+- Lobby/ReplicatedStorage/Modules/UI/UITheme.luau
 - Map0_Test/ServerScriptService/GameService/Match/MatchStats.luau
-- FlashlightService.luau
-- MonsterConfig.Get
-- FirstPersonCrosshair.local.luau
-- Lobby/ServerScriptService/GameService/Pickup/PickupHandlers/Cash.luau
+- UIBuilder.CreateScreenGui
+- Map0_Test/ServerScriptService/GameService/Player/FlashlightService.luau
+- UIBuilder.CreateScreenGui
+- Map0_Test/ReplicatedStorage/Modules/Spectate/SpectateController.luau
+- Lobby/ServerScriptService/GameService/Pickup/PickupRegistry.luau
 - Lobby/ServerScriptService/GameService/Monster/MonsterEvolution.luau
-- Map0_Test/ReplicatedStorage/Modules/PlayerStats.luau
+- Map0_Test/StarterPlayerScripts/Hudcontroller.local.luau
+- Lobby/ServerScriptService/GameService/Monster/Brain/Brain.luau
 - refresh
 - Lobby/ServerScriptService/GameService/MatchTime/MatchTimeReplicator.luau
 - refresh
 - Map0_Test/ServerScriptService/GameService/Pickup/PickupRegistry.luau
-- MissionReplicator.Start
+- Lobby/ServerScriptService/GameService/Exit/ExitService.luau
 - Map0_Test/ServerScriptService/GameService/Stimulus/FootstepEmitter.luau
-- MissionReplicator.Start
+- Lobby/ReplicatedStorage/Modules/Item/CCTVViewController.luau
+- Map0_Test/ServerScriptService/GameService/Reward/RewardLedger.luau
 - RewardLedger
+- Lobby/ServerScriptService/GameService/Camera/PhotoCapture.luau
+- Map0_Test/ReplicatedStorage/Modules/Reward/RewardCalculator.luau
+- Map0_Test/ServerScriptService/GameService/Camera/PhotoCapture.luau
+- Lobby/ServerScriptService/GameService/Player/FlashlightService.luau
+- Map0_Test/ReplicatedStorage/Modules/Loadout/LoadoutService.luau
+- Lobby/ServerScriptService/GameService/Match/MatchStats.luau
+- Lobby/StarterPlayerScripts/ItemUseClient.local.luau
+- Map0_Test/ServerScriptService/GameService/Reward/RewardService.luau
+- Map0_Test/ServerScriptService/GameService/CameraShelf/CameraInventory.luau
+- Lobby/ReplicatedStorage/Modules/Item/ItemUseHud.luau
+- Lobby/ReplicatedStorage/Modules/Spectate/SpectateController.luau
+- Map0_Test/ReplicatedStorage/Modules/Item/ItemUseHud.luau
+- Lobby/ServerScriptService/GameService/Monster/EncounterDirector.luau
+- Map0_Test/ServerScriptService/GameService/Pickup/PickupPrompt.luau
+- ensureBuilt
+- Lobby/ReplicatedStorage/Modules/Spectate/SpectateHud.luau
+- ExitReplicator.Start
+- Lobby/ServerScriptService/GameService/Shop/ShopSession.luau
+- ensureBuilt
+- Map0_Test/ServerScriptService/GameService/Player/StartGame.luau
+- Map0_Test/ReplicatedStorage/Modules/Spectate/SpectateHud.luau
+- Map0_Test/ServerScriptService/GameService/Shop/ShopSession.luau
+- instancesForCategory
+- ensureBuilt
+- ensureBuilt
+- Lobby/ReplicatedStorage/Modules/Exit/ExitClient.luau
+- Map0_Test/ReplicatedStorage/Modules/Exit/ExitClient.luau
 
 ## God Nodes (most connected - your core abstractions)
-1. `ServerRole.AssertGameServer()` - 32 edges
-2. `ServerRole.AssertGameServer()` - 31 edges
+1. `ServerRole.AssertGameServer()` - 44 edges
+2. `ServerRole.AssertGameServer()` - 44 edges
 3. `CameraSession.Enter()` - 23 edges
-4. `CameraSession.Enter()` - 18 edges
-5. `Blueprint — Match Time Announcer (countdown + 3 AM enrage)` - 17 edges
-6. `Blueprint — Responsive HUD Scaling (Cash / Match Time / Stamina)` - 17 edges
-7. `ensureBuilt()` - 16 edges
-8. `ensureBuilt()` - 16 edges
-9. `Remotes.Get()` - 15 edges
-10. `Remotes.Get()` - 14 edges
+4. `Remotes.Get()` - 19 edges
+5. `Remotes.Get()` - 19 edges
+6. `CameraSession.Enter()` - 18 edges
+7. `Blueprint — Match Time Announcer (countdown + 3 AM enrage)` - 17 edges
+8. `Blueprint — Responsive HUD Scaling (Cash / Match Time / Stamina)` - 17 edges
+9. `tick()` - 16 edges
+10. `ensureBuilt()` - 16 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `No DataStore session locking (deferred debt)` --semantically_similar_to--> `Known gap: no session locking`  [INFERRED] [semantically similar]
   docs/Planned.md → REWARD_SYSTEM.md
-- `tick()` --calls--> `MatchTimeAnnouncer.Update()`  [INFERRED]
-  Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeHudController.luau → Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeAnnouncer.luau
-- `tick()` --calls--> `MatchTimeAnnouncer.Hide()`  [INFERRED]
-  Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeHudController.luau → Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeAnnouncer.luau
-- `tick()` --calls--> `MatchTimeHud.Hide()`  [INFERRED]
-  Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeHudController.luau → Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeHud.luau
-- `tick()` --calls--> `MatchStates.ShowsMatchTime()`  [INFERRED]
-  Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeHudController.luau → Lobby/ReplicatedStorage/Modules/Shared/MatchStates.luau
+- `CameraSession.Enter()` --calls--> `CameraViewfinder.Hide()`  [INFERRED]
+  Lobby/ReplicatedStorage/Modules/Camera/CameraSession.luau → Lobby/ReplicatedStorage/Modules/Camera/CameraViewfinder.luau
+- `GameBoot.Start()` --calls--> `ExitConfig.Validate()`  [INFERRED]
+  Lobby/ServerScriptService/GameService/Boot/GameBoot.luau → Lobby/ReplicatedStorage/Modules/Exit/ExitConfig.luau
+- `tick()` --calls--> `MatchEventAnnouncer.Update()`  [INFERRED]
+  Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeHudController.luau → Lobby/ReplicatedStorage/Modules/MatchTime/MatchEventAnnouncer.luau
+- `tick()` --calls--> `MatchEventAnnouncer.Hide()`  [INFERRED]
+  Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeHudController.luau → Lobby/ReplicatedStorage/Modules/MatchTime/MatchEventAnnouncer.luau
 
 ## Import Cycles
 - None detected.
@@ -231,67 +261,63 @@
 - **Reward pipeline: shot to persisted currency** — reward_system_rewardservice, reward_system_rewardcalculator, reward_system_rewardledger, reward_system_rewardstore [EXTRACTED 1.00]
 - **Phase 12.5: six deviations closed** — plans_phase_12_5_v1_migration_gate_bug, plans_phase_12_5_onlaunched_timing_bug, plans_phase_12_5_save_confirm_timeout, plans_phase_12_5_step_timeout, plans_phase_12_5_checkprogression, plans_phase_12_5_module_scope_side_effects, plans_phase_12_5_rewardstorediagnostics [EXTRACTED 0.95]
 
-## Communities (229 total, 20 thin omitted)
+## Communities (264 total, 26 thin omitted)
 
 ### Community 0 - "Lobby/ServerScriptService/GameService/Lobby/QueueService.luau"
 Cohesion: 0.09
 Nodes (43): MatchConfig.Get(), ServerRole.AssertLobbyServer(), LaunchGate.Check(), LaunchGate.OnLaunched(), LaunchGate.RegisterOnLaunchAborted(), LaunchGate.RegisterOnLaunched(), LaunchGate.RegisterPrecondition(), LaunchGate.Start() (+35 more)
 
 ### Community 1 - "Map0_Test/ServerScriptService/GameService/Lobby/QueueService.luau"
-Cohesion: 0.07
-Nodes (47): MatchConfig.Get(), ServerRole.AssertLobbyServer(), LaunchGate.Check(), LaunchGate.OnLaunchAborted(), LaunchGate.OnLaunched(), LaunchGate.RegisterOnLaunchAborted(), LaunchGate.RegisterOnLaunched(), LaunchGate.RegisterPrecondition() (+39 more)
+Cohesion: 0.09
+Nodes (43): MatchConfig.Get(), ServerRole.AssertLobbyServer(), LaunchGate.Check(), LaunchGate.OnLaunched(), LaunchGate.RegisterOnLaunchAborted(), LaunchGate.RegisterOnLaunched(), LaunchGate.RegisterPrecondition(), LaunchGate.Start() (+35 more)
 
 ### Community 2 - "Lobby/ServerScriptService/GameService/MatchTime/MatchTimeService.luau"
-Cohesion: 0.19
-Nodes (11): MatchTimeMath.FormatHour(), MatchTimeMath.RealToHour(), MatchTimeMath.TotalRealSeconds(), MatchTimeEvents.Dispatch(), MatchTimeService.GetHour(), MatchTimeService.GetPhase(), MatchTimeService.Start(), sample() (+3 more)
+Cohesion: 0.21
+Nodes (10): MatchTimeMath.RealToHour(), MatchTimeMath.TotalRealSeconds(), MatchTimeEvents.Dispatch(), MatchTimeService.GetHour(), MatchTimeService.GetPhase(), MatchTimeService.Start(), sample(), startClock() (+2 more)
 
 ### Community 3 - "Map0_Test/ServerScriptService/GameService/MatchTime/MatchTimeService.luau"
-Cohesion: 0.23
-Nodes (9): MatchTimeMath.FormatHour(), MatchTimeMath.RealToHour(), MatchTimeMath.TotalRealSeconds(), MatchTimeService.GetHour(), MatchTimeService.GetPhase(), MatchTimeService.Start(), sample(), startClock() (+1 more)
+Cohesion: 0.21
+Nodes (9): MatchTimeMath.RealToHour(), MatchTimeMath.TotalRealSeconds(), MatchTimeEvents.Dispatch(), MatchTimeService.GetHour(), MatchTimeService.GetPhase(), MatchTimeService.Start(), sample(), startClock() (+1 more)
 
 ### Community 6 - "Lobby/ServerScriptService/GameService/Objective/ObjectiveService.luau"
-Cohesion: 0.12
-Nodes (19): ObjectiveStateClient.GetEffectiveState(), ObjectiveStates.IsValid(), ObjectiveTypes.Get(), ObjectiveTypes.TypeOf(), ObjectiveVisuals.Clear(), ObjectiveVisuals.ClearAll(), clearAllVisible(), considerInstance() (+11 more)
+Cohesion: 0.08
+Nodes (29): ObjectiveStateClient.GetEffectiveState(), ObjectiveStates.IsValid(), ObjectiveTypes.Get(), ObjectiveTypes.TypeOf(), ObjectiveVisuals.Clear(), ObjectiveVisuals.ClearAll(), clearAllVisible(), considerInstance() (+21 more)
 
 ### Community 7 - "Map0_Test/ServerScriptService/GameService/Objective/ObjectiveService.luau"
 Cohesion: 0.09
-Nodes (26): ObjectiveStateClient.GetEffectiveState(), ObjectiveStates.IsValid(), ObjectiveTypes.Get(), ObjectiveTypes.TypeOf(), ObjectiveVisuals.Clear(), ObjectiveVisuals.ClearAll(), clearAllVisible(), considerInstance() (+18 more)
+Nodes (27): ObjectiveStateClient.GetEffectiveState(), ObjectiveStates.IsValid(), ObjectiveTypes.Get(), ObjectiveTypes.TypeOf(), ObjectiveVisuals.Clear(), ObjectiveVisuals.ClearAll(), clearAllVisible(), considerInstance() (+19 more)
 
 ### Community 8 - "onPromptTriggered"
-Cohesion: 0.16
-Nodes (13): PickupResultCodes.GetMessage(), PickupHandlers.Get(), anchorPartOf(), PickupPrompt.Clear(), PickupPrompt.Disable(), PickupPrompt.Enable(), PickupPrompt.OwnerOf(), PickupPrompt.Provision() (+5 more)
+Cohesion: 0.19
+Nodes (8): PickupResultCodes.GetMessage(), PickupTypes.Get(), PickupHandlers.Get(), PickupRegistry.IsRegistered(), onPromptTriggered(), PickupService.Start(), pivotOf(), rootPartOf()
 
-### Community 9 - "MatchManager.Get"
-Cohesion: 0.13
-Nodes (18): CaptureRules.Check(), applyModifiers(), calculateCurve(), calculateFlatRoll(), RewardCalculator.Calculate(), RewardCalculator.Describe(), RewardModifiers.Collect(), MatchStates.IsScoringActive() (+10 more)
-
-### Community 10 - "Map0_Test/ServerScriptService/GameService/Match/MissionProgress.luau"
+### Community 9 - "Lobby/ServerScriptService/GameService/Reward/RewardService.luau"
 Cohesion: 0.17
-Nodes (8): PickupTypes.Get(), PickupTypes.TypeOf(), countObjectives(), countRemainingDocuments(), MissionProgress.Get(), MissionProgress.Reset(), MissionProgress.Start(), PickupRegistry.All()
+Nodes (12): CaptureRules.Check(), applyModifiers(), calculateCurve(), calculateFlatRoll(), RewardCalculator.Calculate(), RewardCalculator.Describe(), RewardModifiers.Collect(), Units.StudsToMeters() (+4 more)
 
 ### Community 11 - "Evolution.Tiers schema"
 Cohesion: 0.07
 Nodes (33): Abilities (Unlock), Aggression (Decay/Thresholds), AppliedTiers set (Stacks=false), Brain.candidates (built once in Brain.new), Capabilities (Grant/Revoke), Clamps guard, Components/init.luau, Evolution (system) (+25 more)
 
 ### Community 12 - "Lobby/ReplicatedStorage/Modules/Shared/ServerRole.luau"
-Cohesion: 0.09
-Nodes (24): resolve(), ServerRole.AssertGameServer(), ServerRole.Get(), MatchCleanup.RegisterSaveStep(), MatchCleanup.RegisterTeardownStep(), MatchCleanup.Start(), runCleanup(), runWithTimeout() (+16 more)
+Cohesion: 0.07
+Nodes (31): resolve(), ServerRole.AssertGameServer(), ServerRole.Get(), ServerRole.Is(), ExitAnnounceHook.Start(), onExitStateChanged(), ExitResultHook.Start(), ExitState.GetEscape() (+23 more)
 
 ### Community 13 - "onPromptTriggered"
-Cohesion: 0.07
-Nodes (33): PickupResultCodes.GetMessage(), PickupTypes.Get(), PickupTypes.TypeOf(), countObjectives(), countRemainingDocuments(), MissionProgress.Get(), MissionProgress.Reset(), MissionProgress.Start() (+25 more)
+Cohesion: 0.16
+Nodes (13): PickupResultCodes.GetMessage(), PickupHandlers.Get(), anchorPartOf(), PickupPrompt.Clear(), PickupPrompt.Disable(), PickupPrompt.Enable(), PickupPrompt.OwnerOf(), PickupPrompt.Provision() (+5 more)
 
 ### Community 14 - "Lobby/ReplicatedStorage/Modules/Shared/MatchStates.luau"
-Cohesion: 0.15
-Nodes (13): MatchStates.AcceptsJoins(), MatchStates.IsGameplayActive(), MatchStates.IsKitGranted(), MatchStates.IsSpectateAllowed(), MatchStates.IsValid(), MatchStates.ShowsMatchTime(), loadIfNeeded(), MatchSpawner.Start() (+5 more)
+Cohesion: 0.10
+Nodes (27): MatchStates.AcceptsJoins(), MatchStates.CanTransition(), MatchStates.IsKitGranted(), MatchStates.IsScoringActive(), MatchStates.IsSpectateAllowed(), MatchStates.IsTerminal(), MatchStates.IsValid(), MatchStates.RespawnsOnDeath() (+19 more)
 
-### Community 15 - "Map0_Test/ReplicatedStorage/Modules/Shared/ServerRole.luau"
-Cohesion: 0.15
-Nodes (12): resolve(), ServerRole.Get(), MatchCleanup.RegisterSaveStep(), MatchCleanup.RegisterTeardownStep(), MatchCleanup.Start(), runCleanup(), runWithTimeout(), captureAuthored() (+4 more)
+### Community 15 - "Map0_Test/ReplicatedStorage/Modules/Shared/Signal.luau"
+Cohesion: 0.10
+Nodes (11): MatchCleanup.RegisterSaveStep(), MatchCleanup.RegisterTeardownStep(), MatchCleanup.Start(), runCleanup(), runWithTimeout(), captureAuthored(), MatchTimeLighting.Start(), onPhaseOrTick() (+3 more)
 
-### Community 16 - "Map0_Test/ServerScriptService/GameService/Camera/PhotoCapture.luau"
-Cohesion: 0.08
-Nodes (34): CaptureRules.Check(), CaptureTargets.AttributeFor(), CaptureTargets.IsType(), CaptureTargets.Resolve(), CaptureTargets.TypeOf(), applyModifiers(), calculateCurve(), calculateFlatRoll() (+26 more)
+### Community 16 - "Map0_Test/ReplicatedStorage/Modules/Reward/CaptureTargets.luau"
+Cohesion: 0.27
+Nodes (11): CaptureTargets.AttributeFor(), CaptureTargets.IsType(), CaptureTargets.Resolve(), CaptureTargets.TypeOf(), bootstrap(), considerInstance(), isLiveCapturable(), refresh() (+3 more)
 
 ### Community 17 - "Lobby/ServerScriptService/GameService/Monster/States/Patrol.luau"
 Cohesion: 0.28
@@ -302,40 +328,36 @@ Cohesion: 0.28
 Nodes (14): deferPoint(), ensureRouteTarget(), maybeDivert(), memoryFor(), Patrol.Enter(), Patrol.Update(), patrolCfg(), pauseChanceFor() (+6 more)
 
 ### Community 19 - "Lobby/ReplicatedStorage/Modules/UI/MatchReceipt.luau"
-Cohesion: 0.08
-Nodes (42): ensureBuilt(), QueueHud.Hide(), QueueHud.SetMessage(), CaptureTargets.Get(), CaptureTargets.OrderedNames(), MatchResultCodes.GetMessage(), ensureBuilt(), setBackpackVisible() (+34 more)
+Cohesion: 0.15
+Nodes (22): CaptureTargets.Get(), CaptureTargets.OrderedNames(), MatchResultCodes.GetMessage(), buildColumnHeader(), buildDetailLabel(), buildGrade(), buildHeader(), buildReturnButton() (+14 more)
 
 ### Community 20 - "Map0_Test/ReplicatedStorage/Modules/UI/MatchReceipt.luau"
-Cohesion: 0.07
-Nodes (42): ensureBuilt(), QueueHud.Hide(), QueueHud.SetMessage(), CaptureTargets.Get(), CaptureTargets.OrderedNames(), MatchResultCodes.GetMessage(), ensureBuilt(), setBackpackVisible() (+34 more)
+Cohesion: 0.14
+Nodes (22): CaptureTargets.Get(), CaptureTargets.OrderedNames(), MatchResultCodes.GetMessage(), buildColumnHeader(), buildDetailLabel(), buildGrade(), buildHeader(), buildReturnButton() (+14 more)
 
 ### Community 21 - "Map0_Test/ReplicatedStorage/Modules/Shared/PlayerStates.luau"
-Cohesion: 0.16
-Nodes (8): MatchSchedule.Validate(), MatchStates.Validate(), PlayerStates.CanSpectate(), PlayerStates.Validate(), GameBoot.Start(), guardNonReservedServer(), LobbyBoot.Start(), SunriseEndHook.Start()
+Cohesion: 0.10
+Nodes (27): PlayerStates.CanTransition(), PlayerStates.CountsAsActive(), PlayerStates.IsValid(), PlayerStates.Validate(), LobbyBoot.Start(), anyoneCountsAsActive(), clearProgress(), escape() (+19 more)
 
 ### Community 22 - "Lobby/ReplicatedStorage/Modules/Shared/Remotes.luau"
-Cohesion: 0.07
-Nodes (15): ArrivalService.Start(), handleArrival(), LaunchGate.OnLaunchAborted(), handleInitFailed(), MatchLauncher.Launch(), MatchLauncher.Start(), ensureMatchInfoFolder(), MatchReplicator.Start() (+7 more)
+Cohesion: 0.06
+Nodes (17): CameraSessionTracker.IsInCamera(), CameraSessionTracker.Start(), ArrivalService.Start(), handleArrival(), LaunchGate.OnLaunchAborted(), handleInitFailed(), MatchLauncher.Launch(), MatchLauncher.Start() (+9 more)
 
-### Community 23 - "Lobby/ReplicatedStorage/Modules/Shared/Signal.luau"
-Cohesion: 0.11
-Nodes (17): MatchStates.RespawnsOnDeath(), PlayerStates.CanTransition(), PlayerStates.IsValid(), DeathPolicy.Get(), bindCharacter(), DeathService.Start(), onCharacterAdded(), onHumanoidDied() (+9 more)
+### Community 23 - "Lobby/ReplicatedStorage/Modules/Shared/PlayerStates.luau"
+Cohesion: 0.13
+Nodes (17): PlayerStates.CanTransition(), PlayerStates.IsValid(), PlayerStates.Validate(), LobbyBoot.Start(), DeathPolicy.Get(), bindCharacter(), DeathService.Start(), onCharacterAdded() (+9 more)
 
 ### Community 24 - "Blueprint — Match Time Announcer (countdown + 3 AM enrage)"
 Cohesion: 0.08
 Nodes (25): 10. Files expected to change, 11. Dependencies, 12. Edge cases, 13. Studio verification checklist, 14. Deviations from the request, 15. Found, not fixed, 1.1 The clock is derived, not streamed, 1.2 Hours are a continuous unwrapped scale (+17 more)
-
-### Community 25 - "Lobby/ReplicatedStorage/Modules/Monster/MonsterConfig.luau"
-Cohesion: 0.19
-Nodes (7): mergeStages(), MonsterConfig.All(), MonsterConfig.Validate(), resolveStats(), Components.PlannedFor(), MonsterFramework.Start(), reportPlannedComponents()
 
 ### Community 26 - "Lobby/ServerScriptService/Vendor/ProfileStore.luau"
 Cohesion: 0.10
 Nodes (4): AcquireRunnerThreadAndCallEventHandler(), ProfileStore:VersionQuery(), ProfileVersionQuery.New(), RunEventHandlerInFreeThread()
 
 ### Community 27 - "Map0_Test/ReplicatedStorage/Modules/Monster/MonsterConfig.luau"
-Cohesion: 0.19
-Nodes (7): mergeStages(), MonsterConfig.All(), MonsterConfig.Validate(), resolveStats(), Components.PlannedFor(), MonsterFramework.Start(), reportPlannedComponents()
+Cohesion: 0.14
+Nodes (15): collect(), expand(), MonsterCapabilities.ComponentsFor(), MonsterCapabilities.Resolve(), MonsterCapabilities.StatesFor(), MonsterCapabilities.StimuliFor(), MonsterCapabilities.Validate(), mergeStages() (+7 more)
 
 ### Community 28 - "Blueprint — Responsive HUD Scaling (Cash / Match Time / Stamina)"
 Cohesion: 0.08
@@ -345,21 +367,21 @@ Nodes (25): 10. Safe-area handling, 11. Files changed, 12. Studio verification c
 Cohesion: 0.10
 Nodes (4): AcquireRunnerThreadAndCallEventHandler(), ProfileStore:VersionQuery(), ProfileVersionQuery.New(), RunEventHandlerInFreeThread()
 
-### Community 30 - "Lobby/ReplicatedStorage/Modules/Camera/CameraSession.luau"
-Cohesion: 0.21
-Nodes (11): CameraEffects.Apply(), CameraEffects.Clear(), CameraEffects.GetBlurAlpha(), CameraEffects.UpdateFromSpeed(), CameraSession.Enter(), CameraSession.UpdateBlur(), hideOtherGuis(), setToolLocalTransparency() (+3 more)
+### Community 30 - "Lobby/ReplicatedStorage/Modules/Camera/CameraEffects.luau"
+Cohesion: 0.38
+Nodes (6): CameraEffects.Apply(), CameraEffects.Clear(), CameraEffects.GetBlurAlpha(), CameraEffects.UpdateFromSpeed(), CameraSession.UpdateBlur(), CameraViewfinder.SetBlurAlpha()
 
 ### Community 31 - "Lobby/ServerScriptService/GameService/Monster/Components/Investigation.luau"
 Cohesion: 0.23
 Nodes (6): Investigation:Tick(), Investigation:_visualCandidate(), investigationConfig(), pickBest(), stimulusCandidate(), trailCandidate()
 
 ### Community 32 - "Map0_Test/ReplicatedStorage/Modules/Shared/MatchStates.luau"
-Cohesion: 0.10
-Nodes (28): MatchStates.AcceptsJoins(), MatchStates.CanTransition(), MatchStates.IsGameplayActive(), MatchStates.IsKitGranted(), MatchStates.IsScoringActive(), MatchStates.IsSpectateAllowed(), MatchStates.IsTerminal(), MatchStates.IsValid() (+20 more)
+Cohesion: 0.08
+Nodes (32): MatchStates.AcceptsJoins(), MatchStates.CanTransition(), MatchStates.IsGameplayActive(), MatchStates.IsScoringActive(), MatchStates.IsSpectateAllowed(), MatchStates.IsTerminal(), MatchStates.IsValid(), MatchStates.RespawnsOnDeath() (+24 more)
 
-### Community 33 - "Map0_Test/ServerScriptService/GameService/PlayerState/PlayerStateService.luau"
-Cohesion: 0.29
-Nodes (9): PlayerStates.CanTransition(), PlayerStates.IsValid(), bindCharacter(), LobbyDeathPolicy.Start(), onCharacterAdded(), onPlayerRemoving(), PlayerStateService.Set(), PlayerStateService.Start() (+1 more)
+### Community 33 - "Lobby/ServerScriptService/GameService/Exit/ExitState.luau"
+Cohesion: 0.07
+Nodes (44): ExitConfig.Validate(), ExitRequirements.Describe(), ExitRequirements.DescribeMainProgress(), ExitRequirements.DescribeProgress(), ExitRequirements.IsMainSatisfied(), ExitRequirements.IsSatisfied(), ExitRequirements.Progress(), ExitRequirements.SelectRandom() (+36 more)
 
 ### Community 34 - "Lobby/ReplicatedStorage/Modules/CameraShelf/CameraShelfGui.luau"
 Cohesion: 0.17
@@ -369,93 +391,93 @@ Nodes (14): CameraStats.GetOrderedIds(), buildCameraRow(), buildCloseButton(), b
 Cohesion: 0.17
 Nodes (14): CameraStats.GetOrderedIds(), buildCameraRow(), buildCloseButton(), buildListHolder(), buildMessageLabel(), buildPanel(), buildTitle(), CameraShelfGui.Build() (+6 more)
 
-### Community 36 - "Lobby/ServerScriptService/GameService/Monster/MonsterInstance.luau"
-Cohesion: 0.12
-Nodes (5): Brain.new(), MonsterBus.new(), buildComponents(), MonsterInstance.new(), MonsterInstance:SetStage()
+### Community 36 - "Lobby/ReplicatedStorage/Modules/Shared/Trove.luau"
+Cohesion: 0.11
+Nodes (5): Trove.new(), MonsterBus.new(), buildComponents(), MonsterInstance.new(), MonsterInstance:SetStage()
 
 ### Community 37 - "Map0_Test/ReplicatedStorage/Modules/Camera/CameraState.luau"
-Cohesion: 0.17
-Nodes (11): CameraState.GetFOV(), CameraState.GetFOVChangeRate(), CameraState.GetWalkSpeedMultiplier(), CameraState.OnStableChanged(), CameraState.SetInCamera(), CameraState.SetMovementSettings(), CameraState.SetStable(), CameraState.SetZoomSettings() (+3 more)
+Cohesion: 0.15
+Nodes (13): CameraState.GetFOV(), CameraState.GetFOVChangeRate(), CameraState.GetStable(), CameraState.GetWalkSpeedMultiplier(), CameraState.OnStableChanged(), CameraState.SetInCamera(), CameraState.SetMovementSettings(), CameraState.SetStable() (+5 more)
 
 ### Community 38 - "Map0_Test/ServerScriptService/GameService/Monster/MonsterInstance.luau"
 Cohesion: 0.12
 Nodes (5): Brain.new(), MonsterBus.new(), buildComponents(), MonsterInstance.new(), MonsterInstance:SetStage()
 
-### Community 39 - "Lobby/ServerScriptService/GameService/Monster/Brain/StateMachine.luau"
-Cohesion: 0.20
+### Community 39 - "Lobby/ReplicatedStorage/Modules/Monster/MonsterConstants.luau"
+Cohesion: 0.18
 Nodes (3): StateMachine.new(), StateMachine:Transition(), States.Get()
 
 ### Community 40 - "Lobby/ReplicatedStorage/Modules/UI/UIScaleController.luau"
 Cohesion: 0.27
 Nodes (5): TouchSession.IsActive(), applyFactor(), computeFactor(), recompute(), isTouchSession()
 
-### Community 41 - "Lobby/ReplicatedStorage/Modules/Shop/PurchaseNotification.luau"
-Cohesion: 0.17
-Nodes (10): playSound(), PurchaseNotification.Handle(), showText(), PurchaseResultCodes.GetMessage(), ShopPrices.GetPrice(), SoundIds.GetSoundId(), findSlot(), ShopFillSlot.PurchaseItem() (+2 more)
+### Community 41 - "Lobby/ReplicatedStorage/Modules/Shop/ShopCatalog.luau"
+Cohesion: 0.05
+Nodes (45): EffectAttributes.IsActive(), EffectAttributes.NameFor(), playSound(), PurchaseNotification.Handle(), showText(), PurchaseResultCodes.GetMessage(), ShopCatalog.Get(), ShopCatalog.GetOrdered() (+37 more)
 
 ### Community 42 - "Map0_Test/ServerScriptService/GameService/Monster/Brain/StateMachine.luau"
 Cohesion: 0.20
 Nodes (3): StateMachine.new(), StateMachine:Transition(), States.Get()
 
 ### Community 43 - "Map0_Test/StarterPlayerScripts/MobileSprintButton.local.luau"
-Cohesion: 0.23
+Cohesion: 0.13
 Nodes (8): PlayerRuntimeStats.Get(), fallbackHome(), getControlModule(), getStickMagnitude(), hasStaminaToStart(), positionAtHome(), toggleArm(), tryArm()
 
-### Community 44 - "Map0_Test/ServerScriptService/GameService/Match/MatchParticipants.luau"
-Cohesion: 0.14
-Nodes (19): PlayerStates.CountsAsActive(), MatchArrival.GetModeId(), MatchArrival.Start(), seedFrom(), config(), MatchClock.GetEndingDeadline(), MatchClock.Start(), runCountdown() (+11 more)
+### Community 44 - "MatchManager.Is"
+Cohesion: 0.25
+Nodes (13): clear(), ensureMatchInfoFolder(), ExitReplicator.Start(), publish(), ExitState.GetSnapshot(), config(), MatchClock.GetEndingDeadline(), MatchClock.Start() (+5 more)
 
-### Community 45 - "Map0_Test/ReplicatedStorage/Modules/Shop/PurchaseNotification.luau"
-Cohesion: 0.17
-Nodes (10): playSound(), PurchaseNotification.Handle(), showText(), PurchaseResultCodes.GetMessage(), ShopPrices.GetPrice(), SoundIds.GetSoundId(), findSlot(), ShopFillSlot.PurchaseItem() (+2 more)
+### Community 45 - "Map0_Test/ReplicatedStorage/Modules/Shop/ShopCatalog.luau"
+Cohesion: 0.05
+Nodes (45): EffectAttributes.IsActive(), EffectAttributes.NameFor(), playSound(), PurchaseNotification.Handle(), showText(), PurchaseResultCodes.GetMessage(), ShopCatalog.Get(), ShopCatalog.GetOrdered() (+37 more)
 
 ### Community 46 - "Lobby/ServerScriptService/GameService/Reward/RewardStore.luau"
 Cohesion: 0.23
 Nodes (14): RewardTypes.Persistent(), checkProgression(), onLaunchAborted(), onLaunched(), activeStore(), attemptLegacyRead(), keyFor(), RewardStore.ClearSession() (+6 more)
 
-### Community 47 - "Map0_Test/ReplicatedStorage/Modules/Shared/Trove.luau"
-Cohesion: 0.21
-Nodes (8): CameraEffects.Apply(), CameraEffects.Clear(), CameraEffects.GetBlurAlpha(), CameraEffects.UpdateFromSpeed(), CameraSession.UpdateBlur(), CameraViewfinder.SetBlurAlpha(), PickupVisuals.Apply(), Trove.new()
+### Community 47 - "Map0_Test/ReplicatedStorage/Modules/Camera/CameraEffects.luau"
+Cohesion: 0.38
+Nodes (6): CameraEffects.Apply(), CameraEffects.Clear(), CameraEffects.GetBlurAlpha(), CameraEffects.UpdateFromSpeed(), CameraSession.UpdateBlur(), CameraViewfinder.SetBlurAlpha()
 
 ### Community 48 - "Map0_Test/ServerScriptService/GameService/Reward/CaptureGuard.luau"
-Cohesion: 0.24
-Nodes (10): CameraStability.IsMoving(), CameraStats.GetIdFromTool(), getEquippedCameraTool(), handleShot(), CaptureGuard.CheckRepeatPolicy(), CaptureGuard.ResolveShotQuality(), CaptureGuard.ValidateShot(), checkCooldown() (+2 more)
+Cohesion: 0.22
+Nodes (9): CameraStability.IsMoving(), getEquippedCameraTool(), handleShot(), CaptureGuard.CheckRepeatPolicy(), CaptureGuard.ResolveShotQuality(), CaptureGuard.ValidateShot(), checkCooldown(), isFiniteVector() (+1 more)
 
 ### Community 49 - "Map0_Test/ServerScriptService/GameService/Reward/RewardStore.luau"
-Cohesion: 0.07
-Nodes (41): attempt(), keyFor(), LoadoutService.ClearSession(), LoadoutService.GetCameraId(), LoadoutService.Load(), LoadoutService.Save(), RewardTypes.Get(), RewardTypes.Persistent() (+33 more)
+Cohesion: 0.23
+Nodes (13): RewardTypes.Persistent(), checkProgression(), onLaunchAborted(), onLaunched(), activeStore(), attemptLegacyRead(), keyFor(), RewardStore.ClearSession() (+5 more)
 
-### Community 50 - "Lobby/ServerScriptService/GameService/Monster/EncounterDirector.luau"
-Cohesion: 0.22
-Nodes (14): MatchStates.MonstersSpawn(), cframeOf(), despawnEncounter(), effectiveStage(), EncounterDirector.Start(), findSpawnPoints(), restageEncounter(), spawnEncounter() (+6 more)
+### Community 50 - "MonsterService.Spawn"
+Cohesion: 0.20
+Nodes (11): MatchStates.MonstersSpawn(), despawnEncounter(), MonsterRegistry.Add(), MonsterRegistry.Get(), MonsterRegistry.Remove(), MonsterRegistry.Start(), monstersCanSpawn(), MonsterService.Despawn() (+3 more)
 
 ### Community 51 - "Map0_Test/ServerScriptService/GameService/Monster/EncounterDirector.luau"
-Cohesion: 0.15
-Nodes (18): MatchStates.MonstersSpawn(), cframeOf(), despawnEncounter(), effectiveStage(), EncounterDirector.Start(), findSpawnPoints(), restageEncounter(), spawnEncounter() (+10 more)
+Cohesion: 0.17
+Nodes (16): MatchStates.MonstersSpawn(), cframeOf(), despawnEncounter(), effectiveStage(), EncounterDirector.Start(), findSpawnPoints(), restageEncounter(), spawnEncounter() (+8 more)
 
 ### Community 52 - "Lobby/ServerScriptService/GameService/Reward/CaptureGuard.luau"
-Cohesion: 0.20
-Nodes (10): CameraStability.IsMoving(), CameraStats.GetIdFromTool(), getEquippedCameraTool(), handleShot(), CaptureGuard.CheckRepeatPolicy(), CaptureGuard.ResolveShotQuality(), CaptureGuard.ValidateShot(), checkCooldown() (+2 more)
+Cohesion: 0.27
+Nodes (9): CameraStability.IsMoving(), getEquippedCameraTool(), handleShot(), CaptureGuard.CheckRepeatPolicy(), CaptureGuard.ResolveShotQuality(), CaptureGuard.ValidateShot(), checkCooldown(), isFiniteVector() (+1 more)
 
 ### Community 53 - "Lobby/ReplicatedStorage/Modules/Camera/CameraViewfinder.luau"
-Cohesion: 0.26
-Nodes (12): applyGrain(), applyScanlines(), applyVignette(), CameraViewfinder.Show(), createBar(), createBracket(), createCornerLabel(), createGrainFrame() (+4 more)
+Cohesion: 0.24
+Nodes (13): applyGrain(), applyScanlines(), applyVignette(), CameraViewfinder.Hide(), CameraViewfinder.Show(), createBar(), createBracket(), createCornerLabel() (+5 more)
 
 ### Community 54 - "Map0_Test/ServerScriptService/GameService/Monster/Components/Investigation.luau"
 Cohesion: 0.23
 Nodes (6): Investigation:Tick(), Investigation:_visualCandidate(), investigationConfig(), pickBest(), stimulusCandidate(), trailCandidate()
 
 ### Community 55 - "Map0_Test/ReplicatedStorage/Modules/Camera/CameraViewfinder.luau"
-Cohesion: 0.23
-Nodes (14): applyGrain(), applyReticleColor(), applyScanlines(), applyVignette(), CameraViewfinder.SetStable(), CameraViewfinder.Show(), createBar(), createBracket() (+6 more)
+Cohesion: 0.21
+Nodes (15): applyGrain(), applyReticleColor(), applyScanlines(), applyVignette(), CameraViewfinder.Hide(), CameraViewfinder.SetStable(), CameraViewfinder.Show(), createBar() (+7 more)
 
 ### Community 56 - "Lobby/ServerScriptService/GameService/Monster/PatrolGraph.luau"
-Cohesion: 0.29
-Nodes (8): matchesMonster(), PatrolGraph.HasPatrolPoints(), PatrolGraph.Nearest(), PatrolGraph.PointsWithin(), PatrolGraph.SearchPointsWithin(), PatrolGraph.Start(), tryAdd(), Patrol.Score()
+Cohesion: 0.20
+Nodes (14): matchesMonster(), PatrolGraph.HasPatrolPoints(), PatrolGraph.Nearest(), PatrolGraph.PointsWithin(), PatrolGraph.SearchPointsWithin(), PatrolGraph.Start(), tryAdd(), bearingAlignment() (+6 more)
 
-### Community 57 - "MonsterConfig.Get"
-Cohesion: 0.38
-Nodes (8): collect(), expand(), MonsterCapabilities.ComponentsFor(), MonsterCapabilities.Resolve(), MonsterCapabilities.StatesFor(), MonsterCapabilities.StimuliFor(), MonsterCapabilities.Validate(), MonsterConfig.Get()
+### Community 57 - "Lobby/ReplicatedStorage/Modules/Monster/MonsterConfig.luau"
+Cohesion: 0.20
+Nodes (13): collect(), expand(), MonsterCapabilities.ComponentsFor(), MonsterCapabilities.Resolve(), MonsterCapabilities.StatesFor(), MonsterCapabilities.StimuliFor(), MonsterCapabilities.Validate(), mergeStages() (+5 more)
 
 ### Community 58 - "MatchManager"
 Cohesion: 0.17
@@ -465,9 +487,9 @@ Nodes (12): DeathService, KitLifecycleHook, LobbyDeathPolicy, MatchCleanup, Matc
 Cohesion: 0.33
 Nodes (6): CameraSession.IsActive(), CameraToolController.Init(), fireEquippedChanged(), onCharacterAdded(), tryInit(), watchContainer()
 
-### Community 60 - "Lobby/ServerScriptService/GameService/Player/CharacterMovementService.luau"
-Cohesion: 0.42
-Nodes (9): applyBudget(), CharacterMovementService.Start(), onCharacterAdded(), onSprintRequest(), onStateChanged(), setupPlayer(), step(), syncPlayer() (+1 more)
+### Community 60 - "Map0_Test/ServerScriptService/GameService/Exit/ExitState.luau"
+Cohesion: 0.07
+Nodes (44): ExitRequirements.Describe(), ExitRequirements.DescribeMainProgress(), ExitRequirements.DescribeProgress(), ExitRequirements.IsMainSatisfied(), ExitRequirements.IsSatisfied(), ExitRequirements.Progress(), ExitRequirements.SelectRandom(), isCategoryComplete() (+36 more)
 
 ### Community 61 - "Lobby/ReplicatedStorage/Modules/Pickup/PickupVisualsController.luau"
 Cohesion: 0.33
@@ -482,8 +504,8 @@ Cohesion: 0.29
 Nodes (8): matchesMonster(), PatrolGraph.HasPatrolPoints(), PatrolGraph.Nearest(), PatrolGraph.PointsWithin(), PatrolGraph.SearchPointsWithin(), PatrolGraph.Start(), tryAdd(), Patrol.Score()
 
 ### Community 65 - "CameraSession.Enter"
-Cohesion: 0.24
-Nodes (15): CameraSession.Enter(), hideOtherGuis(), setToolLocalTransparency(), CameraState.GetStable(), CameraStats.GetBlurSettings(), CameraStats.GetColorGradeSettings(), CameraStats.GetEffectsSettings(), CameraStats.GetFlashSettings() (+7 more)
+Cohesion: 0.28
+Nodes (12): CameraSession.Enter(), CameraStats.GetBlurSettings(), CameraStats.GetColorGradeSettings(), CameraStats.GetEffectsSettings(), CameraStats.GetFlashSettings(), CameraStats.GetIdFromTool(), CameraStats.GetMovementSettings(), CameraStats.GetShotSettings() (+4 more)
 
 ### Community 66 - "Map0_Test/ServerScriptService/GameService/Monster/Components/Aggression.luau"
 Cohesion: 0.15
@@ -493,9 +515,9 @@ Nodes (4): AggressionModifiers.Get(), Aggression:_publishLevel(), Aggression:_ta
 Cohesion: 0.39
 Nodes (5): PickupVisuals.Clear(), PickupVisuals.Step(), clearAllVisible(), considerInstance(), unregister()
 
-### Community 68 - "Lobby/ReplicatedStorage/Modules/Camera/CameraStats.luau"
-Cohesion: 0.29
-Nodes (9): CameraStats.GetBlurSettings(), CameraStats.GetColorGradeSettings(), CameraStats.GetEffectsSettings(), CameraStats.GetFlashSettings(), CameraStats.GetMovementSettings(), CameraStats.GetShotSettings(), CameraStats.GetStabilitySettings(), CameraStats.GetStats() (+1 more)
+### Community 68 - "Lobby/ReplicatedStorage/Modules/Camera/CameraSession.luau"
+Cohesion: 0.21
+Nodes (13): CameraSession.Enter(), hideOtherGuis(), setToolLocalTransparency(), CameraStats.GetBlurSettings(), CameraStats.GetColorGradeSettings(), CameraStats.GetEffectsSettings(), CameraStats.GetFlashSettings(), CameraStats.GetIdFromTool() (+5 more)
 
 ### Community 70 - "RewardStore"
 Cohesion: 0.40
@@ -505,21 +527,21 @@ Nodes (6): No DataStore session locking (deferred debt), checkProgression (Rewar
 Cohesion: 0.39
 Nodes (5): Chase.Score(), Chase.Update(), committedUtility(), pursuitAnchor(), pursuitTarget()
 
-### Community 72 - "Lobby/ServerScriptService/GameService/Spectate/SpectateService.luau"
-Cohesion: 0.21
-Nodes (20): PlayerStates.CanControlCharacter(), Remotes.Get(), PlayerStateService.Get(), assignBest(), fireSync(), onMatchStateChanged(), onPlayerRemoving(), onPlayerStateChanged() (+12 more)
+### Community 72 - "Remotes.Get"
+Cohesion: 0.24
+Nodes (18): PlayerStates.CanSpectate(), Remotes.Get(), assignBest(), fireSync(), onMatchStateChanged(), onPlayerRemoving(), onPlayerStateChanged(), onSpectateRequest() (+10 more)
 
-### Community 73 - "Map0_Test/ServerScriptService/GameService/Death/DeathService.luau"
-Cohesion: 0.31
-Nodes (7): MatchStates.RespawnsOnDeath(), DeathPolicy.Get(), bindCharacter(), DeathService.Start(), onCharacterAdded(), onHumanoidDied(), PlayerStateService.Is()
+### Community 73 - "Lobby/ServerScriptService/GameService/Item/ItemWorld/CCTVService.luau"
+Cohesion: 0.07
+Nodes (36): ShopCatalog.ResolvePlacedAsset(), Handler.Apply(), Handler.Apply(), Handler.Apply(), Handler.Apply(), Handler.Apply(), CCTVService.EnterView(), CCTVService.Place() (+28 more)
 
 ### Community 74 - "Lobby/ReplicatedStorage/Modules/Camera/CameraState.luau"
 Cohesion: 0.18
 Nodes (13): CameraSession.Capture(), CameraSession.Exit(), CameraSession.Toggle(), CameraState.Get(), CameraState.GetStable(), CameraState.SetInCamera(), CameraState.SetMovementSettings(), CameraState.SetStable() (+5 more)
 
 ### Community 75 - "tick"
-Cohesion: 0.29
-Nodes (13): MatchAnnouncerState.Resolve(), MatchSchedule.Get(), getMatchInfo(), MatchTimeClient.GetAnchors(), MatchTimeClient.GetElapsedReal(), MatchTimeClient.GetHour(), MatchTimeClient.GetHourText(), MatchTimeClient.GetPhase() (+5 more)
+Cohesion: 0.27
+Nodes (14): MatchAnnouncerState.Resolve(), MatchSchedule.Get(), getMatchInfo(), MatchTimeClient.GetAnchors(), MatchTimeClient.GetElapsedReal(), MatchTimeClient.GetHour(), MatchTimeClient.GetHourText(), MatchTimeClient.GetPhase() (+6 more)
 
 ### Community 76 - "Lobby/ServerScriptService/GameService/Monster/Components/Perception.luau"
 Cohesion: 0.22
@@ -550,40 +572,40 @@ Cohesion: 0.39
 Nodes (7): buildCircleButton(), CameraTouchHud.Init(), CameraTouchHud.SetInCamera(), CameraTouchHud.Show(), ensureBuilt(), ensureReady(), isTouchDevice()
 
 ### Community 85 - "Lobby/StarterPlayerScripts/MobileSprintButton.local.luau"
-Cohesion: 0.12
-Nodes (10): CameraState.GetWalkSpeedMultiplier(), PlayerRuntimeStats.Get(), fallbackHome(), getControlModule(), getStickMagnitude(), hasStaminaToStart(), positionAtHome(), toggleArm() (+2 more)
+Cohesion: 0.17
+Nodes (7): fallbackHome(), getControlModule(), getStickMagnitude(), hasStaminaToStart(), positionAtHome(), toggleArm(), tryArm()
 
 ### Community 86 - "Lobby/ReplicatedStorage/Modules/Queue/QueuePadDisplay.luau"
 Cohesion: 0.36
 Nodes (6): bootstrap(), considerInstance(), findLabel(), refresh(), QueuePadLabels.Counting(), QueuePadLabels.Format()
 
 ### Community 87 - "Lobby/ReplicatedStorage/Modules/Spectate/SpectateCameraController.luau"
-Cohesion: 0.50
-Nodes (8): applySubject(), ensureFreeCameraAnchor(), ensureSubjectGuard(), getCamera(), resolveSubject(), SpectateCameraController.SetTarget(), SpectateCameraController.Stop(), tryExitCameraSession()
+Cohesion: 0.40
+Nodes (10): applySubject(), ensureFreeCameraAnchor(), ensureSubjectGuard(), getCamera(), lockSpectateMouse(), resolveSubject(), SpectateCameraController.SetTarget(), SpectateCameraController.Stop() (+2 more)
 
 ### Community 88 - "Lobby/ServerScriptService/GameService/Monster/Components/Evolution.luau"
 Cohesion: 0.24
 Nodes (5): MonsterConfig.ClampStats(), Evolution:Apply(), Evolution:_applyTier(), multiplyStats(), warnUnsupportedFields()
 
-### Community 89 - "Lobby/ServerScriptService/GameService/Monster/MonsterRegistry.luau"
-Cohesion: 0.33
-Nodes (5): MonsterRegistry.Add(), MonsterRegistry.ForEach(), MonsterRegistry.Remove(), MonsterRegistry.Start(), MonsterScheduler.Start()
+### Community 89 - "MonsterRegistry.ForEach"
+Cohesion: 0.50
+Nodes (4): MatchStates.IsGameplayActive(), MonsterRegistry.ForEach(), gameplayActive(), MonsterScheduler.Start()
 
 ### Community 90 - "PickupRegistry"
 Cohesion: 0.22
 Nodes (9): ClientBootstrap, Monster/EncounterDirector.luau, MatchPhases, Effective monster stage = max(authored, phase), MonsterService, PickupRegistry, PickupSpawner (planned, not built), Pickup/PickupTypes.luau (+1 more)
 
 ### Community 91 - "Map0_Test/ReplicatedStorage/Modules/Camera/CameraSession.luau"
-Cohesion: 0.21
-Nodes (12): CameraSession.Capture(), CameraSession.Exit(), CameraSession.IsActive(), CameraSession.Toggle(), stopExposureWatch(), CameraState.Get(), CameraToolController.GetEquipped(), CameraToolController.Init() (+4 more)
+Cohesion: 0.17
+Nodes (17): CameraSession.Capture(), CameraSession.Exit(), CameraSession.IsActive(), CameraSession.Toggle(), hideOtherGuis(), setToolLocalTransparency(), stopExposureWatch(), CameraState.Get() (+9 more)
 
-### Community 92 - "ServerRole.AssertGameServer"
-Cohesion: 0.11
-Nodes (17): Remotes.Get(), ServerRole.AssertGameServer(), MatchManager.GetElapsed(), MatchManager.Start(), ensureMatchInfoFolder(), MatchReplicator.Start(), buildPerPlayer(), MatchResultBuilder.Build() (+9 more)
+### Community 92 - "Map0_Test/ReplicatedStorage/Modules/Shared/ServerRole.luau"
+Cohesion: 0.07
+Nodes (32): MatchEvents.Get(), Remotes.Get(), resolve(), ServerRole.AssertGameServer(), ServerRole.Get(), ServerRole.Is(), ExitAnnounceHook.Start(), onExitStateChanged() (+24 more)
 
 ### Community 93 - "Map0_Test/ReplicatedStorage/Modules/Shared/Remotes.luau"
-Cohesion: 0.09
-Nodes (10): CameraSessionTracker.IsInCamera(), CameraSessionTracker.Start(), ArrivalService.Start(), handleArrival(), attemptReturn(), buildTeleportData(), handleInitFailed(), handleReturnRequest() (+2 more)
+Cohesion: 0.07
+Nodes (14): CameraSessionTracker.IsInCamera(), CameraSessionTracker.Start(), ArrivalService.Start(), handleArrival(), LaunchGate.OnLaunchAborted(), handleInitFailed(), MatchLauncher.Launch(), MatchLauncher.Start() (+6 more)
 
 ### Community 94 - "Map0_Test/ReplicatedStorage/Modules/Queue/QueuePadDisplay.luau"
 Cohesion: 0.36
@@ -591,7 +613,7 @@ Nodes (6): bootstrap(), considerInstance(), findLabel(), refresh(), QueuePadLabe
 
 ### Community 95 - "Map0_Test/ReplicatedStorage/Modules/Spectate/SpectateCameraController.luau"
 Cohesion: 0.40
-Nodes (10): applySubject(), ensureFreeCameraAnchor(), ensureSubjectGuard(), getCamera(), relockSpectateMouse(), resolveSubject(), SpectateCameraController.SetTarget(), SpectateCameraController.Stop() (+2 more)
+Nodes (10): applySubject(), ensureFreeCameraAnchor(), ensureSubjectGuard(), getCamera(), lockSpectateMouse(), resolveSubject(), SpectateCameraController.SetTarget(), SpectateCameraController.Stop() (+2 more)
 
 ### Community 96 - "Map0_Test/ServerScriptService/GameService/Monster/Components/Evolution.luau"
 Cohesion: 0.24
@@ -661,17 +683,21 @@ Nodes (8): Reward/CaptureTargets.luau, Tools/CheckXpMigration.luau, Defaults are
 Cohesion: 0.38
 Nodes (7): G10 — ReserveServer/TeleportAsync 403 in Studio, G3 — execute_luau require-cache isolation, LaunchGate, MatchLauncher, Lobby/PartyService.luau, Shared/QueueResultCodes.luau, QueueService.luau
 
-### Community 118 - "tick"
-Cohesion: 0.20
-Nodes (10): MatchAnnouncerState.Resolve(), MatchTimeAnnouncer.Attach(), MatchTimeAnnouncer.Hide(), MatchTimeAnnouncer.Update(), ensureBuilt(), MatchTimeHud.Hide(), MatchTimeHud.Update(), getMatchState() (+2 more)
+### Community 118 - "Map0_Test/ReplicatedStorage/Modules/UI/UITheme.luau"
+Cohesion: 0.18
+Nodes (9): MatchEventAnnouncer.Attach(), MatchEventAnnouncer.Hide(), MatchEventAnnouncer.Update(), MatchTimeAnnouncer.Attach(), MatchTimeAnnouncer.Hide(), MatchTimeAnnouncer.Update(), ensureBuilt(), MatchTimeHud.Hide() (+1 more)
 
 ### Community 119 - "Map0_Test/ServerScriptService/GameService/Monster/MonsterFactory.luau"
 Cohesion: 0.57
 Nodes (6): applyAnchoring(), assetsRoot(), cloneAsset(), MonsterFactory.Create(), MonsterFactory.Validate(), resolveLocomotionName()
 
+### Community 120 - "Lobby/ReplicatedStorage/Modules/PlayerRuntimeStats.luau"
+Cohesion: 0.25
+Nodes (4): PlayerRuntimeStats.Get(), PlayerStats.Get(), PlayerEffects.GetStat(), updateBar()
+
 ### Community 121 - "Lobby/ServerScriptService/GameService/Stimulus/FootstepEmitter.luau"
-Cohesion: 0.43
-Nodes (6): CharacterMovementService.IsSprinting(), FootstepEmitter.Start(), onCharacterAdded(), setupPlayer(), step(), strengthFor()
+Cohesion: 0.29
+Nodes (5): FootstepEmitter.Start(), onCharacterAdded(), setupPlayer(), step(), strengthFor()
 
 ### Community 122 - "Lobby/ServerScriptService/GameService/Monster/States/Wander.luau"
 Cohesion: 0.53
@@ -690,8 +716,8 @@ Cohesion: 0.20
 Nodes (11): Countdowns cross the wire as a deadline, DeathService, MatchClock, MatchEndCondition, MatchReplicator, MatchTime/MatchSchedule.luau, MatchStates, Match time — single authority on match length (+3 more)
 
 ### Community 126 - "Map0_Test/ServerScriptService/GameService/Spectate/SpectateService.luau"
-Cohesion: 0.24
-Nodes (18): PlayerStates.CanControlCharacter(), PlayerStateService.Get(), assignBest(), fireSync(), onMatchStateChanged(), onPlayerRemoving(), onPlayerStateChanged(), onSpectateRequest() (+10 more)
+Cohesion: 0.19
+Nodes (22): MatchStates.IsKitGranted(), PlayerStates.CanControlCharacter(), PlayerStates.CanSpectate(), ItemUseGuard.CanBegin(), ItemUseGuard.StillValid(), PlayerStateService.Get(), assignBest(), fireSync() (+14 more)
 
 ### Community 127 - "Map0_Test/ServerScriptService/GameService/Monster/States/Wander.luau"
 Cohesion: 0.53
@@ -701,9 +727,9 @@ Nodes (4): memoryFor(), Wander.Enter(), Wander.Exit(), Wander.Update()
 Cohesion: 0.33
 Nodes (6): LaunchGate.OnLaunched, LaunchGate.Rollback (removed in Phase 12), OnLaunched fires on request-accepted, not arrival, RewardLaunchHook, RewardLedger.SetupPlayer, RewardStore.Reacquire
 
-### Community 130 - "Map0_Test/ReplicatedStorage/Modules/MatchTime/MatchTimeClient.luau"
-Cohesion: 0.36
-Nodes (10): MatchSchedule.Get(), getMatchInfo(), MatchTimeClient.GetAnchors(), MatchTimeClient.GetElapsedReal(), MatchTimeClient.GetHour(), MatchTimeClient.GetHourText(), MatchTimeClient.GetPhase(), MatchTimeClient.GetProgress() (+2 more)
+### Community 130 - "tick"
+Cohesion: 0.24
+Nodes (15): MatchAnnouncerState.Resolve(), MatchSchedule.Get(), getMatchInfo(), MatchTimeClient.GetAnchors(), MatchTimeClient.GetElapsedReal(), MatchTimeClient.GetHour(), MatchTimeClient.GetHourText(), MatchTimeClient.GetPhase() (+7 more)
 
 ### Community 138 - "Shared/TouchSession.IsActive"
 Cohesion: 0.40
@@ -722,32 +748,32 @@ Cohesion: 0.31
 Nodes (7): attempt(), keyFor(), LoadoutService.ClearSession(), LoadoutService.Load(), LoadoutService.Save(), onPlayerAdded(), onPlayerRemoving()
 
 ### Community 142 - "Map0_Test/ServerScriptService/GameService/Monster/MonsterEvolution.luau"
-Cohesion: 0.27
-Nodes (8): MatchTimeEvents.Dispatch(), MatchTimeEvents.Register(), MatchTimeEvents.Reset(), MatchTimeEvents.Start(), everyTier(), evolveAt(), MonsterEvolution.ApplyCurrentTiers(), MonsterEvolution.Start()
+Cohesion: 0.24
+Nodes (9): MonsterConfig.All(), MatchTimeEvents.Register(), MatchTimeEvents.Reset(), MatchTimeEvents.Start(), everyTier(), evolveAt(), MonsterEvolution.ApplyCurrentTiers(), MonsterEvolution.Start() (+1 more)
 
 ### Community 143 - "Lobby/ReplicatedStorage/Modules/Mission/MissionHud.luau"
-Cohesion: 0.27
-Nodes (9): ensureBuilt(), formatRow(), MissionHud.Hide(), MissionHud.Update(), ensureBuilt(), HudLeftColumn.Get(), UIScaleController.Attach(), ensureBuilt() (+1 more)
+Cohesion: 0.31
+Nodes (8): ensureBuilt(), formatRow(), MissionHud.Hide(), MissionHud.Update(), ensureBuilt(), HudLeftColumn.Get(), ensureBuilt(), showCurrencyUI()
 
 ### Community 145 - "Map0_Test/ReplicatedStorage/Modules/Mission/MissionHud.luau"
-Cohesion: 0.27
-Nodes (9): ensureBuilt(), formatRow(), MissionHud.Hide(), MissionHud.Update(), ensureBuilt(), HudLeftColumn.Get(), UIScaleController.Attach(), ensureBuilt() (+1 more)
+Cohesion: 0.31
+Nodes (8): ensureBuilt(), formatRow(), MissionHud.Hide(), MissionHud.Update(), ensureBuilt(), HudLeftColumn.Get(), ensureBuilt(), showCurrencyUI()
 
 ### Community 151 - "PhotoScoring module"
 Cohesion: 0.40
 Nodes (5): CameraStability, Distance score bands (100/60/30/10), Behavior.OnPhotographed, PhotoScoring module, ShotTypeMultiplier
 
-### Community 152 - "Lobby/ReplicatedStorage/Modules/Shared/PlayerStates.luau"
-Cohesion: 0.19
-Nodes (7): MatchSchedule.Validate(), MatchStates.Validate(), PlayerStates.CanSpectate(), PlayerStates.Validate(), GameBoot.Start(), guardNonReservedServer(), LobbyBoot.Start()
+### Community 152 - "Lobby/ServerScriptService/GameService/Match/SpawnSelection.luau"
+Cohesion: 0.11
+Nodes (19): MatchSchedule.Validate(), MatchDifficulty.Get(), MatchDifficulty.Validate(), MatchStates.Validate(), SpawnCategories.Get(), SpawnCategories.OrderedNames(), SpawnCategories.Validate(), SpawnMath.AdjustedFraction() (+11 more)
 
 ### Community 153 - "Lobby/ServerScriptService/GameService/CameraShelf/CameraInventory.luau"
-Cohesion: 0.24
-Nodes (8): CameraSessionTracker.IsInCamera(), CameraSessionTracker.Start(), CameraInventory.ClearSlot(), CameraInventory.FindSlot(), CameraInventory.Give(), templatesFolder(), CameraShelfSwap.ClearCameraSlot(), CameraShelfSwap.TakeCamera()
+Cohesion: 0.36
+Nodes (6): CameraInventory.ClearSlot(), CameraInventory.FindSlot(), CameraInventory.Give(), templatesFolder(), CameraShelfSwap.ClearCameraSlot(), CameraShelfSwap.TakeCamera()
 
-### Community 154 - "Map0_Test/ServerScriptService/GameService/Player/CharacterMovementService.luau"
-Cohesion: 0.42
-Nodes (9): applyBudget(), CharacterMovementService.Start(), onCharacterAdded(), onSprintRequest(), onStateChanged(), setupPlayer(), step(), syncPlayer() (+1 more)
+### Community 154 - "Map0_Test/ServerScriptService/GameService/Item/ItemWorld/CCTVService.luau"
+Cohesion: 0.07
+Nodes (36): ShopCatalog.ResolvePlacedAsset(), Handler.Apply(), Handler.Apply(), Handler.Apply(), Handler.Apply(), Handler.Apply(), CCTVService.EnterView(), CCTVService.Place() (+28 more)
 
 ### Community 155 - "Map0_Test/ReplicatedStorage/Modules/Camera/CameraTouchHud.luau"
 Cohesion: 0.39
@@ -761,9 +787,9 @@ Nodes (4): Known bias: distance measured to hit point, PhotoCapture.luau, Shared
 Cohesion: 0.67
 Nodes (3): GameBoot, LobbyBoot, ServerRole
 
-### Community 161 - "Lobby/ServerScriptService/GameService/Match/MatchManager.luau"
-Cohesion: 0.12
-Nodes (23): MatchStates.CanTransition(), MatchStates.IsTerminal(), PlayerStates.CountsAsActive(), MatchArrival.GetModeId(), MatchArrival.Start(), seedFrom(), config(), MatchClock.GetEndingDeadline() (+15 more)
+### Community 161 - "MatchManager.Is"
+Cohesion: 0.11
+Nodes (25): MatchDifficulty.IsValid(), PlayerStates.CountsAsActive(), anyoneCountsAsActive(), MatchArrival.GetModeId(), MatchArrival.Start(), seedFrom(), config(), MatchClock.GetEndingDeadline() (+17 more)
 
 ### Community 163 - "Continuous hour scale past 24"
 Cohesion: 0.67
@@ -777,21 +803,21 @@ Nodes (6): cancelTween(), ensureGui(), ScreenFlashRenderer.FadeOut(), ScreenFlas
 Cohesion: 0.46
 Nodes (7): arm(), cancelTween(), ensurePart(), WorldLightRenderer.FadeOut(), WorldLightRenderer.HideInstant(), WorldLightRenderer.Play(), WorldLightRenderer.ShowSolid()
 
-### Community 167 - "Lobby/ServerScriptService/GameService/Camera/PhotoCapture.luau"
-Cohesion: 0.11
-Nodes (28): CaptureTargets.AttributeFor(), CaptureTargets.IsType(), CaptureTargets.Resolve(), CaptureTargets.TypeOf(), MatchGrade.Evaluate(), angularOffsetToSphere(), buildBasis(), clampToCone() (+20 more)
+### Community 167 - "Lobby/ReplicatedStorage/Modules/Reward/CaptureTargets.luau"
+Cohesion: 0.27
+Nodes (11): CaptureTargets.AttributeFor(), CaptureTargets.IsType(), CaptureTargets.Resolve(), CaptureTargets.TypeOf(), bootstrap(), considerInstance(), isLiveCapturable(), refresh() (+3 more)
 
 ### Community 169 - "RewardCleanupHook"
 Cohesion: 0.67
 Nodes (3): RewardCleanupHook, RewardStore.SAVE_CONFIRM_TIMEOUT_SECONDS, MatchCleanup.STEP_TIMEOUT_SECONDS
 
-### Community 174 - "Map0_Test/StarterPlayerScripts/CameraToolWatcher.local.luau"
-Cohesion: 0.83
-Nodes (3): onCharacterAdded(), tryInit(), watchContainer()
+### Community 174 - "Map0_Test/ServerScriptService/GameService/Match/SpawnSelection.luau"
+Cohesion: 0.08
+Nodes (27): ExitConfig.Validate(), MatchSchedule.Validate(), MatchDifficulty.Get(), MatchDifficulty.IsValid(), MatchDifficulty.Validate(), MatchStates.Validate(), SpawnCategories.Get(), SpawnCategories.OrderedNames() (+19 more)
 
-### Community 200 - "Lobby/ServerScriptService/GameService/Monster/Search/PointSelector.luau"
-Cohesion: 0.57
-Nodes (6): bearingAlignment(), investigationConfig(), PointSelector.Select(), PointSelector.SelectPatrolPoint(), PointSelector.SelectSearchPoint(), withinCone()
+### Community 200 - "Map0_Test/StarterPlayerScripts/ItemUseClient.local.luau"
+Cohesion: 0.16
+Nodes (16): CCTVViewController.Enter(), CCTVViewController.Exit(), getCamera(), hideModel(), render(), showLocalCharacter(), tryExitCameraSession(), PickupVisuals.Apply() (+8 more)
 
 ### Community 206 - "Map0_Test/ServerScriptService/GameService/Monster/Search/PointSelector.luau"
 Cohesion: 0.57
@@ -802,36 +828,44 @@ Cohesion: 0.53
 Nodes (5): clear(), ensureMatchInfoFolder(), MatchTimeReplicator.Start(), publish(), MatchTimeService.GetAnchors()
 
 ### Community 208 - "Lobby/ServerScriptService/GameService/Player/StartGame.luau"
-Cohesion: 0.70
-Nodes (4): LoadoutService.GetCameraId(), createEmptySlot(), giveStarterCamera(), StartGameService.GivePlayerStarterKit()
+Cohesion: 0.60
+Nodes (5): LoadoutService.GetCameraId(), createEmptySlot(), giveStarterCamera(), kitIsPresent(), StartGameService.GivePlayerStarterKit()
 
-### Community 209 - "Lobby/ReplicatedStorage/Modules/MatchTime/MatchTimeHud.luau"
-Cohesion: 0.24
-Nodes (6): MatchTimeAnnouncer.Attach(), MatchTimeAnnouncer.Hide(), MatchTimeAnnouncer.Update(), ensureBuilt(), MatchTimeHud.Hide(), MatchTimeHud.Update()
+### Community 209 - "Lobby/ReplicatedStorage/Modules/UI/UITheme.luau"
+Cohesion: 0.14
+Nodes (11): MatchEventAnnouncer.Attach(), MatchEventAnnouncer.Hide(), MatchEventAnnouncer.Update(), MatchEvents.Get(), MatchTimeAnnouncer.Attach(), MatchTimeAnnouncer.Hide(), MatchTimeAnnouncer.Update(), ensureBuilt() (+3 more)
 
 ### Community 210 - "Map0_Test/ServerScriptService/GameService/Match/MatchStats.luau"
 Cohesion: 0.33
 Nodes (6): MatchGrade.Evaluate(), ensureCaptureRow(), MatchStats.Start(), onAwarded(), reset(), survivedSeconds()
 
-### Community 212 - "FlashlightService.luau"
-Cohesion: 0.46
-Nodes (6): FlashlightAim.GetPose(), getBeamStats(), getEmitter(), onAimReport(), poseEmitter(), toggleFlashlight()
+### Community 211 - "UIBuilder.CreateScreenGui"
+Cohesion: 0.23
+Nodes (14): ensureBuilt(), buildButton(), buildButtonHolder(), buildHeader(), DeathScreen.Hide(), DeathScreen.Show(), ensureBuilt(), renderButtons() (+6 more)
 
-### Community 213 - "MonsterConfig.Get"
-Cohesion: 0.38
-Nodes (8): collect(), expand(), MonsterCapabilities.ComponentsFor(), MonsterCapabilities.Resolve(), MonsterCapabilities.StatesFor(), MonsterCapabilities.StimuliFor(), MonsterCapabilities.Validate(), MonsterConfig.Get()
+### Community 212 - "Map0_Test/ServerScriptService/GameService/Player/FlashlightService.luau"
+Cohesion: 0.42
+Nodes (7): FlashlightAim.GetPose(), getBeamStats(), getEmitter(), getFill(), onAimReport(), poseEmitter(), toggleFlashlight()
 
-### Community 214 - "FirstPersonCrosshair.local.luau"
-Cohesion: 0.32
-Nodes (3): PlayerStateClient.Get(), applyCameraModeForState(), isAlive()
+### Community 213 - "UIBuilder.CreateScreenGui"
+Cohesion: 0.23
+Nodes (14): ensureBuilt(), buildButton(), buildButtonHolder(), buildHeader(), DeathScreen.Hide(), DeathScreen.Show(), ensureBuilt(), renderButtons() (+6 more)
 
-### Community 215 - "Lobby/ServerScriptService/GameService/Pickup/PickupHandlers/Cash.luau"
-Cohesion: 0.48
-Nodes (5): Cash.Collect(), CashWallet.Add(), CashWallet.Get(), CashWallet.Has(), findCash()
+### Community 214 - "Map0_Test/ReplicatedStorage/Modules/Spectate/SpectateController.luau"
+Cohesion: 0.21
+Nodes (5): PlayerStateClient.Get(), onAction(), requestCycle(), applyCameraModeForState(), isAlive()
+
+### Community 215 - "Lobby/ServerScriptService/GameService/Pickup/PickupRegistry.luau"
+Cohesion: 0.22
+Nodes (12): PickupTypes.Get(), PickupTypes.TypeOf(), countRemainingDocuments(), instancesForCategory(), considerInstance(), isAnchored(), PickupRegistry.All(), PickupRegistry.Start() (+4 more)
 
 ### Community 216 - "Lobby/ServerScriptService/GameService/Monster/MonsterEvolution.luau"
-Cohesion: 0.36
-Nodes (6): MatchTimeEvents.Register(), MatchTimeEvents.Reset(), MatchTimeEvents.Start(), everyTier(), evolveAt(), MonsterEvolution.Start()
+Cohesion: 0.31
+Nodes (7): MonsterConfig.All(), MatchTimeEvents.Register(), MatchTimeEvents.Reset(), MatchTimeEvents.Start(), everyTier(), evolveAt(), MonsterEvolution.Start()
+
+### Community 217 - "Map0_Test/StarterPlayerScripts/Hudcontroller.local.luau"
+Cohesion: 0.40
+Nodes (3): PlayerStats.Get(), PlayerEffects.GetStat(), updateBar()
 
 ### Community 220 - "refresh"
 Cohesion: 0.47
@@ -849,21 +883,113 @@ Nodes (4): getMatchInfo(), MissionClient.Get(), refresh(), watchMatchInfo()
 Cohesion: 0.62
 Nodes (6): considerInstance(), isAnchored(), PickupRegistry.Start(), register(), unregister(), watchAttribute()
 
-### Community 224 - "MissionReplicator.Start"
-Cohesion: 0.70
-Nodes (4): clear(), ensureMatchInfoFolder(), MissionReplicator.Start(), publish()
+### Community 224 - "Lobby/ServerScriptService/GameService/Exit/ExitService.luau"
+Cohesion: 0.27
+Nodes (13): clearProgress(), escape(), ExitService.Start(), isInside(), occupiedExitType(), pushProgress(), rootPartOf(), sample() (+5 more)
 
 ### Community 225 - "Map0_Test/ServerScriptService/GameService/Stimulus/FootstepEmitter.luau"
-Cohesion: 0.43
-Nodes (6): CharacterMovementService.IsSprinting(), FootstepEmitter.Start(), onCharacterAdded(), setupPlayer(), step(), strengthFor()
+Cohesion: 0.29
+Nodes (5): FootstepEmitter.Start(), onCharacterAdded(), setupPlayer(), step(), strengthFor()
 
-### Community 226 - "MissionReplicator.Start"
-Cohesion: 0.70
-Nodes (4): clear(), ensureMatchInfoFolder(), MissionReplicator.Start(), publish()
+### Community 226 - "Lobby/ReplicatedStorage/Modules/Item/CCTVViewController.luau"
+Cohesion: 0.26
+Nodes (10): CameraState.GetWalkSpeedMultiplier(), CCTVViewController.Enter(), CCTVViewController.Exit(), CCTVViewController.IsActive(), getCamera(), hideModel(), render(), showLocalCharacter() (+2 more)
+
+### Community 227 - "Map0_Test/ServerScriptService/GameService/Reward/RewardLedger.luau"
+Cohesion: 0.27
+Nodes (10): RewardTypes.Get(), RewardTypes.RunScoped(), getOrCreateLeaderstats(), getValue(), RewardLedger.Add(), RewardLedger.CurrentPersistentValues(), RewardLedger.Get(), RewardLedger.ResetRunScoped() (+2 more)
 
 ### Community 228 - "RewardLedger"
 Cohesion: 0.40
 Nodes (5): EndGame.luau, PlayerCurrency.legacy.luau, RewardLedger, RewardModifiers, RewardService
+
+### Community 229 - "Lobby/ServerScriptService/GameService/Camera/PhotoCapture.luau"
+Cohesion: 0.35
+Nodes (10): angularOffsetToSphere(), buildBasis(), clampToCone(), collectCandidates(), fireConeDetection(), fireLegacySpread(), getBoundingSphere(), hasLineOfSight() (+2 more)
+
+### Community 230 - "Map0_Test/ReplicatedStorage/Modules/Reward/RewardCalculator.luau"
+Cohesion: 0.27
+Nodes (7): applyModifiers(), calculateCurve(), calculateFlatRoll(), RewardCalculator.Calculate(), RewardCalculator.Describe(), RewardModifiers.Collect(), Units.StudsToMeters()
+
+### Community 231 - "Map0_Test/ServerScriptService/GameService/Camera/PhotoCapture.luau"
+Cohesion: 0.35
+Nodes (10): angularOffsetToSphere(), buildBasis(), clampToCone(), collectCandidates(), fireConeDetection(), fireLegacySpread(), getBoundingSphere(), hasLineOfSight() (+2 more)
+
+### Community 232 - "Lobby/ServerScriptService/GameService/Player/FlashlightService.luau"
+Cohesion: 0.36
+Nodes (8): FlashlightAim.GetPose(), FlashlightService.Start(), getBeamStats(), getEmitter(), getFill(), onAimReport(), poseEmitter(), toggleFlashlight()
+
+### Community 233 - "Map0_Test/ReplicatedStorage/Modules/Loadout/LoadoutService.luau"
+Cohesion: 0.31
+Nodes (7): attempt(), keyFor(), LoadoutService.ClearSession(), LoadoutService.Load(), LoadoutService.Save(), onPlayerAdded(), onPlayerRemoving()
+
+### Community 234 - "Lobby/ServerScriptService/GameService/Match/MatchStats.luau"
+Cohesion: 0.33
+Nodes (6): MatchGrade.Evaluate(), ensureCaptureRow(), MatchStats.Start(), onAwarded(), reset(), survivedSeconds()
+
+### Community 235 - "Lobby/StarterPlayerScripts/ItemUseClient.local.luau"
+Cohesion: 0.39
+Nodes (7): beginHold(), cancelHold(), ensureTouchButton(), initTool(), onCharacterAdded(), refreshControls(), watchContainer()
+
+### Community 236 - "Map0_Test/ServerScriptService/GameService/Reward/RewardService.luau"
+Cohesion: 0.36
+Nodes (5): CaptureRules.Check(), flagIfAnomalous(), isScoringActive(), RewardService.AwardFromCapture(), RewardService.Grant()
+
+### Community 237 - "Map0_Test/ServerScriptService/GameService/CameraShelf/CameraInventory.luau"
+Cohesion: 0.36
+Nodes (6): CameraInventory.ClearSlot(), CameraInventory.FindSlot(), CameraInventory.Give(), templatesFolder(), CameraShelfSwap.ClearCameraSlot(), CameraShelfSwap.TakeCamera()
+
+### Community 238 - "Lobby/ReplicatedStorage/Modules/Item/ItemUseHud.luau"
+Cohesion: 0.39
+Nodes (7): ensureBuilt(), hideBar(), ItemUseHud.Begin(), ItemUseHud.Cancel(), ItemUseHud.Complete(), ItemUseHud.SetMotionDetected(), UIScaleController.Attach()
+
+### Community 240 - "Map0_Test/ReplicatedStorage/Modules/Item/ItemUseHud.luau"
+Cohesion: 0.39
+Nodes (7): ensureBuilt(), hideBar(), ItemUseHud.Begin(), ItemUseHud.Cancel(), ItemUseHud.Complete(), ItemUseHud.SetMotionDetected(), UIScaleController.Attach()
+
+### Community 241 - "Lobby/ServerScriptService/GameService/Monster/EncounterDirector.luau"
+Cohesion: 0.52
+Nodes (6): cframeOf(), effectiveStage(), EncounterDirector.Start(), findSpawnPoints(), restageEncounter(), spawnEncounter()
+
+### Community 243 - "Map0_Test/ServerScriptService/GameService/Pickup/PickupPrompt.luau"
+Cohesion: 0.33
+Nodes (6): anchorPartOf(), PickupPrompt.Clear(), PickupPrompt.Disable(), PickupPrompt.Enable(), PickupPrompt.OwnerOf(), PickupPrompt.Provision()
+
+### Community 244 - "ensureBuilt"
+Cohesion: 0.47
+Nodes (4): onDwellSync(), ensureBuilt(), ExitCountdownHud.Hide(), ExitCountdownHud.Update()
+
+### Community 245 - "Lobby/ReplicatedStorage/Modules/Spectate/SpectateHud.luau"
+Cohesion: 0.53
+Nodes (4): ensureBuilt(), setBackpackVisible(), SpectateHud.Hide(), SpectateHud.Update()
+
+### Community 246 - "ExitReplicator.Start"
+Cohesion: 0.53
+Nodes (5): clear(), ensureMatchInfoFolder(), ExitReplicator.Start(), publish(), ExitState.GetSnapshot()
+
+### Community 250 - "ensureBuilt"
+Cohesion: 0.47
+Nodes (4): onDwellSync(), ensureBuilt(), ExitCountdownHud.Hide(), ExitCountdownHud.Update()
+
+### Community 251 - "Map0_Test/ServerScriptService/GameService/Player/StartGame.luau"
+Cohesion: 0.60
+Nodes (5): LoadoutService.GetCameraId(), createEmptySlot(), giveStarterCamera(), kitIsPresent(), StartGameService.GivePlayerStarterKit()
+
+### Community 252 - "Map0_Test/ReplicatedStorage/Modules/Spectate/SpectateHud.luau"
+Cohesion: 0.53
+Nodes (4): ensureBuilt(), setBackpackVisible(), SpectateHud.Hide(), SpectateHud.Update()
+
+### Community 255 - "instancesForCategory"
+Cohesion: 0.50
+Nodes (5): PickupTypes.TypeOf(), countRemainingDocuments(), instancesForCategory(), PickupRegistry.All(), CaptureRegistry.All()
+
+### Community 256 - "ensureBuilt"
+Cohesion: 0.83
+Nodes (3): ensureBuilt(), QueueHud.Hide(), QueueHud.SetMessage()
+
+### Community 257 - "ensureBuilt"
+Cohesion: 0.83
+Nodes (3): ensureBuilt(), QueueHud.Hide(), QueueHud.SetMessage()
 
 ## Ambiguous Edges - Review These
 - `G12 — Spectate uses CameraType.Custom, not Scriptable` → `CameraInventory`  [AMBIGUOUS]
@@ -872,22 +998,22 @@ Nodes (5): EndGame.luau, PlayerCurrency.legacy.luau, RewardLedger, RewardModifie
 ## Knowledge Gaps
 - **123 isolated node(s):** `Context`, `1.1 The clock is derived, not streamed`, `1.2 Hours are a continuous unwrapped scale`, `1.3 Seconds-per-hour is per-segment, not global`, `1.4 The conversion primitives already exist and are pure` (+118 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **26 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `G12 — Spectate uses CameraType.Custom, not Scriptable` and `CameraInventory`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `MissionHud.Update()` connect `Lobby/ReplicatedStorage/Modules/Mission/MissionHud.luau` to `refresh`?**
+- **Why does `ServerRole.AssertGameServer()` connect `Map0_Test/ReplicatedStorage/Modules/Shared/ServerRole.luau` to `Map0_Test/ReplicatedStorage/Modules/Shared/MatchStates.luau`, `Map0_Test/ServerScriptService/GameService/MatchTime/MatchTimeService.luau`, `onPromptTriggered`, `Map0_Test/ServerScriptService/GameService/Match/MissionProgress.luau`, `MatchManager.Is`, `Map0_Test/ServerScriptService/GameService/Match/SpawnSelection.luau`, `Map0_Test/ReplicatedStorage/Modules/Shared/Signal.luau`, `Map0_Test/ServerScriptService/GameService/Monster/MonsterEvolution.luau`, `Map0_Test/ServerScriptService/GameService/MatchTime/MatchTimeReplicator.luau`, `Map0_Test/ServerScriptService/GameService/Match/MatchStats.luau`, `Map0_Test/ServerScriptService/GameService/Monster/EncounterDirector.luau`, `Map0_Test/ReplicatedStorage/Modules/Shared/PlayerStates.luau`, `Map0_Test/ReplicatedStorage/Modules/Monster/MonsterConfig.luau`, `Map0_Test/ServerScriptService/GameService/Exit/ExitState.luau`, `Map0_Test/ReplicatedStorage/Modules/Shared/Remotes.luau`, `Map0_Test/ServerScriptService/GameService/Pickup/PickupRegistry.luau`?**
   _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Why does `refresh()` connect `refresh` to `Lobby/ReplicatedStorage/Modules/Mission/MissionHud.luau`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Why does `ServerRole.AssertGameServer()` connect `Lobby/ReplicatedStorage/Modules/Shared/ServerRole.luau` to `MissionReplicator.Start`, `Lobby/ServerScriptService/GameService/Match/MatchManager.luau`, `Lobby/ServerScriptService/GameService/MatchTime/MatchTimeService.luau`, `Lobby/ServerScriptService/GameService/Camera/PhotoCapture.luau`, `Lobby/ServerScriptService/GameService/Spectate/SpectateService.luau`, `onPromptTriggered`, `Lobby/ReplicatedStorage/Modules/Shared/MatchStates.luau`, `Lobby/ServerScriptService/GameService/Monster/EncounterDirector.luau`, `Lobby/ReplicatedStorage/Modules/Shared/Remotes.luau`, `Lobby/ReplicatedStorage/Modules/Shared/PlayerStates.luau`, `Lobby/ReplicatedStorage/Modules/Monster/MonsterConfig.luau`, `Lobby/ServerScriptService/GameService/MatchTime/MatchTimeReplicator.luau`, `Lobby/ServerScriptService/GameService/Monster/MonsterEvolution.luau`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Are the 30 inferred relationships involving `ServerRole.AssertGameServer()` (e.g. with `GameBoot.Start()` and `MatchArrival.Start()`) actually correct?**
-  _`ServerRole.AssertGameServer()` has 30 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 29 inferred relationships involving `ServerRole.AssertGameServer()` (e.g. with `GameBoot.Start()` and `MatchArrival.Start()`) actually correct?**
-  _`ServerRole.AssertGameServer()` has 29 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `ServerRole.AssertGameServer()` connect `Lobby/ReplicatedStorage/Modules/Shared/ServerRole.luau` to `Lobby/ServerScriptService/GameService/Exit/ExitService.luau`, `Lobby/ServerScriptService/GameService/Exit/ExitState.luau`, `MatchManager.Is`, `Lobby/ServerScriptService/GameService/MatchTime/MatchTimeService.luau`, `Lobby/ServerScriptService/GameService/Objective/ObjectiveService.luau`, `Lobby/ServerScriptService/GameService/Player/FlashlightService.luau`, `Remotes.Get`, `Lobby/ServerScriptService/GameService/Match/MatchStats.luau`, `onPromptTriggered`, `Lobby/ReplicatedStorage/Modules/Shared/MatchStates.luau`, `Lobby/ServerScriptService/GameService/Monster/EncounterDirector.luau`, `ExitReplicator.Start`, `Lobby/ReplicatedStorage/Modules/Shared/Remotes.luau`, `Lobby/ServerScriptService/GameService/Match/SpawnSelection.luau`, `Lobby/ReplicatedStorage/Modules/Monster/MonsterConfig.luau`, `Lobby/ServerScriptService/GameService/Pickup/PickupRegistry.luau`, `Lobby/ServerScriptService/GameService/MatchTime/MatchTimeReplicator.luau`, `Lobby/ServerScriptService/GameService/Monster/MonsterEvolution.luau`?**
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `renderStats()` connect `Lobby/ReplicatedStorage/Modules/UI/MatchReceipt.luau` to `Lobby/ServerScriptService/GameService/Exit/ExitState.luau`?**
+  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+- **Are the 42 inferred relationships involving `ServerRole.AssertGameServer()` (e.g. with `GameBoot.Start()` and `ExitAnnounceHook.Start()`) actually correct?**
+  _`ServerRole.AssertGameServer()` has 42 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 42 inferred relationships involving `ServerRole.AssertGameServer()` (e.g. with `GameBoot.Start()` and `ExitAnnounceHook.Start()`) actually correct?**
+  _`ServerRole.AssertGameServer()` has 42 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 19 inferred relationships involving `CameraSession.Enter()` (e.g. with `CameraEffects.Apply()` and `CameraEffects.Clear()`) actually correct?**
   _`CameraSession.Enter()` has 19 INFERRED edges - model-reasoned connections that need verification._
