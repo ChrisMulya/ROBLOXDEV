@@ -37,6 +37,8 @@ end
 --                               sprint button and both modals
 --    30    MobileSprintGui   -- must beat TouchGui (the thumbstick region
 --                               covers it) but lose to both modals below
+--    35    ShopGui           -- another interaction modal; must beat the
+--                               sprint button but lose to Death/MatchReceipt
 --    40    DeathScreenGui
 --    50    MatchReceiptGui   -- covers DeathScreen at a death-triggered end
 --   100    CameraTouchHud    -- built directly, not via this function

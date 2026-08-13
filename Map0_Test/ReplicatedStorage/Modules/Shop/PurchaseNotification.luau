@@ -53,20 +53,26 @@ local function showText(text, color)
 		{TextTransparency = 1, Position = label.Position - UDim2.new(0, 0, 0.05, 0)}
 	)
 
-	task.wait(1)
-	tween:Play()
-	tween.Completed:Connect(function()
-		label:Destroy()
+	-- Spawned so this fade-out doesn't block the caller's thread -- Handle is
+	-- invoked directly off the PurchaseResult remote's OnClientEvent, and a
+	-- blocking task.wait here used to stall that connection for a full second.
+	task.spawn(function()
+		task.wait(1)
+		tween:Play()
+		tween.Completed:Connect(function()
+			label:Destroy()
+		end)
 	end)
 end
 
 function PurchaseNotification.Handle(resultData)
+	local displayName = resultData.displayName or resultData.itemId or resultData.itemName
 	if resultData.success then
-		local text = string.format("Successfully bought %s for $%d", resultData.itemName, resultData.price)
+		local text = string.format("Successfully bought %s for $%d", displayName, resultData.price)
 		showText(text, Color3.fromRGB(85, 255, 127))
 		playSound("KaChing")
 	else
-		local text = PurchaseResultCodes.GetMessage(resultData.reason, resultData.itemName)
+		local text = PurchaseResultCodes.GetMessage(resultData.reason, displayName)
 		showText(text, Color3.fromRGB(255, 85, 85))
 	end
 end

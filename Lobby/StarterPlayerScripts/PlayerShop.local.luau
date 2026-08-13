@@ -2,11 +2,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
 local OpenShop = Remotes.Get("OpenShop")
 local BuyItem = Remotes.Get("BuyItem")
-
+local PurchaseResult = Remotes.Get("PurchaseResult")
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
 local RunService = game:GetService("RunService")
 local character = player.Character or player.CharacterAdded:Wait()
 
@@ -15,82 +14,72 @@ local UserInputService = game:GetService("UserInputService")
 local playerModule = require(player:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule"))
 local controls = playerModule:GetControls()
 
+local ShopGui = require(ReplicatedStorage.Modules.Shop.ShopGui)
+local PurchaseNotification = require(ReplicatedStorage.Modules.Shop.PurchaseNotification)
+
 local MAX_DISTANCE = 10
 local distanceCheckConnection = nil
 local mouseLockConnection = false
 
-local PurchaseResult = Remotes.Get("PurchaseResult")
-local PurchaseNotification = require(ReplicatedStorage.Modules.Shop.PurchaseNotification)
-local ShopPrices = require(ReplicatedStorage.Modules.ShopPrices)
+local SLOT_NAMES = { "Slot 1", "Slot 2" }
 
--- Build the Shop GUI once, keep it hidden until needed
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "ShopGui"
-screenGui.ResetOnSpawn = false
-screenGui.Enabled = false
-screenGui.Parent = playerGui
+-- Reads the two carry slots straight off Backpack + Character (whichever
+-- currently holds each) to compute what ShopGui.Refresh needs: which item
+-- ids are owned, and how many slots are free. Pure read -- no remotes, since
+-- slot state replicates to the client as ordinary Instance data.
+local function readSlotState(): ({ [string]: boolean }, number)
+	local ownedIds = {}
+	local freeCount = 0
 
-local frame = Instance.new("Frame")
-frame.Name = "ShopFrame"
-frame.Size = UDim2.new(0, 400, 0, 300)
-frame.Position = UDim2.new(0.5, -200, 0.5, -150)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.BorderSizePixel = 0
-frame.Parent = screenGui
+	local backpack = player:FindFirstChild("Backpack")
+	local char = player.Character
 
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 40)
-title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-title.Text = "Shop"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.TextScaled = true
-title.Parent = frame
+	for _, slotName in ipairs(SLOT_NAMES) do
+		local slot = backpack and backpack:FindFirstChild(slotName)
+		if not slot and char then
+			slot = char:FindFirstChild(slotName)
+		end
 
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -35, 0, 5)
-closeButton.Text = "X"
-closeButton.BackgroundColor3 = Color3.fromRGB(150, 30, 30)
-closeButton.TextColor3 = Color3.new(1, 1, 1)
-closeButton.Parent = frame
+		if slot and slot:IsA("Tool") then
+			if slot:GetAttribute("IsEmpty") then
+				freeCount += 1
+			else
+				local itemId = slot:GetAttribute("ItemId")
+				if itemId then
+					ownedIds[itemId] = true
+				end
+			end
+		end
+	end
 
-local itemList = Instance.new("UIListLayout")
-itemList.Padding = UDim.new(0, 8)
-itemList.SortOrder = Enum.SortOrder.LayoutOrder
-
-local itemContainer = Instance.new("Frame")
-itemContainer.Size = UDim2.new(1, -20, 1, -60)
-itemContainer.Position = UDim2.new(0, 10, 0, 50)
-itemContainer.BackgroundTransparency = 1
-itemContainer.Parent = frame
-itemList.Parent = itemContainer
-
--- Driven by ShopPrices instead of a hardcoded name list -- previously this
--- list and ShopPrices.Prices had to be kept in sync by hand, and the button
--- showed no price at all.
-local ITEM_NAMES = {"Item1", "Item2", "Item3", "Item4"}
-
-for i, itemName in ipairs(ITEM_NAMES) do
-	local itemButton = Instance.new("TextButton")
-	itemButton.Name = itemName
-	itemButton.Size = UDim2.new(1, 0, 0, 45)
-	itemButton.LayoutOrder = i
-	itemButton.Text = string.format("Buy %s ($%d)", itemName, ShopPrices.GetPrice(itemName) or 0)
-	itemButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-	itemButton.TextColor3 = Color3.new(1, 1, 1)
-	itemButton.Parent = itemContainer
-
-	itemButton.MouseButton1Click:Connect(function()
-		BuyItem:FireServer(itemName)
-	end)
+	return ownedIds, freeCount
 end
 
--- Open/close behavior. isShopOpen (not screenGui.Enabled) is the source of
--- truth for whether cleanup is needed -- CameraSession.hideOtherGuis can set
--- screenGui.Enabled = false out from under this script while the shop is
--- still logically open, which used to skip closeShop's cleanup entirely and
--- leak the distance-check Heartbeat and the mouse-unlock render-step across
--- every subsequent respawn.
+local function refreshGui()
+	if not ShopGui.IsBuilt() then
+		return
+	end
+	local leaderstats = player:FindFirstChild("leaderstats")
+	local cash = leaderstats and leaderstats:FindFirstChild("Cash")
+	local ownedIds, freeCount = readSlotState()
+	ShopGui.Refresh(cash and cash.Value or 0, ownedIds, freeCount)
+end
+
+ShopGui.SetOnBuy(function(itemId)
+	ShopGui.SetPending(itemId, true)
+	refreshGui()
+	BuyItem:FireServer(itemId)
+end)
+
+-- Open/close behavior. isShopOpen (not screenGui.Enabled, and not ShopGui's
+-- own internal state) is the source of truth for whether cleanup is needed --
+-- CameraSession.hideOtherGuis can set the ScreenGui's Enabled to false out
+-- from under this script while the shop is still logically open, which used
+-- to skip closeShop's cleanup entirely and leak the distance-check Heartbeat
+-- and the mouse-unlock render-step across every subsequent respawn. This is
+-- also why ShopGui's own X button doesn't call ShopGui.Hide() directly --
+-- see ShopGui.SetOnCloseRequested below, wired to closeShop so the panel's
+-- close button goes through the same cleanup path as every other trigger.
 local isShopOpen = false
 
 local function closeShop()
@@ -99,7 +88,7 @@ local function closeShop()
 	end
 	isShopOpen = false
 
-	screenGui.Enabled = false
+	ShopGui.Hide()
 	controls:Enable()
 
 	if mouseLockConnection then
@@ -113,6 +102,8 @@ local function closeShop()
 		distanceCheckConnection = nil
 	end
 end
+
+ShopGui.SetOnCloseRequested(closeShop)
 
 local function bindDeathHandler(char)
 	local humanoid = char:WaitForChild("Humanoid")
@@ -133,7 +124,8 @@ local function openShop(shopPart)
 	end
 	isShopOpen = true
 
-	screenGui.Enabled = true
+	ShopGui.Show()
+	refreshGui()
 	controls:Disable()
 	UserInputService.MouseIconEnabled = true
 
@@ -160,7 +152,24 @@ OpenShop.OnClientEvent:Connect(function(shopPart)
 end)
 
 PurchaseResult.OnClientEvent:Connect(function(resultData)
+	if resultData.itemId then
+		ShopGui.SetPending(resultData.itemId, false)
+	end
+	refreshGui()
 	PurchaseNotification.Handle(resultData)
 end)
 
-closeButton.MouseButton1Click:Connect(closeShop)
+-- Refresh whenever cash or slot contents change, so affordability/owned/full
+-- states stay live while the shop is open (and cost nothing while it's not --
+-- Refresh no-ops before ShopGui has been built).
+player:WaitForChild("leaderstats"):WaitForChild("Cash").Changed:Connect(refreshGui)
+
+local function watchContainer(container: Instance)
+	container.ChildAdded:Connect(refreshGui)
+	container.ChildRemoved:Connect(refreshGui)
+end
+
+local backpack = player:WaitForChild("Backpack")
+watchContainer(backpack)
+watchContainer(character)
+player.CharacterAdded:Connect(watchContainer)

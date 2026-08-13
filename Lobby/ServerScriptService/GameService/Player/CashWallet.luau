@@ -1,12 +1,12 @@
--- The missing "grant money" API. PlayerCurrency.legacy.luau owns CREATING
--- the leaderstats.Cash IntValue; this module owns CHANGING it. Cash's
--- per-life semantics (StartGame sets it to PlayerStats.StartingCash on kit
--- grant, EndGame zeroes it on death/match end) are untouched and stay owned
--- by those two files -- this module does not change when or whether Cash
--- resets, only how something other than the shop debits/credits it.
+-- The "grant/spend money" API. PlayerCurrency.legacy.luau owns CREATING the
+-- leaderstats.Cash IntValue; this module owns CHANGING it. Cash's per-life
+-- semantics (StartGame sets it to PlayerStats.StartingCash on kit grant,
+-- EndGame zeroes it on death/match end) are untouched and stay owned by
+-- those two files -- this module does not change when or whether Cash
+-- resets, only how something other than those two debits/credits it.
 --
--- ShopFillSlot.luau's existing `cash.Value -= price` is a separate, already-
--- working write path and is intentionally not migrated onto this module.
+-- ShopFillSlot.luau reads and writes Cash exclusively through this module --
+-- it is the single owner of currency mutation outside of grant/reset.
 
 local CashWallet = {}
 

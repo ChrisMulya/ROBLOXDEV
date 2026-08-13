@@ -462,7 +462,7 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 | Sprint / stamina / jump cooldown | works | server-authoritative (`CharacterMovementService`); client renders, never simulates |
 | Mobile sprint button | works | tap-to-arm, `MobileSprintButton.local.luau`; touch only |
 | HUD (stamina) | works | `StarterPlayerScripts`, **not** `StarterGui` — see G1 |
-| Inventory slots + shop | works | server-authoritative buy; empty slots tagged `IsEmpty` |
+| Inventory slots + shop | works | `ShopCatalog` (7 support items) drives price/description/UI; server-authoritative buy through `CashWallet`; empty slots tagged `IsEmpty`, held items tagged `ItemId`; Game place only |
 | Currency UI | works | remote-driven |
 | Camera framework | works | client session/viewfinder/touch HUD + shelf; one `Trove` per session |
 | Photo capture → reward | works | 5×5 spread raycast → `CaptureTargets.Resolve` → `RewardService` |

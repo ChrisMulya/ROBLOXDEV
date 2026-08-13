@@ -13,6 +13,10 @@ PurchaseResultCodes.Messages = {
 	NoSlot = "No empty slot available.",
 	InsufficientFunds = "Not enough cash for %s.",
 	TooFarAway = "Move closer to the shop.",
+	AlreadyOwned = "You're already carrying that.",
+	ItemDisabled = "That item is unavailable right now.",
+	ShopUnavailable = "The shop isn't open right now.",
+	NotOpen = "Open the shop first.",
 }
 
 -- itemName fills a "%s" placeholder when the template has one (InsufficientFunds).
