@@ -8,6 +8,12 @@
 -- it, a teleported player arrives as a disembodied camera and the match can
 -- never end (MatchEndCondition needs a Humanoid to die with).
 --
+-- Reacts to MatchArrival.Seeded rather than StateChanged -> WaitingForPlayers
+-- now: the match loading screen spawns characters DURING Loading, under the
+-- curtain, so the pop-in and camera snap never reach the player's screen.
+-- Loading.AcceptsJoins is true precisely so the MatchParticipants.Joined
+-- backfill below still fires for a participant who joins mid-Loading.
+--
 -- Respawn after death is deliberately NOT this module's job -- DeathService
 -- calls LoadCharacter itself for a death outside GameplayActive, and a death
 -- during Playing is meant to leave the player Dead/Spectating until the
@@ -19,6 +25,7 @@ local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 local MatchStates = require(ReplicatedStorage.Modules.Shared.MatchStates)
 local MatchManager = require(script.Parent.MatchManager)
 local MatchParticipants = require(script.Parent.MatchParticipants)
+local MatchArrival = require(script.Parent.MatchArrival)
 
 local MatchSpawner = {}
 
@@ -38,19 +45,17 @@ function MatchSpawner.Start()
 
 	ServerRole.AssertGameServer()
 
-	MatchManager.StateChanged:Connect(function(newState: string)
-		if newState == "WaitingForPlayers" then
-			for _, player in ipairs(MatchParticipants.GetPresent()) do
-				loadIfNeeded(player)
-			end
+	MatchArrival.Seeded:Connect(function()
+		for _, player in ipairs(MatchParticipants.GetPresent()) do
+			loadIfNeeded(player)
 		end
 	end)
 
 	-- MatchParticipants.Joined's first subscriber ever -- covers a
-	-- participant whose Player instance appears after WaitingForPlayers was
-	-- already reached. Non-participants never fire Joined (it only tracks
-	-- seeded userIds), so they never get a character here -- explicit, not
-	-- accidental: MatchStates.AcceptsJoins gates whether that's expected.
+	-- participant whose Player instance appears after Seeded already fired.
+	-- Non-participants never fire Joined (it only tracks seeded userIds), so
+	-- they never get a character here -- explicit, not accidental:
+	-- MatchStates.AcceptsJoins gates whether that's expected.
 	MatchParticipants.Joined:Connect(function(player: Player)
 		if MatchStates.AcceptsJoins(MatchManager.Get()) then
 			loadIfNeeded(player)

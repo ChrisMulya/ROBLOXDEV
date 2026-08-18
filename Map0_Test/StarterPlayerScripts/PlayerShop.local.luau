@@ -11,13 +11,13 @@ local character = player.Character or player.CharacterAdded:Wait()
 
 local UserInputService = game:GetService("UserInputService")
 
-local playerModule = require(player:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule"))
-local controls = playerModule:GetControls()
-
 local ShopCatalog = require(ReplicatedStorage.Modules.Shop.ShopCatalog)
 local EffectAttributes = require(ReplicatedStorage.Modules.Player.EffectAttributes)
 local ShopGui = require(ReplicatedStorage.Modules.Shop.ShopGui)
 local PurchaseNotification = require(ReplicatedStorage.Modules.Shop.PurchaseNotification)
+local ControlLock = require(ReplicatedStorage.Modules.Shared.ControlLock)
+
+local LOCK_REASON = "PlayerShop"
 
 local MAX_DISTANCE = 10
 local distanceCheckConnection = nil
@@ -101,7 +101,7 @@ local function closeShop()
 	isShopOpen = false
 
 	ShopGui.Hide()
-	controls:Enable()
+	ControlLock.Release(LOCK_REASON)
 
 	if mouseLockConnection then
 		RunService:UnbindFromRenderStep("ShopMouseUnlock")
@@ -138,7 +138,7 @@ local function openShop(shopPart)
 
 	ShopGui.Show()
 	refreshGui()
-	controls:Disable()
+	ControlLock.Acquire(LOCK_REASON)
 	UserInputService.MouseIconEnabled = true
 
 	if not mouseLockConnection then

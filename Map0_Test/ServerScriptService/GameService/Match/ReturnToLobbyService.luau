@@ -99,7 +99,13 @@ end
 -- (WaitingForPlayers/Countdown/Playing) means there's no result to show yet
 -- and nothing to return FROM; ReturnAll() already owns Finished, this just
 -- lets an individual player jump the automatic 60s Ending hold.
-local ALLOWED_RETURN_STATES = { Ending = true, Cleanup = true, Finished = true }
+--
+-- Loading is also allowed -- it's the match loading screen's hard-watchdog
+-- escape hatch (LoadingController's failure panel). There is no result to
+-- show at that point either, but this reuses the exact same teleport-retry +
+-- kick path (handleInitFailed below) rather than growing a second lobby-
+-- return lifecycle for one failure case.
+local ALLOWED_RETURN_STATES = { Loading = true, Ending = true, Cleanup = true, Finished = true }
 
 -- Rate-limited per player so a spammed click (or a resent client event)
 -- can't queue duplicate TeleportAsync calls before returningPlayers catches

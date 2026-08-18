@@ -49,6 +49,10 @@ end
 --                               so it must beat ShopGui (35)
 --   100    CameraTouchHud    -- built directly, not via this function
 --  1000    ScreenFlashRenderer
+--  2000    LoadingCurtainGui -- match loading screen; must beat everything,
+--                               including the camera flash -- an opaque
+--                               curtain during Loading must never be
+--                               punched through by a stray flash
 function UIBuilder.CreateScreenGui(name: string, parent: Instance, displayOrder: number?): ScreenGui
 	local screenGui = Instance.new("ScreenGui")
 	screenGui.Name = name

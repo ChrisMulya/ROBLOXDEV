@@ -19,6 +19,7 @@ local CameraState = require(ReplicatedStorage.Modules.Camera.CameraState)
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
 local Trove = require(ReplicatedStorage.Modules.Shared.Trove)
 local TouchSession = require(ReplicatedStorage.Modules.Shared.TouchSession)
+local ControlLock = require(ReplicatedStorage.Modules.Shared.ControlLock)
 local ItemUseHud = require(ReplicatedStorage.Modules.Item.ItemUseHud)
 local CCTVViewController = require(ReplicatedStorage.Modules.Item.CCTVViewController)
 
@@ -28,8 +29,6 @@ local motionSensorAlert = Remotes.Get("MotionSensorAlert")
 local cctvViewState = Remotes.Get("CCTVViewState")
 
 local player = Players.LocalPlayer
-local playerModule = require(player:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule"))
-local controls = playerModule:GetControls()
 
 -- Rough hotbar cell pitch. There is no addressable hotbar to measure --
 -- Roblox's default Backpack CoreGui can't be parented to or queried -- so
@@ -54,23 +53,27 @@ local equippedTool: Tool? = nil
 -- Control-kind items (the CCTV tablet) complete instantly and never produce
 -- an ItemUseState at all, so a single flag set optimistically on LMB-down
 -- stayed true through the whole click. Clicking the tablet to CLOSE the feed
--- therefore ran refreshControls while it still read "holding", left the
--- player frozen, and the matching LMB-up cleared the flag without re-deriving
--- the switch -- so movement never came back.
+-- used to re-derive one shared, unrefcounted PlayerModule switch from a
+-- flag that still read "holding" -- ControlLock replaces that switch with a
+-- reason-keyed lock, so a use-hold and an open CCTV feed compose safely
+-- without either needing to know about the other.
 local holdRequested = false
 local holding = false
 local viewingCCTV = false
 
--- Two independent reasons to freeze the player (a use-hold, and an open CCTV
--- feed) share one PlayerModule control switch, so neither may call Enable
--- directly -- the CCTV feed opening and a hold completing in the same frame
--- would otherwise let the completion hand movement back mid-view. Both write
--- their own flag and re-derive the switch from both.
-local function refreshControls()
-	if holding or viewingCCTV then
-		controls:Disable()
-	else
-		controls:Enable()
+local function setHoldLocked(locked: boolean)
+	if locked then
+		ControlLock.Acquire("ItemUseHold")
+	elseif ControlLock.IsHeld("ItemUseHold") then
+		ControlLock.Release("ItemUseHold")
+	end
+end
+
+local function setCCTVLocked(locked: boolean)
+	if locked then
+		ControlLock.Acquire("CCTVView")
+	elseif ControlLock.IsHeld("CCTVView") then
+		ControlLock.Release("CCTVView")
 	end
 end
 
@@ -262,7 +265,8 @@ local function onCharacterAdded(character: Model)
 			holdRequested = false
 			holding = false
 			viewingCCTV = false
-			refreshControls()
+			setHoldLocked(false)
+			setCCTVLocked(false)
 			CCTVViewController.Exit()
 			ItemUseHud.Cancel()
 		end)
@@ -283,16 +287,16 @@ itemUseState.OnClientEvent:Connect(function(payload)
 
 	if payload.status == "Active" then
 		holding = true
-		refreshControls()
+		setHoldLocked(true)
 		local offset = TouchSession.IsActive() and 0 or (equippedTool and offsetForTool(equippedTool) or 0)
 		ItemUseHud.Begin(offset, payload.endsAt, payload.holdSeconds)
 	elseif payload.status == "Cancelled" then
 		holding = false
-		refreshControls()
+		setHoldLocked(false)
 		ItemUseHud.Cancel()
 	elseif payload.status == "Complete" then
 		holding = false
-		refreshControls()
+		setHoldLocked(false)
 		ItemUseHud.Complete()
 	end
 end)
@@ -312,5 +316,5 @@ cctvViewState.OnClientEvent:Connect(function(lens: BasePart?, model: Instance?)
 	-- The server holds the authoritative lock (its WalkSpeed budget); this is
 	-- the local half, so the stick doesn't fight a zero budget and read as
 	-- rubber-banding instead of as standing still.
-	refreshControls()
+	setCCTVLocked(viewingCCTV)
 end)

@@ -18,6 +18,15 @@ MatchConfig.Modes = {
 		ScheduleId = "Default", -- key into MatchSchedule.Schedules
 		EndingHoldSeconds = 60, -- how long Ending stays up so the summary is readable
 		PadCountdownSeconds = 10, -- lobby queue pad: countdown from the first player stepping on to launch
+		-- Loading timeout backstop: forces Loading -> WaitingForPlayers even if
+		-- a seeded participant never reports MatchClientReady (disconnect mid-
+		-- handshake, a stuck preload). Matches WaitTimeout's role for the next
+		-- phase -- degrade the match rather than hang it.
+		LoadingTimeout = 45,
+		-- Floor, not a delay: a same-frame ready report (fast local join) still
+		-- holds the curtain this long so it never strobes on screen. Must never
+		-- be used to pad out a genuinely slow load.
+		LoadingMinSeconds = 0.5,
 	},
 }
 

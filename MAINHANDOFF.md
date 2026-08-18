@@ -26,14 +26,15 @@ lock. Verified live on the published two-place build.
 
 **Uncommitted work-in-progress on top of that baseline** (not yet verified
 live, not yet committed): a formal Match layer (`GameService/Match/*`)
-replacing the old ad hoc lifecycle glue, a shared Mission List HUD, a
-Monster investigation/search overhaul (`Investigation` component,
-`VisualScan` behaviour, `PointSelector`), a capture-target registry feeding a
-rewritten cone-based `PhotoCapture`, a Document pickup, and the match-time
-announcer + responsive-HUD work described in `plans/`. See the new
-subsections below and `git status` for the exact file list — this paragraph
-only orients; it is not a substitute for reading the diff before touching any
-of it.
+replacing the old ad hoc lifecycle glue — now including a real, timed
+`Loading` phase with a client curtain (`plans/match-loading-screen.md`) — a
+shared Mission List HUD, a Monster investigation/search overhaul
+(`Investigation` component, `VisualScan` behaviour, `PointSelector`), a
+capture-target registry feeding a rewritten cone-based `PhotoCapture`, a
+Document pickup, and the match-time announcer + responsive-HUD work
+described in `plans/`. See the new subsections below and `git status` for
+the exact file list — this paragraph only orients; it is not a substitute
+for reading the diff before touching any of it.
 
 **Known-broken and half-built items are their own sections below** — this
 paragraph is the only narrative allowed in this file. For how any of this was
@@ -92,13 +93,23 @@ name:
   is expected), independent of `Players:GetPlayers()`. A disconnected
   participant is still a participant.
 - `MatchArrival` — Game-side counterpart to the Lobby's `ArrivalService`:
-  consumes `TeleportData`, seeds `MatchParticipants`, advances
-  `Loading → WaitingForPlayers`. Falls back to a solo participant (the
-  arriving player) with no `TeleportData`, so a direct Studio Play-test still
-  produces a runnable match of one.
-- `MatchSpawner` — loads a character for each participant. Required because
-  `GameBoot` sets `CharacterAutoLoads = false`; without this an arriving
-  participant is a disembodied camera.
+  consumes `TeleportData`, seeds `MatchParticipants`, captures
+  `MatchSettings`, and fires `Seeded`. **No longer transitions the match
+  itself** — that used to happen here in the same frame as the first
+  arrival, which left no real `Loading` window. `MatchLoadingGate` (below)
+  owns `Loading → WaitingForPlayers` now. Falls back to a solo participant
+  (the arriving player) with no `TeleportData`, so a direct Studio Play-test
+  still produces a runnable match of one.
+- `MatchSpawner` — loads a character for each participant, reacting to
+  `MatchArrival.Seeded` (not a state change) so it happens **during**
+  `Loading`, under the curtain. Required because `GameBoot` sets
+  `CharacterAutoLoads = false`; without this an arriving participant is a
+  disembodied camera.
+- `MatchLoadingGate` — the one module that may fire `Loading →
+  WaitingForPlayers`. Gated on every present participant firing the
+  `MatchClientReady` remote (client-reported, never trusted alone) or
+  `MatchConfig.LoadingTimeout` (45s, via `MatchClock.StartLoadingTimeout`)
+  elapsing. Ledger is drop-on-leave. See "Match loading screen" below.
 - `MatchClock` — optional per-mode timers (`WaitingForPlayers` timeout,
   `Countdown` ticks, the `Ending → Cleanup` hold). Drives transitions only
   through `MatchManager`, holds no state of its own. Supersedes
@@ -109,9 +120,11 @@ name:
   itself clean up or teleport.
 - `MatchReplicator` — mirrors `MatchManager`'s state onto
   `ReplicatedStorage.MatchInfo` attributes (shared state → attribute, per the
-  existing invariant). The one Match module allowed to touch remotes: on
-  entering `Ending` it also builds and sends the per-player
-  `MatchResultSync` payload.
+  existing invariant), plus `LoadingReadyCount`/`LoadingReadyTotal` from
+  `MatchLoadingGate.ReadyCountChanged` (nil outside `Loading`, same
+  `ShowsMatchTime`-only convention as the match clock). The one Match module
+  allowed to touch remotes: on entering `Ending` it also builds and sends
+  the per-player `MatchResultSync` payload.
 - `MatchResultBuilder` — assembles the end-of-match summary from registered
   contributors (`RegisterContributor`, same non-yielding/side-effect-free
   contract as `RewardService.RegisterContextProvider`). Feature systems
@@ -140,6 +153,43 @@ above — this one times the `WaitingForPlayers`/`Countdown`/`Ending→Cleanup`
 states *around* a match; `MatchTime` times the *Playing* night itself. Same
 naming collision the original "Match time" section already calls out for the
 old `MatchClock` — worth a rename pass before this ships, not done here.
+
+### Match loading screen — real `Loading` phase + client curtain, uncommitted
+
+Blueprint: `plans/match-loading-screen.md`. `Loading` was previously
+instantaneous (`MatchArrival` transitioned out of it in the same frame as
+the first arrival); it is now a real, timed, server-gated phase.
+
+- **`MatchStates.Loading`** gained `ShowsLoadingScreen = true` (new
+  `CORE_FLAGS` entry, all 7 states carry it) and flipped `KitGranted`/
+  `AcceptsJoins` to `true` — characters spawn and kits grant **during**
+  `Loading`, hidden under the curtain, not after it.
+- **Client**: `ReplicatedFirst/LoadingCurtain.local.luau` builds an opaque,
+  dependency-free curtain (`LoadingCurtainGui`, `DisplayOrder` 2000,
+  `KeepDuringCamera`) before `ReplicatedStorage.Modules` even replicates.
+  `UI/LoadingController` (required first in `ClientBootstrap`'s
+  `GameServer` branch) adopts that same instance by name once `Modules`
+  exists, runs four stages (replication → `ContentProvider:PreloadAsync` off
+  `Shared/LoadingManifest` → local character/camera → server handshake),
+  fires `MatchClientReady` once, then waits for `MatchInfo.MatchState` to
+  leave `"Loading"` before fading. `UI/LoadingHud` is the pure-UI half.
+- **Input lock**: `Shared/ControlLock` — a refcounted, reason-keyed
+  replacement for the three previously-unrefcounted
+  `PlayerModule.Controls:Disable()/Enable()` call sites
+  (`ItemUseClient`/`CameraShelfClient`/`PlayerShop`, now all migrated onto
+  it). `LoadingController` acquires `"MatchLoading"` for the duration.
+- **`StarterPlayerScripts/CoreGuiController`** additionally disables
+  `Backpack`/`Chat` CoreGuis while `MatchInfo.MatchState == "Loading"`,
+  reacting to the attribute directly (same nil-tolerant pattern as
+  `MissionHudController`) rather than coordinating with `LoadingController`.
+- **Escape hatch**: `Loading` was added to
+  `ReturnToLobbyService.ALLOWED_RETURN_STATES` so the client's hard
+  watchdog (60s, no server response) can offer a working "Return to Lobby"
+  button through the existing teleport-retry/kick path.
+- Preload manifest (`Shared/LoadingManifest.Collect`) is deliberately
+  narrow: monster/camera/pickup/support-item models + tool sounds. Map
+  geometry is explicitly excluded — the engine streams it, and blanket
+  preloading it was the biggest available regression risk.
 
 ### Mission List HUD — shared match-scoped progress, uncommitted
 
@@ -457,6 +507,7 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 - **RemoteEvents only.** Zero RemoteFunctions in the repo. Client fires a request; server replies on a separate `*Result`/`*Feedback` remote with a **code string**; a shared `*ResultCodes` module maps code → message. Some flows (queue pads) have no client-initiated request at all — server-sensed state replicates via attributes instead, and the remote exists only for one-off result messages.
 - **All remotes registered** in `Remotes.ALL_NAMES`; `Remotes.Init()` provisions them (server, from `Bootstrap.legacy.luau`). Never `WaitForChild` a remote by hand.
 - **Ownership is symmetric.** Whoever acquires a GUI/effect/connection releases it, by reference, via a `Trove` — never by name lookup.
+- **Freezing player input goes through `Shared/ControlLock`**, never a bare `PlayerModule.Controls:Disable()/Enable()`. The raw switch is shared and unrefcounted — two independent freeze reasons stomp each other. `Acquire(reason)`/`Release(reason)` compose; every current caller (loading curtain, camera shelf, item-use hold, CCTV view, shop) is migrated onto it.
 - **No reward amount ever crosses a remote.** `RewardService` is the only sink.
 - **Server reads attributes off the server-observed instance**, never client-declared identity.
 - **Countdowns cross the wire as a deadline, never a remaining duration.** A `workspace:GetServerTimeNow()` timestamp the client subtracts locally, so its tick cannot drift and costs nothing per second. Used by `QueuePadEndsAt`, `MatchResultSync.returnsAt`, and the `MatchTime*` anchors. Corollary: **one owner computes the deadline, everyone else reads it** — `MatchClock.GetEndingDeadline()` anchors on first request precisely so the receipt's countdown and the real `Cleanup` transition can't disagree.
@@ -494,6 +545,7 @@ Rules that outlive any single file. Violating one is a bug even if it works.
 | Loadout persistence | works | camera choice survives teleport and rejoin |
 | Pickup / Cash collection | works | Prompt + grant are Game place only; visuals are place-agnostic; hand-placed pickups, no spawner yet — see Phase section above |
 | Match layer (`GameService/Match/*`) | uncommitted, unverified | Formal phased lifecycle replacing prior ad hoc glue — see Phase section above |
+| Match loading screen | uncommitted, unverified | Real, timed `Loading` phase + client curtain, server-gated on `MatchClientReady`/`LoadingTimeout` — see Phase section above and `plans/match-loading-screen.md` |
 | Mission List HUD | uncommitted, unverified | Shared match-scoped progress (photo score / soft objectives / documents) — see Phase section above |
 | Monster investigation/search overhaul | uncommitted, unverified | `Investigation` + `VisualScan` + `PointSelector`; needs the same unplaced Patrol/Search points as Patrol |
 | Photo capture (cone detection) | uncommitted, unverified | Rewritten from 5×5 grid to angular-cone detection behind `USE_CONE_DETECTION`; old path still reachable |
@@ -573,6 +625,7 @@ Non-derivable from code. These will burn a session if forgotten.
 | `QueuePadLabel` | a Part inside the pad model | Marks which descendant carries the display `BillboardGui`/`TextLabel` |
 | `QueuePadCount` / `QueuePadCapacity` / `QueuePadEndsAt` | the pad's `Zone` Part | Server-written, read-only display state. `QueuePadEndsAt` is `0` when idle, else a `workspace:GetServerTimeNow()` deadline |
 | `MatchState` | `ReplicatedStorage.MatchInfo` Folder | Current `MatchStates` name. Written by `MatchReplicator` |
+| `LoadingReadyCount` / `LoadingReadyTotal` | same `MatchInfo` Folder | `MatchLoadingGate`'s ready ledger, mirrored by `MatchReplicator`. **Nil outside `Loading`** — same nil-outside-scope convention as the match time anchors below |
 | `MatchScheduleId`, `MatchTimeStartedAt`, `MatchTimeEndsAt`, `MatchTimeAnchorAt`, `MatchTimeAnchorHour` | same `MatchInfo` Folder | Match clock anchors, written by `MatchTimeReplicator`. **All nil outside `Playing`** — absent must read as "no match time", never hour 0. `AnchorAt`/`AnchorHour` equal `StartedAt`/`StartHour` unless a schedule is swapped mid-match |
 | `IsMonsterSpawn` | Part or Model, Workspace | Hand-placed monster spawn point. Optional `MonsterId` (default `Monster1`) and `Stage` (default 1) |
 | `MonsterId` / `Stage` | spawned monster Model | `Stage` here is the **effective** stage and is rewritten on every re-stage — the authored floor lives on the spawn point, not on this |
@@ -594,6 +647,7 @@ Non-derivable from code. These will burn a session if forgotten.
 | 50 | `MatchReceiptGui` |
 | 100 | `CameraTouchHud` |
 | 1000 | `ScreenFlashRenderer` |
+| 2000 | `LoadingCurtainGui` — match loading screen; must beat everything, including the camera flash |
 
 **Asset paths** (tree structure differs — don't assume parity):
 - `ReplicatedStorage.Assets.Tool.SupportItem`

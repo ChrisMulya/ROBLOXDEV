@@ -16,6 +16,7 @@ local MatchManager = require(script.Parent.MatchManager)
 local MatchParticipants = require(script.Parent.MatchParticipants)
 local MatchResultBuilder = require(script.Parent.MatchResultBuilder)
 local MatchClock = require(script.Parent.MatchClock)
+local MatchLoadingGate = require(script.Parent.MatchLoadingGate)
 
 local MatchReplicator = {}
 
@@ -42,6 +43,24 @@ function MatchReplicator.Start()
 
 	MatchManager.StateChanged:Connect(function(newState: string)
 		matchInfo:SetAttribute("MatchState", newState)
+
+		-- Nil, not 0/0 -- a client reading these outside Loading should see
+		-- "no such data" rather than a stale count from the match that just
+		-- ended, same nil-outside-scope convention as MatchTimeService's
+		-- GetHour/GetPhase/GetProgress.
+		if newState ~= "Loading" then
+			matchInfo:SetAttribute("LoadingReadyCount", nil)
+			matchInfo:SetAttribute("LoadingReadyTotal", nil)
+		end
+	end)
+
+	-- Shared, identical-for-everyone counts -- attributes, not a remote, same
+	-- rule as MatchState itself. LoadingController only reads these to
+	-- decorate its own status text after a soft-warn threshold; it never
+	-- gates the curtain's lift on them, only on MatchState leaving "Loading".
+	MatchLoadingGate.ReadyCountChanged:Connect(function(readyCount: number, total: number)
+		matchInfo:SetAttribute("LoadingReadyCount", readyCount)
+		matchInfo:SetAttribute("LoadingReadyTotal", total)
 	end)
 
 	-- Fired by MatchResultBuilder itself once its Ending capture has actually

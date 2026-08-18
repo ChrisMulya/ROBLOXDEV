@@ -1,6 +1,7 @@
--- Optional per-mode timers: WaitingForPlayers timeout, Countdown ticks, and
--- the Ending -> Cleanup hold. Drives transitions via MatchManager only and
--- holds no state of its own beyond reading the mode id through MatchArrival.
+-- Optional per-mode timers: a Loading timeout backstop, WaitingForPlayers
+-- timeout, Countdown ticks, and the Ending -> Cleanup hold. Drives
+-- transitions via MatchManager only and holds no state of its own beyond
+-- reading the mode id through MatchArrival.
 --
 -- Supersedes MatchCleanup's placeholder ENDING_HOLD_SECONDS constant, per
 -- that module's own comment inviting this swap once MatchClock landed.
@@ -18,6 +19,33 @@ local MatchClock = {}
 
 local function config()
 	return MatchConfig.Get(MatchArrival.GetModeId())
+end
+
+-- Loading has no other timer and, unlike every other runXxx below, is never
+-- reached via StateChanged -- it's MatchManager's INITIAL_STATE, so no
+-- transition into it ever fires. MatchLoadingGate.Start() calls this
+-- directly instead. Polls the same way as the others: checking
+-- MatchManager.Is("Loading") every iteration means MatchLoadingGate winning
+-- the race with "AllClientsReady" simply falls out of the loop, no
+-- cancellation flag needed. Targets WaitingForPlayers, not Cleanup -- a slow
+-- client must degrade the match, not kill it.
+local function runLoading()
+	local cfg = config()
+	local waited = 0
+
+	while MatchManager.Is("Loading") do
+		if waited >= cfg.LoadingTimeout then
+			MatchManager.RequestTransition("WaitingForPlayers", "LoadingTimeout")
+			return
+		end
+
+		task.wait(1)
+		waited += 1
+	end
+end
+
+function MatchClock.StartLoadingTimeout()
+	task.spawn(runLoading)
 end
 
 -- Polls rather than building a fully event-driven state machine -- same

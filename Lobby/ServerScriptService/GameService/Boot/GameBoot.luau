@@ -245,9 +245,16 @@ function GameBoot.Start()
 		-- PlayerStateService.StateChanged for the Dead transition, and
 		-- DeathService is the only thing that ever fires it into Dead.
 		require(ServerScriptService.GameService.Match.MatchStats),
-		-- MatchArrival LAST: it fires the first real transition
-		-- (Loading -> WaitingForPlayers), so every StateChanged subscriber
-		-- above (MatchClock, MatchSpawner, MatchResultBuilder, etc.) must
+		-- MatchLoadingGate before MatchArrival: it owns the first real
+		-- transition (Loading -> WaitingForPlayers) now, gated on
+		-- MatchArrival.Seeded plus every present participant's
+		-- MatchClientReady report (or MatchClock's LoadingTimeout backstop,
+		-- which this also starts). Must be listening on Seeded before
+		-- MatchArrival can fire it -- registry before registrant, same rule
+		-- as everything else in this list.
+		require(ServerScriptService.GameService.Match.MatchLoadingGate),
+		-- MatchArrival LAST: it seeds the roster and fires Seeded, so every
+		-- subscriber above (MatchLoadingGate, MatchSpawner, etc.) must
 		-- already be connected before that can happen -- this was previously
 		-- correct only by accident (Signal fires deferred), which required
 		-- re-deriving that fact every time a new subscriber was added.

@@ -22,6 +22,7 @@ local CORE_FLAGS = {
 	"KitGranted",
 	"ShowsMatchTime",
 	"RespawnsOnDeath",
+	"ShowsLoadingScreen",
 }
 
 -- KitGranted: whether a participant may hold their starter kit right now.
@@ -45,17 +46,24 @@ local CORE_FLAGS = {
 -- survivor while the match is already Ending, and the old
 -- `not IsGameplayActive` test would have respawned all of them into the map
 -- underneath the result receipt.
+--
+-- ShowsLoadingScreen: true for Loading only. Loading.KitGranted and
+-- Loading.AcceptsJoins are also true -- the match loading screen spawns
+-- characters (and therefore grants kits) under the curtain, and a reserved
+-- server is accepting joins the moment it boots, not only once the roster is
+-- confirmed ready.
 MatchStates.All = {
 	Loading = {
 		GameplayActive = false,
-		AcceptsJoins = false,
+		AcceptsJoins = true,
 		SpectateAllowed = false,
 		ScoringActive = false,
 		MonstersSpawn = false,
 		Terminal = false,
-		KitGranted = false,
+		KitGranted = true,
 		ShowsMatchTime = false,
 		RespawnsOnDeath = true,
+		ShowsLoadingScreen = true,
 	},
 	WaitingForPlayers = {
 		GameplayActive = false,
@@ -67,6 +75,7 @@ MatchStates.All = {
 		KitGranted = true,
 		ShowsMatchTime = false,
 		RespawnsOnDeath = true,
+		ShowsLoadingScreen = false,
 	},
 	Countdown = {
 		GameplayActive = false,
@@ -78,6 +87,7 @@ MatchStates.All = {
 		KitGranted = true,
 		ShowsMatchTime = false,
 		RespawnsOnDeath = true,
+		ShowsLoadingScreen = false,
 	},
 	Playing = {
 		GameplayActive = true,
@@ -89,6 +99,7 @@ MatchStates.All = {
 		KitGranted = true,
 		ShowsMatchTime = true,
 		RespawnsOnDeath = false,
+		ShowsLoadingScreen = false,
 	},
 	Ending = {
 		GameplayActive = false,
@@ -100,6 +111,7 @@ MatchStates.All = {
 		KitGranted = false,
 		ShowsMatchTime = false,
 		RespawnsOnDeath = false,
+		ShowsLoadingScreen = false,
 	},
 	Cleanup = {
 		GameplayActive = false,
@@ -111,6 +123,7 @@ MatchStates.All = {
 		KitGranted = false,
 		ShowsMatchTime = false,
 		RespawnsOnDeath = false,
+		ShowsLoadingScreen = false,
 	},
 	Finished = {
 		GameplayActive = false,
@@ -122,6 +135,7 @@ MatchStates.All = {
 		KitGranted = false,
 		ShowsMatchTime = false,
 		RespawnsOnDeath = false,
+		ShowsLoadingScreen = false,
 	},
 }
 
@@ -182,6 +196,11 @@ end
 function MatchStates.RespawnsOnDeath(state: string): boolean
 	local def = MatchStates.All[state]
 	return def ~= nil and def.RespawnsOnDeath
+end
+
+function MatchStates.ShowsLoadingScreen(state: string): boolean
+	local def = MatchStates.All[state]
+	return def ~= nil and def.ShowsLoadingScreen
 end
 
 function MatchStates.CanTransition(from: string, to: string): boolean

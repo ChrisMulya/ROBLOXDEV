@@ -1,7 +1,14 @@
 -- Consumes TeleportData on the Game Server: seeds MatchParticipants from the
--- reserved server's participant roster + mode id, then advances
--- Loading -> WaitingForPlayers once that's done. This is the Game-side
--- counterpart to ArrivalService, which handles the return leg on the Lobby.
+-- reserved server's participant roster + mode id, captures MatchSettings, and
+-- fires Seeded once that's done. This is the Game-side counterpart to
+-- ArrivalService, which handles the return leg on the Lobby.
+--
+-- Does NOT transition Loading -> WaitingForPlayers itself -- that used to
+-- happen here, but the match loading screen needs a real Loading window
+-- (character spawn, asset preload, a client readiness handshake) rather than
+-- a transition that fires in the same frame as the first arrival.
+-- MatchLoadingGate owns that transition now, gated on Seeded plus every
+-- present participant's MatchClientReady report.
 --
 -- Falls back to seeding a solo participant (the arriving player themselves)
 -- when no TeleportData is present -- a direct Studio Play-test or a stray
@@ -12,11 +19,15 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
-local MatchManager = require(script.Parent.MatchManager)
+local Signal = require(ReplicatedStorage.Modules.Shared.Signal)
 local MatchParticipants = require(script.Parent.MatchParticipants)
 local MatchSettings = require(script.Parent.MatchSettings)
 
 local MatchArrival = {}
+
+-- Fires once, after the roster is seeded and MatchSettings captured.
+-- MatchLoadingGate and MatchSpawner are its subscribers.
+MatchArrival.Seeded = Signal.new()
 
 local DEFAULT_MODE = "Default"
 
@@ -65,17 +76,16 @@ local function seedFrom(player: Player)
 		MatchParticipants.Seed({ player.UserId })
 	end
 
-	-- Guarded separately: a second Loading -> WaitingForPlayers would be an
-	-- illegal transition and warn, and in the Studio path this runs once per
-	-- arriving player. MatchSettings.Capture happens here too, immediately
-	-- before the transition it gates on -- MatchParticipants.All() is already
-	-- correct at this point (the roster is seeded above), and every
-	-- WaitingForPlayers subscriber must see MatchSettings.Get() succeed with
-	-- no dependency on subscriber order (G20).
+	-- Guarded separately: a second Seeded fire would be wrong regardless of
+	-- transition legality, and in the Studio path this runs once per arriving
+	-- player. MatchSettings.Capture happens here too, immediately before the
+	-- Signal it gates on -- MatchParticipants.All() is already correct at this
+	-- point (the roster is seeded above), and every Seeded subscriber must see
+	-- MatchSettings.Get() succeed with no dependency on subscriber order (G20).
 	if not advanced then
 		advanced = true
 		MatchSettings.Capture(teleportData, modeId)
-		MatchManager.RequestTransition("WaitingForPlayers", "MatchArrival")
+		MatchArrival.Seeded:Fire()
 	end
 end
 

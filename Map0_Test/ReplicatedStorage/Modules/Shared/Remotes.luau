@@ -86,6 +86,12 @@ Remotes.ALL_NAMES = {
 	-- is the sole decider of who may view; the client only renders what it's
 	-- told.
 	"CCTVViewState",
+	-- Client -> server, fired exactly once per match by LoadingController once
+	-- its local stages (replication, preload, character, camera) are done.
+	-- A report, never a command -- MatchLoadingGate is the sole authority on
+	-- when Loading actually ends, gated on this from every present participant
+	-- plus its own LoadingTimeout backstop.
+	"MatchClientReady",
 }
 
 function Remotes.Get(name: string): RemoteEvent

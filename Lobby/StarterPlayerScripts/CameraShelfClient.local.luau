@@ -6,21 +6,22 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CameraShelfGui = require(ReplicatedStorage.Modules.CameraShelf.CameraShelfGui)
 local ShelfResultCodes = require(ReplicatedStorage.Modules.CameraShelf.ShelfResultCodes)
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
+local ControlLock = require(ReplicatedStorage.Modules.Shared.ControlLock)
 
 local OpenCameraShelf = Remotes.Get("OpenCameraShelf")
 local CloseCameraShelf = Remotes.Get("CloseCameraShelf")
 local CameraShelfResult = Remotes.Get("CameraShelfResult")
 
 local player = Players.LocalPlayer
-local playerModule = require(player:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule"))
-local controls = playerModule:GetControls()
+
+local LOCK_REASON = "CameraShelf"
 
 local shelfGui = nil
 local isOpen = false
 
 
 local function lockMovementAndMouse()
-	controls:Disable()
+	ControlLock.Acquire(LOCK_REASON)
 
 	UserInputService.MouseIconEnabled = true
 	RunService:BindToRenderStep("CameraShelfMouseUnlock", Enum.RenderPriority.Camera.Value + 1, function()
@@ -29,7 +30,7 @@ local function lockMovementAndMouse()
 end
 
 local function unlockMovementAndMouse()
-	controls:Enable()
+	ControlLock.Release(LOCK_REASON)
 
 	RunService:UnbindFromRenderStep("CameraShelfMouseUnlock")
 	UserInputService.MouseIconEnabled = true
@@ -37,6 +38,13 @@ local function unlockMovementAndMouse()
 end
 
 local function closeShelf()
+	-- Idempotency guard, added alongside the ControlLock migration: unlike
+	-- the old controls:Enable(), ControlLock.Release warns on a reason that
+	-- isn't held, and CameraShelfResult's "Success" branch below used to call
+	-- this unconditionally.
+	if not isOpen then
+		return
+	end
 	if shelfGui then
 		shelfGui.Enabled = false
 	end

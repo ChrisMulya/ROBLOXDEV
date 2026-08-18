@@ -25,6 +25,11 @@ if ServerRole.Is("LobbyServer") then
 	require(ReplicatedStorage.Modules.Queue.QueueController)
 	require(ReplicatedStorage.Modules.Queue.QueuePadDisplay)
 elseif ServerRole.Is("GameServer") then
+	-- First in the branch, for its side effects, same convention as every
+	-- other controller here (DeathScreenController et al.): it acquires
+	-- ControlLock immediately on require, so no other controller below can
+	-- plausibly grab input before the curtain has a chance to lock it.
+	require(ReplicatedStorage.Modules.UI.LoadingController)
 	require(ReplicatedStorage.Modules.UI.DeathScreenController)
 	require(ReplicatedStorage.Modules.Spectate.SpectateController)
 	require(ReplicatedStorage.Modules.UI.MatchReceiptController)
