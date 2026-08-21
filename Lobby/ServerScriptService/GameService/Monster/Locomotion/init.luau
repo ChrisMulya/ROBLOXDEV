@@ -9,8 +9,9 @@ local Locomotion = {}
 
 local strategies = {
 	Kinematic = require(script.KinematicLocomotion),
-	-- Written, registered, and NOT exercised -- no config selects it yet.
-	-- See the header of HumanoidPathLocomotion for why.
+	-- LIVE: Configs/Monster1.luau selects this (Locomotion = "HumanoidPath").
+	-- An earlier version of this comment said it was written and registered
+	-- but not exercised by any config -- that predates Monster1 shipping.
 	HumanoidPath = require(script.HumanoidPathLocomotion),
 }
 

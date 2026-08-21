@@ -6,6 +6,14 @@ local CameraState = require(ReplicatedStorage.Modules.Camera.CameraState)
 local CameraSession = require(ReplicatedStorage.Modules.Camera.CameraSession)
 local CameraStability = require(ReplicatedStorage.Modules.Camera.CameraStability)
 local CameraStats = require(ReplicatedStorage.Modules.Camera.CameraStats)
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+
+-- No lobby player ever holds a camera Tool (see CameraShelfSwap -- the
+-- shelf is preference-only there), so the camera session driver has nothing
+-- to drive.
+if not ServerRole.Is("GameServer") then
+	return
+end
 
 local player = Players.LocalPlayer
 

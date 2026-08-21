@@ -152,7 +152,15 @@ function Chase.Update(instance, dt: number)
 		return
 	end
 
-	if not navigation:MoveTo(destination, dt) then
+	local arrived, stuck = navigation:MoveTo(destination, dt)
+	if not arrived then
+		-- Pressed against geometry with nowhere direct to go: give up now
+		-- rather than grinding at a wall for the rest of PursuitDuration (up
+		-- to 20s). Same Forget() as the two branches below -- the point is
+		-- reached early, not reached differently.
+		if stuck and targeting then
+			targeting:Forget()
+		end
 		return
 	end
 
@@ -176,6 +184,36 @@ function Chase.Update(instance, dt: number)
 	end
 end
 
-function Chase.Exit(_instance) end
+-- Safety net for the race MonsterInstance:Tick's ordering creates: Brain runs
+-- BEFORE StateMachine every tick, so if the Brain re-evaluates on the exact
+-- tick the pursuit window lapses, Chase.Score has already gone nil (see
+-- above) and the Brain transitions away -- meaning Chase.Update's own timeout
+-- branch, and the Forget() inside it, never runs. Without this Exit, that
+-- race permanently strands LastKnownPos: Patrol.Score and Wander.Score both
+-- gate on `not blackboard.LastKnownPos`, so the monster falls to Idle and
+-- never patrols or wanders again for the rest of the match.
+--
+-- Guarded on `not blackboard.Target`: a LIVE target (the Chase --> Attack
+-- edge, Band 2 outranking Chase the instant it scores) must not be forgotten
+-- here. Attack.Score reads blackboard.Target/LastKnownPos itself on every
+-- Brain tick -- clearing them the moment Chase exits would de-score Attack
+-- one tick after entering it, breaking "nothing outranks a kill in progress."
+-- The pursuit-window check mirrors Update's own timeout predicate exactly, so
+-- this only ever fires the SAME Forget() Update would have made, just not
+-- later than the tick that made Chase ineligible.
+function Chase.Exit(instance)
+	local blackboard = instance.blackboard
+	if blackboard.Target or not blackboard.LastKnownPos then
+		return
+	end
+
+	local pursuitDuration = instance.config.Stats.PursuitDuration or 0
+	if os.clock() - pursuitAnchor(blackboard) > pursuitDuration then
+		local targeting = instance:GetComponent("Targeting")
+		if targeting then
+			targeting:Forget()
+		end
+	end
+end
 
 return Chase

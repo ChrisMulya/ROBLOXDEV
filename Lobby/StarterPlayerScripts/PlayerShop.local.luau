@@ -1,4 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+
+-- ShopPromptService already refuses to open outside a Game-place active
+-- match; this stops the client from even wiring up shop UI on the Lobby.
+if not ServerRole.Is("GameServer") then
+	return
+end
+
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
 local OpenShop = Remotes.Get("OpenShop")
 local BuyItem = Remotes.Get("BuyItem")

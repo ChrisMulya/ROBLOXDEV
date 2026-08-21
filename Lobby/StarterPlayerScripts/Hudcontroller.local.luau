@@ -15,6 +15,13 @@ local PlayerStats = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChi
 local PlayerRuntimeStats = require(ReplicatedStorage.Modules.PlayerRuntimeStats)
 local UIScaleController = require(ReplicatedStorage.Modules.UI.UIScaleController)
 local EffectAttributes = require(ReplicatedStorage.Modules.Player.EffectAttributes)
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+
+-- No stamina or buffs exist on the Lobby -- this HUD has nothing to show
+-- there.
+if not ServerRole.Is("GameServer") then
+	return
+end
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")

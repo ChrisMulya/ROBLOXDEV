@@ -19,16 +19,14 @@ local StimulusKinds = {
 	CameraFlash  = "CameraFlash",
 	Photographed = "Photographed",
 
-	-- Injected by a monster into ITSELF (Perception:Inject), never published to
-	-- the bus and never subscribed to -- it is not something that happens in
-	-- the world, it is a monster handing itself something to investigate.
-	--
-	-- Chase raises it on reaching a target's last known position and not
-	-- finding them there, so Check runs a real search of the area instead of
-	-- the monster standing on the spot for the rest of PursuitDuration.
-	-- Deliberately NOT gated by a capability: a monster that can chase can
-	-- always investigate where its target went, and requiring CanHear for that
-	-- would be nonsense.
+	-- Reserved, no raiser yet -- same graceful-gap pattern as Sound/Sprint
+	-- above. Intended for Perception:Inject (also currently uncalled): a
+	-- monster injecting this into ITSELF, never published to the bus and
+	-- never subscribed to, meaning "I reached where my target was and they
+	-- weren't there, go search." What Chase actually does today on that same
+	-- edge is call Targeting:Forget() directly, not raise this kind -- an
+	-- earlier version of this comment described the Inject path as live; it
+	-- was never wired up.
 	LostTarget   = "LostTarget",
 }
 

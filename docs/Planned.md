@@ -1,8 +1,19 @@
-# Planned — current project snapshot
+# Planned — historical snapshot (STALE — see MAINHANDOFF.md)
 
-Snapshot of where development stopped and what happens next.
-Source of truth: `MAINHANDOFF.md`. Roadmap: `~/.claude/plans/before-phase-8-perform-scalable-mochi.md`.
-Architecture invariants and environment gotchas (G1–G10) live in MAINHANDOFF — not repeated here.
+**This document is frozen at the "8V" milestone and is substantially out of
+date.** `MAINHANDOFF.md` is the source of truth for current state — this file
+predates roughly a dozen shipped phases (Monster AI, the Match layer,
+Objectives, Shop/Items, Exit, Reward System v2, the Lobby reduction, and
+more), all visible in the current codebase. Do not trust "Current Phase",
+"Next Session Plan", or the open items in "Technical Debt" below without
+cross-checking `MAINHANDOFF.md` and `git log` first — several specific claims
+here are confirmed wrong (see the inline corrections). The Development
+Summary / Current Architecture sections below are kept as history, not as
+live state.
+
+Roadmap: `~/.claude/plans/before-phase-8-perform-scalable-mochi.md` (may
+itself be stale for the same reason).
+Architecture invariants and environment gotchas (G1–G21) live in MAINHANDOFF — not repeated here.
 
 ---
 
@@ -135,7 +146,7 @@ on the Game place is deleted (confirmed gone on disk and in the live Studio data
 |---|---|---|---|
 | No DataStore session locking | Prefer a proven library over hand-rolling | Fast rejoin / server hop = last-write-wins clobber | Cheap gate (`IsReady` + confirmed `Save` + `MarkHandedOff`) in Phase 10; library migration is Phase 12 |
 | Client-supplied shot `origin` | Server-derived origin is its own phase | Spoofable shot position | Mitigated by `CaptureGuard`'s 10-stud proximity check. Revisit for ranked |
-| No encounter director | `MonsterBootstrap` was deleted, not replaced | `MonsterService.Spawn` has zero production callers; monsters are ProximityPrompt-triggered | **Phase 9** — new file + one `GameBoot` line, zero edits to existing files |
+| ~~No encounter director~~ **RESOLVED** | `MonsterBootstrap` was deleted, not replaced | — | `Monster/EncounterDirector.luau` exists, is booted (`MonsterFramework.Start()`), and is the real caller of `MonsterService.Spawn`. This row is stale; kept struck through rather than deleted so a reader doesn't wonder if it silently regressed |
 | `FlashEvents` server Signal, zero subscribers | Reserved for monster perception | Unexercised seam | Phase 9 is its natural first subscriber |
 | `RewardModifiers` registry, zero entries | The first entry should be a designed feature | Unproven Combo/Streak/Event seam | Deferred; right home for a per-mode reward multiplier |
 | `UITheme`/`UIBuilder` adopted by `CurrencyUI` only | Retrofit changes shipped screens | Six divergent greys across five files | Blocked on palette sign-off. **All new UI uses them from line one** |
@@ -160,19 +171,22 @@ on the Game place is deleted (confirmed gone on disk and in the live Studio data
 
 ---
 
-# Current Phase
+# Current Phase (STALE — see MAINHANDOFF.md "Phase")
 
-- **Roadmap phase:** 8V — published-build verification.
-- **Milestone:** prove the teleport round trip end to end on a real client.
-- **Immediate prerequisite:** publish both places. (The duplicate `Bootstrap` blocker and the
-  repo commit are already cleared — see below.)
-- **Gate:** 8V is the last remaining unknown-unknown (roadmap R-1). Phases 9, 10, 11 and 12
-  all sit behind it. **Do not start new gameplay features until 8V passes** — everything after
-  it is Studio-verifiable, so 8V is the only step that can still surprise the design.
+**This section is confirmed wrong and kept only as history.** It describes 8V
+as unrun and gates Phases 9–12 behind it. MAINHANDOFF describes the full
+queue → teleport → match → return loop as working end to end, and
+`EncounterDirector` (the Phase 9 deliverable this section names) already
+exists and is wired — so whatever gate this was describing has been cleared.
+`MAINHANDOFF.md`'s "Phase" section is the current, accurate description of
+where the project stands; it does not use this phase-number scheme.
 
 ---
 
-# Next Session Plan
+# Next Session Plan (STALE)
+
+**All numbered steps below are already done** (see the corrected "Current Phase"
+section above) — kept as history only, do not act on this as a task list.
 
 **Done this session:** repo reorganized into `Lobby/`/`Map0_Test/` (both live-syncing);
 duplicate top-level `Bootstrap` deleted and confirmed gone from the live Game-place
@@ -237,5 +251,6 @@ layout.
 - **File suffix encodes class.** `Foo.luau` = ModuleScript · `Foo.local.luau` = LocalScript ·
   `Foo.legacy.luau` = server Script (RunContext Legacy) · `init.luau` = folder-as-module.
   `.legacy.luau` files are **live and running**, never dead code.
-- **No Python on this machine.** PowerShell is the scripting fallback. Watch for
-  `$arr[0..-1]`, which returns the whole array rather than an empty one.
+- ~~**No Python on this machine.**~~ **Wrong, confirmed.** `python3` is available and has
+  been used this session for scripted file edits. PowerShell remains a fine fallback;
+  watch for `$arr[0..-1]`, which returns the whole array rather than an empty one.

@@ -16,14 +16,11 @@ local RewardCalculator = require(ReplicatedStorage.Modules.Reward.RewardCalculat
 local RewardLedger = require(script.Parent.RewardLedger)
 local CaptureGuard = require(script.Parent.CaptureGuard)
 
--- Lazy: MatchManager is Game-Server-only, and this module is currently
--- required on both places (see MAINHANDOFF's content-migration gap). A
--- top-level require would be inert either way (module scope has no role
--- assert), but resolving it only when actually gating on the Game Server
--- keeps that gap from becoming this file's problem to solve.
+-- Lazy: MatchManager is Game-Server-only. Fails closed off the Game Server --
+-- the Lobby has no active match to score against, so nothing scores there.
 local function isScoringActive(): boolean
 	if not ServerRole.Is("GameServer") then
-		return true
+		return false
 	end
 	local MatchManager = require(script.Parent.Parent.Match.MatchManager)
 	return MatchStates.IsScoringActive(MatchManager.Get())
@@ -111,7 +108,10 @@ function RewardService.Grant(player: Player, amounts: { [string]: number }, meta
 	return true
 end
 
--- context: { player, subject, shotQuality, distanceStuds, cameraId }
+-- context: { player, subject, shotQuality, distanceStuds, headDistanceStuds,
+-- cameraId }. distanceStuds (client-origin-based, reward band only) and
+-- headDistanceStuds (server-derived, what CaptureRules' MaxMeters/MinMeters
+-- gates actually read) are deliberately different values -- see CaptureRules.
 -- (context.subject is whatever PhotoCapture resolved -- re-resolved here
 -- rather than trusted, closing the raycast-to-award race where a subject is
 -- destroyed or detagged in between.)

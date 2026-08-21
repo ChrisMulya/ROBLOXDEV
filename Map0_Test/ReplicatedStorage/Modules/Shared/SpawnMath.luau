@@ -1,8 +1,7 @@
 -- Pure formulas for match-start spawn selection: adjusted spawn fraction,
 -- cash reward multiplier, and selected instance count. No state, no
 -- services -- shared verbatim by SpawnSelection and PickupHandlers/Cash so
--- both derive the same numbers from the same inputs. See
--- plans/create-a-read-only-blueprint-plan-agile-possum.md for the design.
+-- both derive the same numbers from the same inputs.
 
 local SpawnMath = {}
 

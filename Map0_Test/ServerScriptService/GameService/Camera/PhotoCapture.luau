@@ -3,7 +3,9 @@
 -- hooks attach to -- callers get back a result table, not a print statement.
 --
 -- Detection is angular candidate selection -> geometry proof -> line-of-sight
--- confirm (see plans/photo-capture-detection.md). The aim cone half-angle is
+-- confirm (the plan this shipped against, plans/photo-capture-detection.md,
+-- no longer exists on disk -- this file and its own comments are the only
+-- remaining source). The aim cone half-angle is
 -- byte-identical to the old 5x5 grid's outer ring (atan(2 * spreadRadius)) --
 -- every accuracy gain comes from removing false negatives INSIDE that cone,
 -- never from widening it. USE_CONE_DETECTION gates the new path so the

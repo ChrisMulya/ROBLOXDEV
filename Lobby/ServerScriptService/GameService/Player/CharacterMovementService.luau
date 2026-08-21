@@ -28,8 +28,25 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerStats = require(ReplicatedStorage.Modules.PlayerStats)
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
 local PlayerEffects = require(script.Parent.PlayerEffects)
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+local Cooldown = require(ReplicatedStorage.Modules.Shared.Cooldown)
 
 local CharacterMovementService = {}
+
+-- Lobby mode: sprint is free (no stamina resource exists there), so the
+-- stamina gate, the drain/regen loop, and the sync remote all become no-ops.
+-- WalkSpeed authority itself stays live on both places -- see the file header
+-- for why that can never be dropped.
+local isLobby = ServerRole.Is("LobbyServer")
+
+-- SprintRequest's own no-op branch (see onSprintRequest below) used to sync
+-- unconditionally on every duplicate request -- one FireClient + two
+-- Player-attribute writes, both broadcast to every client, with no server-
+-- side ceiling on how often a client could ask. Throttles the correction to
+-- 2/sec/player; the regular SYNC_INTERVAL sweep already re-syncs everyone
+-- every 100ms regardless, so this only removes redundant *extra* syncs, not
+-- the correction itself.
+local noopSyncCooldown = Cooldown.new(0.5)
 
 -- Slack above the target speed. The client's accel lerp, slopes, and knockback
 -- all overshoot the nominal top speed by a stud or two; without headroom the
@@ -79,6 +96,10 @@ local function applyBudget(player: Player, entry: Entry)
 end
 
 local function syncPlayer(player: Player, entry: Entry)
+	-- No stamina resource on the Lobby: nothing to sync, nothing to mirror.
+	if isLobby then
+		return
+	end
 	staminaRemote:FireClient(player, {
 		stamina = entry.stamina,
 		maxStamina = PlayerEffects.GetStat(player, "MaxStamina"),
@@ -101,9 +122,14 @@ local function syncPlayer(player: Player, entry: Entry)
 	-- Mirrored to an attribute purely for observability: stamina lived only in
 	-- this module's private table, so "is the server actually regenerating?"
 	-- was unanswerable from Studio without adding print statements. Nothing
-	-- reads this -- the HUD goes through StaminaSync.
-	player:SetAttribute("Stamina", entry.stamina)
-	player:SetAttribute("Sprinting", entry.sprinting)
+	-- reads this -- the HUD goes through StaminaSync. Player attributes
+	-- replicate to every client, so on a live server this was 40 broadcast
+	-- writes/sec for a value with zero readers -- Studio-only now, since that
+	-- is the only place anything ever looked at it.
+	if RunService:IsStudio() then
+		player:SetAttribute("Stamina", entry.stamina)
+		player:SetAttribute("Sprinting", entry.sprinting)
+	end
 end
 
 -- ItemUseService's movement hold. Cleared unconditionally on every session
@@ -230,14 +256,25 @@ local function onSprintRequest(player: Player, wantsSprint: any, requestId: any)
 		entry.requestId = requestId
 	end
 
-	local granted = wantsSprint and entry.stamina >= PlayerStats.MinStaminaToSprint
+	-- Lobby: the request path stays the same shape, but there's no stamina
+	-- budget to check against -- wanting to sprint is enough.
+	local granted = wantsSprint and (isLobby or entry.stamina >= PlayerStats.MinStaminaToSprint)
 	if entry.sprinting == granted then
 		-- A DENIED request is this branch, not a no-op: sprinting was already
 		-- false and stays false. The client still has to hear the "no" --
 		-- its own stamina copy is up to SYNC_INTERVAL stale, so it can read
 		-- above MinStaminaToSprint and locally grant itself a sprint the
-		-- server just refused. Syncing here is what corrects that.
-		syncPlayer(player, entry)
+		-- server just refused. Syncing here is what corrects that faster than
+		-- the periodic sweep below would.
+		--
+		-- Throttled: nothing stops a client sending this exact request in a
+		-- tight loop, and every hit used to sync unconditionally. Skipping an
+		-- occasional correction here is safe -- the SYNC_INTERVAL sweep at the
+		-- bottom of step() re-syncs every entry every 100ms regardless, so the
+		-- worst case is a 500ms-late correction, not a stuck one.
+		if noopSyncCooldown:Check(player.UserId) then
+			syncPlayer(player, entry)
+		end
 		return
 	end
 	entry.sprinting = granted
@@ -260,23 +297,28 @@ local function step(dt: number)
 		end
 
 		local wasSprinting = entry.sprinting
-		if entry.sprinting then
-			-- Standing still while holding sprint costs nothing, same rule the
-			-- client used before this moved server-side -- but after
-			-- StaminaIdleRegenDelay of not moving, regen anyway rather than
-			-- leaving a player who stopped stuck at whatever they had left.
-			if moving then
-				entry.stamina -= PlayerStats.StaminaDrainRate * dt
-			elseif entry.idleTime >= PlayerStats.StaminaIdleRegenDelay then
+		-- Lobby: entry.sprinting was already granted unconditionally in
+		-- onSprintRequest above, and stays granted -- no budget to drain, so no
+		-- drain, regen, or forced-off-at-zero to run.
+		if not isLobby then
+			if entry.sprinting then
+				-- Standing still while holding sprint costs nothing, same rule the
+				-- client used before this moved server-side -- but after
+				-- StaminaIdleRegenDelay of not moving, regen anyway rather than
+				-- leaving a player who stopped stuck at whatever they had left.
+				if moving then
+					entry.stamina -= PlayerStats.StaminaDrainRate * dt
+				elseif entry.idleTime >= PlayerStats.StaminaIdleRegenDelay then
+					entry.stamina += PlayerStats.StaminaRegenRate * dt
+				end
+				if entry.stamina <= 0 then
+					entry.sprinting = false
+				end
+			else
 				entry.stamina += PlayerStats.StaminaRegenRate * dt
 			end
-			if entry.stamina <= 0 then
-				entry.sprinting = false
-			end
-		else
-			entry.stamina += PlayerStats.StaminaRegenRate * dt
+			entry.stamina = math.clamp(entry.stamina, 0, PlayerEffects.GetStat(player, "MaxStamina"))
 		end
-		entry.stamina = math.clamp(entry.stamina, 0, PlayerEffects.GetStat(player, "MaxStamina"))
 
 		-- Called every tick, not just on a sprint toggle: WalkSpeed/SprintSpeed
 		-- are buffable now (Pills, Adrenaline Shot), so the budget can change

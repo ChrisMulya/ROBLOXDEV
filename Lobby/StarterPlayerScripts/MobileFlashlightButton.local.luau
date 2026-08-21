@@ -21,6 +21,15 @@ local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 
+-- Deliberately relaxes the "requires nothing" sandbox property (see header):
+-- FlashlightService only exists on a Game Server, so this has nothing to
+-- toggle on the Lobby. ServerRole -> PlaceIds is a two-module leaf chain,
+-- nothing else.
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+if not ServerRole.Is("GameServer") then
+	return
+end
+
 local remotesFolder = ReplicatedStorage:WaitForChild("Remotes")
 local toggleRemote = remotesFolder:WaitForChild("FlashlightRequest")
 

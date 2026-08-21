@@ -20,11 +20,13 @@ local CaptureGuard = {}
 -- Instance:GetDebugId() looked like a fit but requires plugin capability and
 -- can't be called from a normal runtime Script.
 --
--- Currently unreachable in practice: both shipped CaptureTargets entries set
--- RepeatPolicy = "Unlimited". Kept, not deleted -- re-enabling per-subject
--- farming protection later is a config flip (RepeatPolicy = "Cooldown"), not
--- a re-implementation. See REWARD_SYSTEM.md for the accepted economic
--- tradeoff of shipping this off.
+-- LIVE: both shipped CaptureTargets entries (Monster, Objective) set
+-- RepeatPolicy = "Cooldown" as of Phase 8.5, so this table is populated on
+-- every real capture. (An earlier version of this comment said the opposite
+-- -- "Unlimited", "currently unreachable" -- that was true before 8.5 and is
+-- corrected here; REWARD_SYSTEM.md carried the same stale claim.) Extending
+-- Cooldown-gated protection to a future target type is still a one-line
+-- config flip, not a re-implementation -- that part remains true.
 local lastCaptureTime = {}
 
 Players.PlayerRemoving:Connect(function(player)
@@ -66,9 +68,15 @@ function CaptureGuard.ValidateShot(player: Player, origin: Vector3, direction: V
 	return validateOrigin(player, origin)
 end
 
--- Re-derives shot quality server-side from the character's actual movement
--- state instead of trusting which remote (Weak/Strong) the client fired. A
--- client claiming Strong while moving is downgraded to Weak, never upgraded.
+-- Re-derives shot quality server-side from the character's REPLICATED
+-- movement state instead of trusting which remote (Weak/Strong) the client
+-- fired. An honest client claiming Strong while moving is downgraded to Weak,
+-- never upgraded. Accepted risk, not a hard guarantee: MoveDirection/
+-- AssemblyLinearVelocity/HumanoidState are all properties the client's own
+-- character owns and replicates, so a modified client can report stillness
+-- while actually moving and keep Strong. See CameraShotHandler's call site
+-- for the full posture and REWARD_SYSTEM.md for the equivalent, already-
+-- documented origin-trust risk this shares its shape with.
 function CaptureGuard.ResolveShotQuality(player: Player, requestedQuality: string, cameraId: string): string
 	if requestedQuality ~= "Strong" then
 		return requestedQuality

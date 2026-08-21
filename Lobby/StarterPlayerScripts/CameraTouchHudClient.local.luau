@@ -8,6 +8,12 @@ local CameraTouchHud = require(ReplicatedStorage.Modules.Camera.CameraTouchHud)
 local CameraToolController = require(ReplicatedStorage.Modules.Camera.CameraToolController)
 local CameraSession = require(ReplicatedStorage.Modules.Camera.CameraSession)
 local CameraState = require(ReplicatedStorage.Modules.Camera.CameraState)
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+
+-- No lobby player ever holds a camera Tool, so there is no touch HUD to wire.
+if not ServerRole.Is("GameServer") then
+	return
+end
 
 local function onOpenPressed()
 	local tool = CameraToolController.GetEquipped()

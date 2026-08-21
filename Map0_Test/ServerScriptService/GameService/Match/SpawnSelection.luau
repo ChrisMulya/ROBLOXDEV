@@ -18,8 +18,11 @@
 -- Document itself -- adding a category is a data change in those two
 -- modules, never a change here.
 --
--- See plans/create-a-read-only-blueprint-plan-agile-possum.md for the full
--- design and edge-case rationale.
+-- The plan this was designed against (plans/create-a-read-only-blueprint-
+-- plan-agile-possum.md) no longer exists on disk -- don't go looking for it.
+-- Whatever edge-case rationale it held beyond what's inline in this file is
+-- lost; treat the code and MatchDifficulty/SpawnMath's own comments as the
+-- only remaining source.
 
 local ServerStorage = game:GetService("ServerStorage")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

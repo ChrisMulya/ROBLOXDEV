@@ -140,9 +140,12 @@ end
 --
 -- Perception is the sole writer of Stimuli/LastStimulus, so callers go through
 -- here instead of touching the keys -- the same ownership rule Targeting
--- enforces for Target via Request/Clear/Forget. Chase uses it to convert "they
--- were here and now they are not" into a searchable position; the blueprint's
--- ScriptedSensor (director-injected set pieces) is the other intended caller.
+-- enforces for Target via Request/Clear/Forget. Reserved, zero callers today:
+-- "they were here and now they are not" is instead handled by
+-- Targeting:Forget (Chase does NOT call this, despite an earlier version of
+-- this comment saying it did). The intended future caller is the blueprint's
+-- ScriptedSensor (director-injected set pieces), which does not exist yet
+-- either.
 function Perception:Inject(kind: string, position: Vector3, strength: number?)
 	self:_absorb({ {
 		Kind      = kind,

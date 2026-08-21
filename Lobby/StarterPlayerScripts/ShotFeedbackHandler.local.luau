@@ -8,6 +8,14 @@ local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
 
 local ShotFeedback = Remotes.Get("ShotFeedback")
 
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+
+-- CameraShotHandler never fires ShotFeedback off the Game Server -- nothing
+-- for this renderer to listen for on the Lobby.
+if not ServerRole.Is("GameServer") then
+	return
+end
+
 local SHOT_COLORS = {
 	Strong = Color3.fromRGB(85, 255, 127),
 	Weak = Color3.fromRGB(255, 200, 85),

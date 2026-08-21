@@ -22,13 +22,27 @@ CaptureRules.Register("RequireShotQuality", function(context, ruleSpec)
 	return context.shotQuality == ruleSpec.Value
 end)
 
+-- MaxMeters/MinMeters read headDistanceStuds, NOT distanceStuds -- these are
+-- hard eligibility cutoffs, and distanceStuds is measured from the client-
+-- reported shot origin (CaptureGuard bounds it to +-10 studs, an accepted
+-- economy-only risk; see REWARD_SYSTEM.md). A gate built on that value
+-- widens by the same slack -- 15m became an effective 18.33m. headDistanceStuds
+-- is measured server-side from the player's own Head, so a rule gate can't be
+-- widened by a spoofed origin. Fails closed (rejects) if it's ever missing,
+-- rather than falling back to the client-influenced value.
 CaptureRules.Register("MaxMeters", function(context, ruleSpec)
+	if context.headDistanceStuds == nil then
+		return false
+	end
 	-- Inclusive: exactly the threshold still passes ("distance <= 15m").
-	return Units.StudsToMeters(context.distanceStuds) <= ruleSpec.Value
+	return Units.StudsToMeters(context.headDistanceStuds) <= ruleSpec.Value
 end)
 
 CaptureRules.Register("MinMeters", function(context, ruleSpec)
-	return Units.StudsToMeters(context.distanceStuds) >= ruleSpec.Value
+	if context.headDistanceStuds == nil then
+		return false
+	end
+	return Units.StudsToMeters(context.headDistanceStuds) >= ruleSpec.Value
 end)
 
 -- Generic equality gate against any field a context provider placed on the

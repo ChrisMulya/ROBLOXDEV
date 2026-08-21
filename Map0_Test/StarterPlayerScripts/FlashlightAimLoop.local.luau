@@ -20,6 +20,15 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+-- Deliberately relaxes the "requires nothing" sandbox property (see header):
+-- FlashlightService only exists on a Game Server, so there is nothing to
+-- report aim to on the Lobby. ServerRole -> PlaceIds is a two-module leaf
+-- chain, nothing else.
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+if not ServerRole.Is("GameServer") then
+	return
+end
+
 -- Mirrors FlashlightAim.SEND_RATE.
 local SEND_RATE = 1 / 30
 

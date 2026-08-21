@@ -13,6 +13,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ContextActionService = game:GetService("ContextActionService")
 
+-- Deliberately relaxes the "requires nothing" sandbox property (see header):
+-- FlashlightService only exists on a Game Server, so this needs to know it's
+-- on one before binding F at all. ServerRole -> PlaceIds is a two-module leaf
+-- chain, nothing else.
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+if not ServerRole.Is("GameServer") then
+	return
+end
+
 local remotesFolder = ReplicatedStorage:WaitForChild("Remotes")
 local toggleRemote = remotesFolder:WaitForChild("FlashlightRequest")
 

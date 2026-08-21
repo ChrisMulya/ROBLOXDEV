@@ -75,7 +75,11 @@ function LoadoutService.Load(player: Player)
 
 	-- ok with nil data is a genuinely new player, not an error.
 	local cameraId = data
-	sessions[player.UserId] = { state = "Ready", cameraId = cameraId }
+	-- persistedCameraId seeds Save's dirty check below with what the backend
+	-- actually holds right now, so re-picking the same camera the player
+	-- already had loaded skips the DataStore round-trip on the very first
+	-- pick too, not just the second.
+	sessions[player.UserId] = { state = "Ready", cameraId = cameraId, persistedCameraId = cameraId }
 
 	if cameraId and player.Parent then
 		player:SetAttribute("CurrentCamera", cameraId)
@@ -116,17 +120,38 @@ end
 function LoadoutService.Save(player: Player, cameraId: string): boolean
 	local session = sessions[player.UserId]
 	if session then
+		-- Dirty check: skip the DataStore round-trip when this exact value is
+		-- already what the backend holds. Compared against persistedCameraId,
+		-- NOT the cameraId field below -- a prior failed save must still
+		-- retry on the next identical pick, or the warned "will not survive a
+		-- teleport/rejoin" state becomes permanent for that value.
+		--
+		-- This matters on the Lobby specifically: no player there ever has a
+		-- Camera slot (see CameraShelfSwap), so every pick -- including a
+		-- re-pick of the same camera -- used to take this unconditional path.
+		-- At the shelf's 0.5s request cooldown that is 2 SetAsync/s/player,
+		-- against Roblox's 60 + 10*players budget (100/min at 4 players) --
+		-- enough to throttle RewardStore's own saves, including the forced
+		-- pre-teleport one in RewardLaunchHook.
+		if session.persistedCameraId == cameraId then
+			session.cameraId = cameraId
+			session.state = "Ready"
+			return true
+		end
 		session.cameraId = cameraId
 		session.state = "Ready"
 	else
-		sessions[player.UserId] = { state = "Ready", cameraId = cameraId }
+		session = { state = "Ready", cameraId = cameraId }
+		sessions[player.UserId] = session
 	end
 
 	local ok = attempt(function()
 		LoadoutService.Backend:SetAsync(keyFor(player), cameraId)
 	end)
 
-	if not ok then
+	if ok then
+		session.persistedCameraId = cameraId
+	else
 		warn(("LoadoutService: failed to save %s's camera choice -- attribute still updated, will not survive a teleport/rejoin until the next successful save"):format(player.Name))
 	end
 

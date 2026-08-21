@@ -20,12 +20,12 @@ local MonsterEvolution = require(script.Parent.MonsterEvolution)
 
 local MonsterService = {}
 
--- Lazy for the same reason as RewardService's isScoringActive: this module is
--- reachable from both places (content-migration gap) and MatchManager is
--- Game-Server-only.
+-- Lazy: MatchManager is Game-Server-only. Fails closed off the Game Server;
+-- MonsterFramework.Start() already asserts GameServer so this is belt-and-
+-- braces, not the only guard.
 local function monstersCanSpawn(): boolean
 	if not ServerRole.Is("GameServer") then
-		return true
+		return false
 	end
 	local MatchManager = require(script.Parent.Parent.Match.MatchManager)
 	return MatchStates.MonstersSpawn(MatchManager.Get())

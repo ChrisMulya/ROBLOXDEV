@@ -24,6 +24,17 @@ local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
 local FlashlightAim = require(ReplicatedStorage.Modules.Player.FlashlightAim)
 local PlayerEffects = require(script.Parent.PlayerEffects)
+local Cooldown = require(ReplicatedStorage.Modules.Shared.Cooldown)
+
+-- Neither remote had a server-side rate ceiling before this -- each toggle
+-- creates/destroys three Instances (emitter, SpotLight, PointLight)
+-- replicated to every client, and each aim report is a replicated CFrame
+-- write. Client callers debounce naturally (a keypress, a 30Hz loop) but that
+-- was never a security control. aimCooldown reuses FlashlightAim.SEND_RATE so
+-- the server actually enforces the budget the module's own header documents,
+-- rather than trusting the client's copy of the same constant.
+local toggleCooldown = Cooldown.new(0.25)
+local aimCooldown = Cooldown.new(FlashlightAim.SEND_RATE)
 
 local FlashlightService = {}
 
@@ -81,6 +92,10 @@ local function poseEmitter(player: Player, emitter: BasePart)
 end
 
 local function toggleFlashlight(player: Player)
+	if not toggleCooldown:Check(player.UserId) then
+		return
+	end
+
 	local character = player.Character
 	local head = character and character:FindFirstChild("Head")
 	if not head or not head:IsA("BasePart") then
@@ -152,6 +167,9 @@ local function toggleFlashlight(player: Player)
 end
 
 local function onAimReport(player: Player, lookDirection: any)
+	if not aimCooldown:Check(player.UserId) then
+		return
+	end
 	if typeof(lookDirection) ~= "Vector3" then
 		return
 	end

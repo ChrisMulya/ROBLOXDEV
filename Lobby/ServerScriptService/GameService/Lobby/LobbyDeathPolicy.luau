@@ -15,7 +15,13 @@ local RemoveAllSlot = require(script.Parent.Parent.Player.EndGame)
 local LobbyDeathPolicy = {}
 
 local function onCharacterAdded(player: Player)
-	if PlayerStateService.Is(player, "Dead") then
+	-- Disconnected alongside Dead: a player who left and rejoined THIS same
+	-- Lobby server lands here still marked Disconnected (PlayerStateService
+	-- retains that entry on PlayerRemoving by design -- see its own header --
+	-- and nothing else on the Lobby ever moves them back to Alive). Both are
+	-- legal transitions to Alive (PlayerStates.Transitions), and a spawned
+	-- character is unambiguously alive either way.
+	if PlayerStateService.Is(player, "Dead") or PlayerStateService.Is(player, "Disconnected") then
 		PlayerStateService.Set(player, "Alive", "CharacterAdded")
 	end
 end

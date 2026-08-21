@@ -216,7 +216,14 @@ end
 local function main()
 	if ServerRole.Is("LobbyServer") then
 		-- The Lobby provisions this curtain purely to keep ReplicatedFirst
-		-- identical across trees -- nothing there ever gates on it.
+		-- identical across trees -- nothing there ever gates on it. Wait for
+		-- the real curtain by name first: both this module and
+		-- LoadingCurtain.local.luau yield on PlayerGui, so the ordering
+		-- between them isn't guaranteed. Without this wait, a ClientBootstrap
+		-- win would let LoadingHud.ensureGui() BUILD a second curtain and hide
+		-- that one, leaving ReplicatedFirst's real curtain stuck on screen --
+		-- the exact bug this branch exists to prevent.
+		player:WaitForChild("PlayerGui"):WaitForChild("LoadingCurtainGui", 5)
 		LoadingHud.HideInstant()
 		return
 	end

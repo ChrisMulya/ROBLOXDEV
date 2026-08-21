@@ -31,6 +31,12 @@ local PlayerRuntimeStats = require(ReplicatedStorage.Modules.PlayerRuntimeStats)
 local PlayerStats = require(ReplicatedStorage.Modules.PlayerStats)
 local UIBuilder = require(ReplicatedStorage.Modules.UI.UIBuilder)
 local UITheme = require(ReplicatedStorage.Modules.UI.UITheme)
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+
+-- No stamina resource on the Lobby -- sprint is free there, nothing to arm.
+if not ServerRole.Is("GameServer") then
+	return
+end
 
 -- There is deliberately NO early return gating on device type here: the touch
 -- test is per-frame (TouchSession.IsActive) and this script always stays

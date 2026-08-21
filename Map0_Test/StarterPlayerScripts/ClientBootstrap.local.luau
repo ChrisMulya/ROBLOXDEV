@@ -7,20 +7,16 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-require(ReplicatedStorage.Modules.Flash.FlashRenderers)
-require(ReplicatedStorage.Modules.Objective.ObjectiveVisualsController)
--- Pickup visuals (idle spin + light pillar) are purely cosmetic and place-
--- agnostic -- boots on both places, regardless of match state. The
--- ProximityPrompt and any actual grant stay Game-place + active-match gated
--- server-side (PickupRegistry/PickupService/PickupHandlers), so a pickup
--- placed on the Lobby spins and glows but is never interactable and never
--- pays out.
-require(ReplicatedStorage.Modules.Pickup.PickupVisualsController)
-
 -- Mirrors the server-side role branch in Bootstrap.legacy.luau.
 local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
 
 if ServerRole.Is("LobbyServer") then
+	-- First in the branch: this is what clears the ReplicatedFirst loading
+	-- curtain on the Lobby (LoadingController.main's LobbyServer path). Until
+	-- it runs the player is looking at an opaque black screen -- same
+	-- first-for-its-side-effects convention as LoadingController itself in
+	-- the GameServer branch below.
+	require(ReplicatedStorage.Modules.UI.LoadingController)
 	require(ReplicatedStorage.Modules.UI.MatchReceiptController)
 	require(ReplicatedStorage.Modules.Queue.QueueController)
 	require(ReplicatedStorage.Modules.Queue.QueuePadDisplay)
@@ -30,6 +26,12 @@ elseif ServerRole.Is("GameServer") then
 	-- ControlLock immediately on require, so no other controller below can
 	-- plausibly grab input before the curtain has a chance to lock it.
 	require(ReplicatedStorage.Modules.UI.LoadingController)
+	-- Photo flash visuals, the objective HUD, and pickup visuals (idle spin +
+	-- light pillar) are all match content -- no photos, objectives, or
+	-- pickups exist on the Lobby, so these only boot on a Game Server now.
+	require(ReplicatedStorage.Modules.Flash.FlashRenderers)
+	require(ReplicatedStorage.Modules.Objective.ObjectiveVisualsController)
+	require(ReplicatedStorage.Modules.Pickup.PickupVisualsController)
 	require(ReplicatedStorage.Modules.UI.DeathScreenController)
 	require(ReplicatedStorage.Modules.Spectate.SpectateController)
 	require(ReplicatedStorage.Modules.UI.MatchReceiptController)

@@ -95,6 +95,19 @@ local function investigationConfig(instance)
 	return instance.config.Investigation or {}
 end
 
+-- SearchPointCooldown lives under Config.Investigation; a helper since
+-- multiple call sites (searchpoint stuck, scan finished, Exit-on-interrupt,
+-- beginInvestigation's own interrupt cleanup) all need the same duration.
+-- Declared here, ahead of beginInvestigation below, rather than in its
+-- original position further down the file -- a `local function` is only a
+-- valid upvalue for closures defined AFTER it textually; beginInvestigation
+-- calling this while it was still declared below would have resolved to a
+-- nil global, not this function.
+local function cooldownDuration(instance): number
+	local cfg = investigationConfig(instance)
+	return cfg.InvestigationSearchPointCooldown or MonsterConstants.DefaultInvestigationSearchPointCooldown
+end
+
 -- How long a given investigation Reason stays worth grading, mirroring the
 -- window Investigation itself already gates candidates against -- kept in
 -- sync here only for the recency curve, not for eligibility: eligibility is
@@ -123,13 +136,26 @@ local function beginInvestigation(instance, navigation, memory, investigationAt:
 	memory.searchPoint = nil
 	memory.pauseUntil = nil
 	-- SearchPoint / scan / linger bookkeeping. Reset on every entry into a
-	-- (re)started investigation -- Check.Exit already cancelled any live scan
-	-- and cooled down any in-progress SearchPoint before this ever runs
-	-- again, so there is nothing to preserve.
+	-- (re)started investigation. NOT always preceded by Exit -- Check.Update's
+	-- mid-investigation restart branch below calls this directly while a scan
+	-- or SearchPoint may still be live, so this must do its own cancel/cooldown
+	-- rather than assume Exit already did. An orphaned VisualScan never
+	-- restores humanoid.AutoRotate on its own -- only Cancel()/Tick-completion
+	-- do -- so skipping this left the monster permanently welded to whatever
+	-- heading the interrupted scan last held, blind in its direction of travel.
 	memory.searchPointsUsed = 0
+
+	if memory.scan then
+		memory.scan:Cancel()
+	end
+	memory.scan = nil
+
+	if memory.currentSearchPoint then
+		memory.searchPointCooldowns[memory.currentSearchPoint] = os.clock() + cooldownDuration(instance)
+	end
 	memory.currentSearchPoint = nil
 	memory.currentSearchPointPosition = nil
-	memory.scan = nil
+
 	memory.lingerUntil = nil
 	memory.lingerCenter = nil
 	-- PatrolPoint relocation bookkeeping (Visual only).
@@ -158,14 +184,6 @@ local function beginInvestigation(instance, navigation, memory, investigationAt:
 	else
 		memory.phase = "travel"
 	end
-end
-
--- SearchPointCooldown lives under Config.Investigation; a helper since
--- multiple call sites (searchpoint stuck, scan finished, Exit-on-interrupt)
--- all need the same duration.
-local function cooldownDuration(instance): number
-	local cfg = investigationConfig(instance)
-	return cfg.InvestigationSearchPointCooldown or MonsterConstants.DefaultInvestigationSearchPointCooldown
 end
 
 local function patrolPointCooldownDuration(instance): number

@@ -11,8 +11,7 @@
 --
 -- CashRewardScaling is a separate concept from SpawnFraction: it scales the
 -- VALUE of a Cash pickup (consumed by PickupHandlers/Cash), never the count
--- of Cash pickups selected to spawn. Do not conflate the two -- see
--- plans/create-a-read-only-blueprint-plan-agile-possum.md section 4.
+-- of Cash pickups selected to spawn. Do not conflate the two.
 
 local MatchDifficulty = {}
 

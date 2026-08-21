@@ -2,6 +2,20 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ProximityPromptService = game:GetService("ProximityPromptService")
 local Players = game:GetService("Players")
 
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+
+-- Cameras are purchased and swapped ONLY on the Lobby by design (Phase 11's
+-- read-only-on-Game loadout depends on that staying true -- see
+-- docs/Planned.md). Every other self-wiring .legacy.luau Script in this repo
+-- is role-gated except this one was; if an IsCameraShelf part were ever
+-- placed on the Game place, this would have let a mid-match swap through
+-- CameraShelfSwap's real CameraInventory.Give path (the Lobby's own
+-- PreferenceSaved branch never applies there, since Game-place players do
+-- have a Camera slot).
+if not ServerRole.Is("LobbyServer") then
+	return
+end
+
 local Cooldown = require(ReplicatedStorage.Modules.Shared.Cooldown)
 local CameraShelfSwap = require(script.Parent.CameraShelfSwap)
 local Remotes = require(ReplicatedStorage.Modules.Shared.Remotes)
@@ -13,6 +27,12 @@ local CameraShelfResult = Remotes.Get("CameraShelfResult")
 
 local MAX_INTERACT_DISTANCE = 12 -- studs; generous margin over the ProximityPrompt's own activation range
 local requestCooldown = Cooldown.new(0.5)
+
+-- PromptTriggered has no cooldown or distance check of its own -- the prompt
+-- normally throttles this, but nothing here re-verifies it server-side, so a
+-- modified client re-arming shelfOpenFor at will was one FireClient per
+-- trigger with no ceiling.
+local promptCooldown = Cooldown.new(0.5)
 
 -- Separate from requestCooldown: the "no open shelf" warn below fires before
 -- requestCooldown is ever checked, so a client spamming TakeCameraRequest
@@ -31,6 +51,18 @@ end
 ProximityPromptService.PromptTriggered:Connect(function(prompt, player)
 	local part = prompt.Parent
 	if not isShelfPart(part) then
+		return
+	end
+
+	if not promptCooldown:Check(player.UserId) then
+		return
+	end
+
+	local character = player.Character
+	local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+	local tooFar = not rootPart
+		or (rootPart.Position - (part :: BasePart).Position).Magnitude > MAX_INTERACT_DISTANCE
+	if tooFar then
 		return
 	end
 

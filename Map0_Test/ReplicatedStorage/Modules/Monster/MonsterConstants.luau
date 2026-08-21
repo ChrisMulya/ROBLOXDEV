@@ -266,13 +266,6 @@ MonsterConstants.AggressionLevels = {
 	{ Name = "Low",    Min = 0 },
 }
 
--- Debug-only Blackboard write guard. When true, MonsterInstance wraps the
--- blackboard in a __newindex proxy that rejects writes to keys no component
--- declared in Component.Writes. Off in production: the proxy costs a metamethod
--- call on every write, and the construction-time duplicate-writer assertion
--- (which is free) already catches the static case.
-MonsterConstants.StrictBlackboard = false
-
 -- Warns whenever a path computation fails and the monster falls back to
 -- walking straight at its target, which is what "it stops chasing at range"
 -- usually turns out to be: the straight line runs into geometry. Off by

@@ -22,6 +22,12 @@ local TouchSession = require(ReplicatedStorage.Modules.Shared.TouchSession)
 local ControlLock = require(ReplicatedStorage.Modules.Shared.ControlLock)
 local ItemUseHud = require(ReplicatedStorage.Modules.Item.ItemUseHud)
 local CCTVViewController = require(ReplicatedStorage.Modules.Item.CCTVViewController)
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+
+-- ItemUseService is Game-place-only -- no items exist to use on the Lobby.
+if not ServerRole.Is("GameServer") then
+	return
+end
 
 local itemUseRequest = Remotes.Get("ItemUseRequest")
 local itemUseState = Remotes.Get("ItemUseState")

@@ -18,15 +18,15 @@ local CORE_FLAGS = {
 MatchPhases.Order = { "Dusk", "Night", "DeepNight", "Dawn" }
 
 MatchPhases.Phases = {
-	Dusk = { StartHour = 16, MonsterStage = 1, MonstersAggressive = false, ExtractionOpen = false },
+	Dusk = { StartHour = 18, MonsterStage = 1, MonstersAggressive = false, ExtractionOpen = false },
 	Night = { StartHour = 19, MonsterStage = 1, MonstersAggressive = true, ExtractionOpen = false },
 	DeepNight = { StartHour = 24, MonsterStage = 2, MonstersAggressive = true, ExtractionOpen = false },
 	Dawn = { StartHour = 28, MonsterStage = 2, MonstersAggressive = true, ExtractionOpen = true },
 }
 
 -- Match-time bar fill colours, as their own ordered band list. Hours are
--- unwrapped on the same scale as Phases.StartHour: the match starts at 16 and
--- counts up, so 27 is 3am.
+-- unwrapped on the same scale as Phases.StartHour: the Default schedule
+-- starts at 18 and counts up, so 27 is 3am.
 --
 -- These bands deliberately do NOT reuse the phase boundaries. Green and purple
 -- happen to land on Dusk and Night, but red starts at 27 (3am) while Dawn
@@ -36,14 +36,14 @@ MatchPhases.Phases = {
 MatchPhases.BarColorOrder = { "Evening", "Night", "Dawn" }
 
 MatchPhases.BarColors = {
-	Evening = { StartHour = 16, Color = Color3.fromRGB(76, 209, 111) },
+	Evening = { StartHour = 18, Color = Color3.fromRGB(76, 209, 111) },
 	Night = { StartHour = 19, Color = Color3.fromRGB(150, 96, 224) },
 	Dawn = { StartHour = 27, Color = Color3.fromRGB(224, 74, 74) },
 }
 
 -- Same "last band whose StartHour <= hour" scan FromHour uses. Hours below the
--- first band (only reachable if a schedule starts before 4pm) take the first
--- colour rather than falling through to nil.
+-- first band (only reachable if a schedule starts before the Default's 6pm)
+-- take the first colour rather than falling through to nil.
 function MatchPhases.BarColorFromHour(hour: number): Color3
 	local result = MatchPhases.BarColors[MatchPhases.BarColorOrder[1]]
 	for _, bandName in ipairs(MatchPhases.BarColorOrder) do
@@ -117,7 +117,7 @@ function MatchPhases.Validate()
 
 	-- Bar colours get the same ascending-order check, plus one tie to the phase
 	-- table: the first colour band must start when the first phase does, so a
-	-- schedule that no longer starts at 4pm fails here instead of drawing the
+	-- schedule that changes its start hour fails here instead of drawing the
 	-- first minutes of the match with no band covering them.
 	local previousBandStart = -math.huge
 	for _, bandName in ipairs(MatchPhases.BarColorOrder) do

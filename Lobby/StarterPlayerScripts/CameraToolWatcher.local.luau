@@ -7,6 +7,13 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CameraToolController = require(ReplicatedStorage.Modules.Camera.CameraToolController)
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+
+-- No lobby player ever holds a camera Tool (see CameraShelfSwap -- the
+-- shelf is preference-only there), so there is nothing to bind to.
+if not ServerRole.Is("GameServer") then
+	return
+end
 
 local player = Players.LocalPlayer
 

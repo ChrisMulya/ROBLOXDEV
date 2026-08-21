@@ -7,6 +7,15 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 
+local ServerRole = require(ReplicatedStorage.Modules.Shared.ServerRole)
+
+-- Photo shots only ever pay out on a Game Server (RewardService fails closed
+-- off it anyway) -- refusing to even wire the remotes here means the Lobby
+-- never runs the raycast at all, not just never scores it.
+if not ServerRole.Is("GameServer") then
+	return
+end
+
 local CameraStats = require(ReplicatedStorage.Modules.Camera.CameraStats)
 local Cooldown = require(ReplicatedStorage.Modules.Shared.Cooldown)
 local PhotoCapture = require(script.Parent.PhotoCapture)
@@ -62,8 +71,14 @@ local function handleShot(player, shotType, origin, direction)
 	end
 
 	local cameraId = CameraStats.GetIdFromTool(cameraTool)
-	-- Server re-derives quality from actual movement state, so a client can't
-	-- just always claim Strong for the bigger payout (see REWARD_SYSTEM.md).
+	-- Server re-derives quality from replicated movement state (MoveDirection/
+	-- AssemblyLinearVelocity/HumanoidState). That downgrades an HONEST client
+	-- that is actually moving -- it does not defeat a MODIFIED client, which
+	-- owns and replicates those same properties and can report stillness while
+	-- moving. Accepted risk, same posture as the client-supplied shot origin
+	-- (REWARD_SYSTEM.md): bounded by the live 8s per-subject repeat cooldown
+	-- (CaptureGuard.CheckRepeatPolicy), not eliminated. A real fix needs a
+	-- server-side displacement sample over time, not a single replicated read.
 	local resolvedQuality = CaptureGuard.ResolveShotQuality(player, shotType, cameraId)
 	local settings = CameraStats.GetShotSettings(cameraId, resolvedQuality)
 
@@ -96,11 +111,24 @@ local function handleShot(player, shotType, origin, direction)
 		return
 	end
 
+	-- Server-derived distance for RULE GATES (MaxMeters/MinMeters), kept
+	-- separate from distanceStuds below on purpose. distanceStuds measures
+	-- from the client-reported origin -- an accepted, documented economy
+	-- risk (REWARD_SYSTEM.md), bounded to +-10 studs by CaptureGuard, that
+	-- only ever shifts a reward BAND by one step. A hard eligibility CUTOFF
+	-- is a different kind of exposure: the same 10-stud slack turned a 15m
+	-- objective gate into an effective 18.33m. headDistanceStuds is measured
+	-- from the server's own Head position, so a rule gate can never be
+	-- widened by a spoofed origin.
+	local head = character and character:FindFirstChild("Head")
+	local headDistanceStuds = head and (head.Position - result.hitPosition).Magnitude
+
 	local rewardContext = {
 		player = player,
 		subject = result.subject,
 		shotQuality = resolvedQuality,
 		distanceStuds = result.distanceStuds,
+		headDistanceStuds = headDistanceStuds,
 		cameraId = cameraId,
 	}
 
